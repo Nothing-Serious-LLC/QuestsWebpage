@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quests · Move With Purpose</title>
+    <meta
+      name="description"
+      content="Quests turns your daily movement into shared adventures. Track progress, stay accountable, and earn rewards with your crew."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page__background"></div>
+    <div class="page__wrapper">
+      <header class="site-header">
+        <div class="site-header__inner">
+          <a class="brand" href="#hero" aria-label="Quests home">
+            <span class="brand__glyph" aria-hidden="true"></span>
+            <span class="brand__name">Quests</span>
+          </a>
+          <a class="download-chip" href="#cta">Download the app</a>
+        </div>
+      </header>
+
+      <main>
+        <section id="hero" class="hero">
+          <div class="hero__quest-cards">
+            <article class="quest-card" data-card="1">
+              <div class="quest-card__bg" style="background-image: url('bg-4.png');"></div>
+              <div class="quest-card__content">
+                <div class="quest-card__icon">
+                  <i class="mdi mdi-skull-crossbones"></i>
+                </div>
+                <h3 class="quest-card__title">75 Hard</h3>
+              </div>
+            </article>
+            <article class="quest-card" data-card="2">
+              <div class="quest-card__bg" style="background-image: url('bg-3.png');"></div>
+              <div class="quest-card__content">
+                <div class="quest-card__icon">
+                  <i class="mdi mdi-heart"></i>
+                </div>
+                <h3 class="quest-card__title">Daily Gratitude</h3>
+              </div>
+            </article>
+            <article class="quest-card" data-card="3">
+              <div class="quest-card__bg" style="background-image: url('bg-2.png');"></div>
+              <div class="quest-card__content">
+                <div class="quest-card__icon">
+                  <i class="mdi mdi-glass-cocktail-off"></i>
+                </div>
+                <h3 class="quest-card__title">Dry January</h3>
+              </div>
+            </article>
+          </div>
+
+          <div class="hero__content">
+            <h1 class="hero__title">Turn habit-building into a shared adventure</h1>
+            <div id="download" class="hero__cta-group">
+              <a class="button button--primary" href="https://apps.apple.com" target="_blank" rel="noreferrer">
+                <span aria-hidden="true" class="button__icon"></span>
+                Download on the App Store
+              </a>
+              <!-- Google Play - Coming Soon -->
+              <!-- <a class="button button--ghost" href="https://play.google.com" target="_blank" rel="noreferrer">
+                <span aria-hidden="true" class="button__icon">▶</span>
+                Get it on Google Play
+              </a> -->
+            </div>
+          </div>
+        </section>
+
+        <section class="intro">
+          <div class="intro__grid">
+            <div class="intro__text-block">
+              <h2 class="intro__heading">Grow together</h2>
+              <p class="intro__description">
+                Quests makes habit-building <strong>social</strong> and <strong>rewarding</strong>. Create a Quest, invite your friends in seconds, and stay accountable with daily check-ins that keep everyone engaged.
+              </p>
+            </div>
+            <div class="intro__visual">
+              <div class="intro__day-count">Day 10 of 30</div>
+              <div class="intro__avatar-group">
+                <div class="intro__avatar intro__avatar--1">
+                  <i class="mdi mdi-account"></i>
+                </div>
+                <div class="intro__avatar intro__avatar--2">
+                  <i class="mdi mdi-account"></i>
+                </div>
+                <div class="intro__avatar intro__avatar--3">
+                  <i class="mdi mdi-account"></i>
+                </div>
+                <div class="intro__avatar intro__avatar--4">
+                  <i class="mdi mdi-account"></i>
+                </div>
+                <div class="intro__avatar intro__avatar--5">
+                  <i class="mdi mdi-account"></i>
+                </div>
+              </div>
+              <div class="intro__check-in-count"><span class="check-in-number">0</span>/5 checked in today</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="why" class="why">
+          <div class="why__grid">
+            <div class="why__visual">
+              <div class="why__stat-display">
+                <p class="why__stat-number"><span class="why__stat-counter">0</span><span class="why__stat-percent">%</span></p>
+                <p class="why__stat-caption">more likely to build a lasting habit with a friend<sup>1</sup></p>
+              </div>
+            </div>
+            <div class="why__text-block">
+              <h2 class="why__heading">Backed&nbsp;by&nbsp;science</h2>
+              <p class="why__description">
+                Studies show that <strong>teaming up with others</strong> dramatically boosts your chances of forming <strong>lasting habits</strong>. Quests is built on this principle of social accountability.
+              </p>
+              <p class="why__footnote"><sup>1</sup> American Society of Training and Development, 2014</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="features" class="features">
+          <div class="features__container">
+            <h2 class="features__heading">Everything you need to build habits together</h2>
+            <div class="features__list">
+              <article class="feature-card feature-card--slide" data-slide="left">
+                <div class="feature-card__icon">
+                  <i class="mdi mdi-fire"></i>
+                </div>
+                <div class="feature-card__content">
+                  <h3 class="feature-card__title">Daily Check-Ins</h3>
+                  <p class="feature-card__text">
+                    Keep your momentum with gentle reminders and progress updates.
+                  </p>
+                </div>
+              </article>
+              <article class="feature-card feature-card--slide" data-slide="right">
+                <div class="feature-card__icon">
+                  <i class="mdi mdi-message-fast"></i>
+                </div>
+                <div class="feature-card__content">
+                  <h3 class="feature-card__title">Instant Invites</h3>
+                  <p class="feature-card__text">
+                    Start a Quest and invite friends in seconds via text.
+                  </p>
+                </div>
+              </article>
+              <article class="feature-card feature-card--slide" data-slide="left">
+                <div class="feature-card__icon">
+                  <i class="mdi mdi-medal"></i>
+                </div>
+                <div class="feature-card__content">
+                  <h3 class="feature-card__title">Earn Points & Badges</h3>
+                  <p class="feature-card__text">
+                    Complete Quests to earn points, collect badges, and unlock rewards.
+                  </p>
+                </div>
+              </article>
+              <article class="feature-card feature-card--slide" data-slide="right">
+                <div class="feature-card__icon">
+                  <i class="mdi mdi-podium"></i>
+                </div>
+                <div class="feature-card__content">
+                  <h3 class="feature-card__title">Climb the Leaderboards</h3>
+                  <p class="feature-card__text">
+                    Compete with friends to see who stays most consistent.
+                  </p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="cta" class="cta">
+          <div class="cta__container">
+            <div class="cta__logo">
+              <svg class="cta__glyph-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <clipPath id="revealClip">
+                    <rect x="0" y="0" width="100" height="0" id="clipRect" />
+                  </clipPath>
+                </defs>
+                <g clip-path="url(#revealClip)">
+                  <image href="logo-glyph.png" width="100" height="100" />
+                </g>
+              </svg>
+            </div>
+            <h2 class="cta__title">Start your first Quest</h2>
+            <a class="button button--primary button--cta" href="https://apps.apple.com" target="_blank" rel="noreferrer">
+              <span aria-hidden="true" class="button__icon"></span>
+              Download on the App Store
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="site-footer__content">
+          <div class="site-footer__brand">
+            <span class="brand__glyph" aria-hidden="true"></span>
+            <span class="brand__name">Quests</span>
+          </div>
+          <div class="site-footer__links">
+            <a href="mailto:hello@thequestsapp.com">Contact</a>
+            <a href="/blog">Blog</a>
+            <a href="mailto:privacy@thequestsapp.com">Privacy</a>
+            <a href="mailto:legal@thequestsapp.com">Terms</a>
+          </div>
+          <div class="site-footer__social">
+            <a href="https://instagram.com/thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <i class="mdi mdi-instagram"></i>
+            </a>
+            <a href="https://tiktok.com/@thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <i class="mdi mdi-music-note"></i>
+            </a>
+            <a href="https://x.com/thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+              <i class="mdi mdi-twitter"></i>
+            </a>
+          </div>
+          <p class="site-footer__meta">© <span id="year"></span> Quests</p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+      
+      // Check-in animation
+      const avatars = document.querySelectorAll('.intro__avatar');
+      const counter = document.querySelector('.check-in-number');
+      let count = 0;
+      let hasAnimated = false;
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !hasAnimated) {
+            hasAnimated = true;
+            avatars.forEach((avatar, index) => {
+              setTimeout(() => {
+                // Turn blue first
+                avatar.classList.add('intro__avatar--checked');
+                
+                // Add pop animation
+                avatar.classList.add('intro__avatar--pop');
+                setTimeout(() => {
+                  avatar.classList.remove('intro__avatar--pop');
+                }, 300);
+                
+                // Update counter
+                count++;
+                counter.textContent = count;
+                
+                // If last avatar, trigger single dramatic wave
+                if (index === 4) {
+                  setTimeout(() => {
+                    avatars.forEach((av, i) => {
+                      setTimeout(() => {
+                        av.classList.add('intro__avatar--wave-jump');
+                        setTimeout(() => {
+                          av.classList.remove('intro__avatar--wave-jump');
+                        }, 400);
+                      }, i * 120);
+                    });
+                  }, 400);
+                }
+              }, (index + 1) * 600);
+            });
+          }
+        });
+      }, { threshold: 0.5 });
+      
+      const introSection = document.querySelector('.intro');
+      if (introSection) {
+        observer.observe(introSection);
+      }
+      
+      // Counter animation for why section
+      const whyCounter = document.querySelector('.why__stat-counter');
+      let hasCountedWhy = false;
+      
+      const whyObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !hasCountedWhy) {
+            hasCountedWhy = true;
+            let currentCount = 0;
+            const targetCount = 65;
+            const duration = 1500; // 1.5 seconds
+            const increment = targetCount / (duration / 16); // 60fps
+            
+            const counterInterval = setInterval(() => {
+              currentCount += increment;
+              if (currentCount >= targetCount) {
+                whyCounter.textContent = targetCount;
+                clearInterval(counterInterval);
+              } else {
+                whyCounter.textContent = Math.floor(currentCount);
+              }
+            }, 16);
+          }
+        });
+      }, { threshold: 0.5 });
+      
+      const whySection = document.querySelector('.why');
+      if (whySection) {
+        whyObserver.observe(whySection);
+      }
+      
+      // Feature cards slide-in animation
+      const featureCards = document.querySelectorAll('.feature-card--slide');
+      
+      const featureObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('feature-card--visible');
+          }
+        });
+      }, { threshold: 0.8, rootMargin: '-120px' });
+      
+      featureCards.forEach(card => {
+        featureObserver.observe(card);
+      });
+      
+      // Smooth scroll for download button
+      document.querySelector('.download-chip')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const ctaElement = document.getElementById('cta');
+        if (!ctaElement) return;
+        
+        const targetPosition = ctaElement.offsetTop - (window.innerHeight * 0.1);
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        const duration = 2000; // 2 seconds for slow, dramatic scroll
+        let start = null;
+        
+        function easeOutCubic(t) {
+          return 1 - Math.pow(1 - t, 3);
+        }
+        
+        function animation(currentTime) {
+          if (start === null) start = currentTime;
+          const timeElapsed = currentTime - start;
+          const progress = Math.min(timeElapsed / duration, 1);
+          const ease = easeOutCubic(progress);
+          
+          window.scrollTo(0, startPosition + (distance * ease));
+          
+          if (timeElapsed < duration) {
+            requestAnimationFrame(animation);
+          }
+        }
+        
+        requestAnimationFrame(animation);
+      });
+      
+      // Logo reveal animation on scroll
+      const ctaSection = document.querySelector('.cta');
+      const clipRect = document.getElementById('clipRect');
+      const ctaGlyph = document.querySelector('.cta__glyph-svg');
+      let logoScrollProgress = 0;
+      let hasCompleted = false;
+      
+      window.addEventListener('scroll', () => {
+        if (!ctaSection || !clipRect || !ctaGlyph) return;
+        
+        const rect = ctaSection.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        
+        // Calculate scroll progress for CTA section
+        // Start revealing when section is well into viewport
+        // Finish when section is well centered
+        const scrollStart = windowHeight * 0.6;
+        const scrollEnd = windowHeight * 0.15;
+        
+        if (rect.top <= scrollStart && rect.top >= scrollEnd) {
+          // Scrolling down - reveal from bottom to top
+          logoScrollProgress = 1 - ((rect.top - scrollEnd) / (scrollStart - scrollEnd));
+        } else if (rect.top > scrollStart) {
+          // Section below viewport - not revealed
+          logoScrollProgress = 0;
+        } else if (rect.top < scrollEnd) {
+          // Section above center - fully revealed
+          logoScrollProgress = 1;
+        }
+        
+        // Update clip-path height (reveal from bottom)
+        const revealHeight = logoScrollProgress * 100;
+        clipRect.setAttribute('y', String(100 - revealHeight));
+        clipRect.setAttribute('height', String(revealHeight));
+      });
+    </script>
+  </body>
+</html>
+
