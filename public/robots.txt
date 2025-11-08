@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://thequestsapp.com/sitemap.xml
