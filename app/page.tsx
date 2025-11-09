@@ -1,253 +1,241 @@
 import Image from 'next/image';
+import Link from 'next/link';
+
+const features = [
+  {
+    title: 'Shared Challenges',
+    description:
+      'Build better habits as a team. Join friends for group Quests and see when everyone checks in so you stay accountable together.',
+    icon: '🤝',
+  },
+  {
+    title: 'Instant Invites',
+    description:
+      'Launch a Quest and invite friends in seconds via text. Getting your crew onboard takes just a couple taps.',
+    icon: '⚡️',
+  },
+  {
+    title: 'Daily Check-Ins & Streaks',
+    description:
+      'Keep momentum with streak tracking, gentle reminders, and daily progress updates that celebrate consistency.',
+    icon: '🔥',
+  },
+  {
+    title: 'Earn Points & Badges',
+    description:
+      'Complete Quests to earn points you can redeem for in-app cosmetics and unlock badges that mark every milestone.',
+    icon: '🏅',
+  },
+  {
+    title: 'Climb the Leaderboards',
+    description:
+      'Friendly competition keeps everyone motivated. See who is out in front and cheer each other on.',
+    icon: '📈',
+  },
+];
+
+const workflow = [
+  {
+    step: '01',
+    title: 'Pick or create your Quest',
+    description:
+      'Choose from curated challenges like "Getting Enlightened" or 75 Hard, or design your own habit journey in seconds.',
+    image: {
+      src: '/screenshots/SC3.png',
+      alt: 'Quest selection screen in the Quests mobile app',
+      width: 692,
+      height: 1500,
+    },
+  },
+  {
+    step: '02',
+    title: 'Invite friends & family',
+    description:
+      'Send instant invites so everyone shows up. Group check-ins, reactions, and shared streaks keep the energy high.',
+    image: {
+      src: '/screenshots/SC5.png',
+      alt: 'Invite friends flow showing contacts and groups',
+      width: 609,
+      height: 1320,
+    },
+  },
+  {
+    step: '03',
+    title: 'Stay on track together',
+    description:
+      'Daily reminders, leaderboards, and progress dashboards turn accountability into a motivating loop you actually enjoy.',
+    image: {
+      src: '/screenshots/SC7.png',
+      alt: 'Progress calendar view with daily check-ins',
+      width: 609,
+      height: 1320,
+    },
+  },
+];
+
+const gallery = [
+  {
+    src: '/screenshots/SC1.png',
+    alt: 'Quests home screen showing active habits and streaks',
+    width: 609,
+    height: 1320,
+  },
+  {
+    src: '/screenshots/SC2.png',
+    alt: 'Quest tiles highlighting community challenges',
+    width: 609,
+    height: 1320,
+  },
+  {
+    src: '/screenshots/SC6.png',
+    alt: 'Points dashboard with rewards and unlocks',
+    width: 692,
+    height: 1500,
+  },
+];
 
 export default function Home() {
   return (
-    <main className="relative overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center gradient-blue overflow-hidden">
-        {/* Animated background circles */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 -left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float delay-200"></div>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 text-center text-white">
-          {/* Logo */}
-          <div className="mb-8 animate-scale-in">
-        <Image
-              src="/logo.png"
-              alt="Quests"
-              width={120}
-              height={120}
-              className="mx-auto rounded-[32px] shadow-2xl"
-          priority
-        />
-          </div>
-
-          <h1 className="text-6xl md:text-8xl font-black mb-6 animate-fade-in-up delay-100">
-            Turn Goals into<br />
-            <span className="bg-gradient-to-r from-yellow-200 to-pink-200 bg-clip-text text-transparent">
-              Shared Adventures
+    <main>
+      <section className="py-20 px-0">
+        <div className="w-[90%] max-w-[1200px] mx-auto grid gap-12 md:grid-cols-[minmax(0,1fr)_minmax(0,360px)] items-center">
+          <div className="space-y-8 fade-in">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[rgba(255,255,255,0.08)] px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-[var(--txt-secondary)]">
+              Habit-building made social
             </span>
-          </h1>
-
-          <p className="text-xl md:text-2xl font-medium mb-12 max-w-3xl mx-auto opacity-95 animate-fade-in-up delay-200">
-            The social habit tracker that makes self-improvement fun. Join friends in daily challenges, earn rewards, and build better habits together.
-          </p>
-
-          {/* Download Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up delay-300">
-            <a
-              href="https://apps.apple.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative px-10 py-5 bg-white text-[#3366CC] rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
-            >
-              <span className="text-3xl">📱</span>
-              <div className="text-left">
-                <div className="text-xs opacity-70">Download on the</div>
-                <div className="text-lg">App Store</div>
-              </div>
-            </a>
-            <a
-              href="https://play.google.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative px-10 py-5 bg-black/20 backdrop-blur-sm text-white rounded-2xl font-bold text-lg border-2 border-white/30 hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
-            >
-              <span className="text-3xl">🤖</span>
-              <div className="text-left">
-                <div className="text-xs opacity-70">Get it on</div>
-                <div className="text-lg">Google Play</div>
-              </div>
-            </a>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-20 grid grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto animate-fade-in-up delay-400">
-            <div>
-              <div className="text-5xl font-black mb-2">65%</div>
-              <div className="text-sm opacity-90">More likely to succeed<br />with a friend</div>
-            </div>
-            <div>
-              <div className="text-5xl font-black mb-2">95%</div>
-              <div className="text-sm opacity-90">Success rate with<br />regular check-ins</div>
-            </div>
-            <div className="col-span-2 md:col-span-1">
-              <div className="text-5xl font-black mb-2">1M+</div>
-              <div className="text-sm opacity-90">Quests completed<br />together</div>
-            </div>
-          </div>
-
-          {/* Scroll indicator */}
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-            <svg className="w-6 h-6 text-white/60" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-              <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-            </svg>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-5xl md:text-6xl font-black text-center mb-6">
-            Simple. Social. Rewarding.
-          </h2>
-          <p className="text-xl text-gray-600 text-center mb-20 max-w-2xl mx-auto">
-            Three steps to building better habits with your crew
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Step 1 */}
-            <div className="text-center group">
-              <div className="mb-8 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-[40px] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <Image
-                  src="/screenshots/SC3.png"
-                  alt="Choose your quest"
-                  width={300}
-                  height={650}
-                  className="mx-auto rounded-[40px] shadow-2xl relative transform group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white font-bold text-xl mb-4">1</div>
-              <h3 className="text-2xl font-bold mb-3">Pick Your Quest</h3>
-              <p className="text-gray-600">
-                Choose from challenges like 75 Hard, Dry January, or create your own custom goal
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center group">
-              <div className="mb-8 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-[40px] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <Image
-                  src="/screenshots/SC5.png"
-                  alt="Invite friends"
-                  width={300}
-                  height={650}
-                  className="mx-auto rounded-[40px] shadow-2xl relative transform group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-white font-bold text-xl mb-4">2</div>
-              <h3 className="text-2xl font-bold mb-3">Invite Your Crew</h3>
-              <p className="text-gray-600">
-                Send instant invites to friends and family. Accountability is more fun together
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center group">
-              <div className="mb-8 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-400 rounded-[40px] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <Image
-                  src="/screenshots/SC7.png"
-                  alt="Track progress"
-                  width={300}
-                  height={650}
-                  className="mx-auto rounded-[40px] shadow-2xl relative transform group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 text-white font-bold text-xl mb-4">3</div>
-              <h3 className="text-2xl font-bold mb-3">Stay On Track</h3>
-              <p className="text-gray-600">
-                Daily check-ins, streaks, and leaderboards keep everyone motivated
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-32 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-5xl md:text-6xl font-black text-center mb-20">
-            Everything You Need to Succeed
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="text-5xl mb-4">🏆</div>
-              <h3 className="text-3xl font-bold mb-4">Earn Rewards</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Complete Quests to unlock badges, earn points, and redeem exclusive in-app cosmetics. Every milestone deserves celebration.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="text-5xl mb-4">🔥</div>
-              <h3 className="text-3xl font-bold mb-4">Build Streaks</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Daily check-ins keep your momentum going. Watch your streak grow and maintain consistency with gentle reminders.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="text-5xl mb-4">📊</div>
-              <h3 className="text-3xl font-bold mb-4">Climb Leaderboards</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Friendly competition keeps everyone engaged. See who&apos;s leading and cheer each other on to the finish line.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-shadow">
-              <div className="text-5xl mb-4">💬</div>
-              <h3 className="text-3xl font-bold mb-4">Stay Connected</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                React to updates, share encouragement, and celebrate wins together. Real-time engagement makes the journey fun.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Section */}
-      <section className="py-32 gradient-purple text-white">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h2 className="text-5xl md:text-6xl font-black mb-6">
-            Powered by Science
-          </h2>
-          <p className="text-2xl opacity-95 mb-12 leading-relaxed">
-            Studies show that teaming up with others dramatically boosts your chances of forming lasting habits. Quests is built on this principle of social accountability.
-          </p>
-          <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
-            <p className="text-lg opacity-90 italic">
-              &ldquo;Committing to a goal with a friend makes you 65% more likely to succeed. Setting regular check-ins can raise your success rate to as high as 95%&rdquo;
+            <h1 className="text-[clamp(2.75rem,5vw,4.25rem)] font-bold leading-tight text-[var(--txt)] fade-in-up">
+              Turn self-improvement into a shared adventure.
+            </h1>
+            <p className="text-lg md:text-xl text-[var(--txt-secondary)] max-w-[680px] leading-relaxed fade-in-up">
+              Quests is the only habit tracking app purpose-built for accountability. Select or create a Quest, meditate for 30 days, conquer 75 Hard, or crush Dry January, and bring friends along for the journey. Daily check-ins, shared streaks, and real-time encouragement keep everyone engaged.
             </p>
-            <p className="text-sm opacity-75 mt-4">
-              — American Society of Training and Development, 2014
+            <p className="text-lg text-[var(--txt-secondary)] leading-relaxed fade-in-up">
+              Start your first Quest today and grow together. Earn points, unlock badges, and climb the leaderboard as a team.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 fade-in-up">
+              <a
+                href="https://apps.apple.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 rounded-xl bg-[var(--accent)] px-6 py-3 font-semibold text-white shadow-[var(--shadow-md)] transition-transform duration-[var(--transition-base)] hover:-translate-y-0.5 hover:bg-[var(--accent-hover)]"
+              >
+                <span>Download on the App Store</span>
+              </a>
+              <a
+                href="https://play.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 rounded-xl border border-[rgba(255,255,255,0.24)] px-6 py-3 font-semibold text-[var(--txt)] transition-all duration-[var(--transition-base)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              >
+                <span>Get it on Google Play</span>
+              </a>
+              <Link
+                href="/#features"
+                className="inline-flex items-center gap-2 text-[var(--accent)] font-semibold transition-colors duration-[var(--transition-fast)] hover:text-[var(--accent-hover)]"
+              >
+                See features →
+              </Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 rounded-3xl bg-[rgba(10,17,40,0.6)] p-6 shadow-[var(--shadow-lg)] backdrop-blur">
+              <div>
+                <p className="text-4xl font-bold text-white">65%</p>
+                <p className="text-sm text-[var(--txt-secondary)]">More likely to succeed when you commit with a friend.</p>
+              </div>
+              <div>
+                <p className="text-4xl font-bold text-white">95%</p>
+                <p className="text-sm text-[var(--txt-secondary)]">Success rate when you schedule regular accountability check-ins.</p>
+              </div>
+              <div className="sm:col-span-2 lg:col-span-1">
+                <p className="text-sm text-[var(--txt-secondary)]">
+                  Source: ASTD 2014 study on accountability and goal achievement - the foundation of the Quests system.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="relative flex justify-center md:justify-end fade-in-up">
+            <div className="relative w-full max-w-[360px]">
+              <div className="absolute inset-0 -translate-x-6 translate-y-6 rounded-[32px] bg-[linear-gradient(135deg,rgba(92,133,214,0.35),rgba(51,102,204,0.15))] blur-3xl" />
+              <Image
+                src="/screenshots/SC1.png"
+                alt="Quests mobile app home screen"
+                width={609}
+                height={1320}
+                priority
+                className="relative rounded-[32px] border border-[rgba(255,255,255,0.12)] shadow-[0_25px_60px_rgba(11,21,56,0.55)]"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" className="py-20 bg-[rgba(10,17,40,0.55)]">
+        <div className="w-[90%] max-w-[1200px] mx-auto">
+          <div className="mb-14 flex flex-col gap-4 text-center">
+            <h2 className="text-4xl font-semibold text-white">Built for social accountability</h2>
+            <p className="mx-auto max-w-[760px] text-lg text-[var(--txt-secondary)]">
+              Everything in Quests is intentionally crafted to help groups stay motivated, from instant invites to the points economy that rewards your progress.
             </p>
           </div>
+          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            {features.map((feature) => (
+              <div
+                key={feature.title}
+                className="flex h-full flex-col gap-4 rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[var(--card)] p-8 shadow-[var(--shadow-lg)] transition-transform duration-[var(--transition-base)] hover:-translate-y-1"
+              >
+                <span className="text-4xl" aria-hidden>{feature.icon}</span>
+                <h3 className="text-2xl font-semibold text-white">{feature.title}</h3>
+                <p className="text-[var(--txt-secondary)] leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Screenshot Gallery */}
-      <section className="py-32 bg-black text-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-5xl md:text-6xl font-black text-center mb-20">
-            See It In Action
-          </h2>
+      <section className="py-20">
+        <div className="w-[90%] max-w-[1200px] mx-auto grid gap-10 md:grid-cols-3">
+          {gallery.map((shot) => (
+            <div
+              key={shot.src}
+              className="relative rounded-[32px] border border-[rgba(255,255,255,0.1)] bg-[rgba(10,17,40,0.55)] p-4 shadow-[0_20px_50px_rgba(11,21,56,0.45)]"
+            >
+              <Image
+                src={shot.src}
+                alt={shot.alt}
+                width={shot.width}
+                height={shot.height}
+                className="rounded-[24px]"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { src: '/screenshots/SC1.png', alt: 'Home screen' },
-              { src: '/screenshots/SC2.png', alt: 'Quest details' },
-              { src: '/screenshots/SC6.png', alt: 'Points and badges' },
-            ].map((screenshot, idx) => (
-              <div key={idx} className="group">
-                <div className="relative overflow-hidden rounded-[40px]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 group-hover:opacity-0 transition-opacity"></div>
+      <section className="py-20 bg-[rgba(10,17,40,0.65)]">
+        <div className="w-[90%] max-w-[1200px] mx-auto">
+          <div className="mb-16 flex flex-col gap-4 text-center">
+            <h2 className="text-4xl font-semibold text-white">How Quests keeps you moving</h2>
+            <p className="mx-auto max-w-[760px] text-lg text-[var(--txt-secondary)]">
+              Three simple moments power the experience: a shared commitment, effortless invites, and ongoing check-ins that make accountability automatic.
+            </p>
+          </div>
+          <div className="grid gap-12 lg:grid-cols-3">
+            {workflow.map((item) => (
+              <div
+                key={item.title}
+                className="flex flex-col gap-6 rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[var(--card)] p-8 shadow-[var(--shadow-lg)]"
+              >
+                <span className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--txt-secondary)]">
+                  {item.step}
+                </span>
+                <h3 className="text-2xl font-semibold text-white">{item.title}</h3>
+                <p className="text-[var(--txt-secondary)] leading-relaxed">{item.description}</p>
+                <div className="relative overflow-hidden rounded-[24px] border border-[rgba(255,255,255,0.12)]">
                   <Image
-                    src={screenshot.src}
-                    alt={screenshot.alt}
-                    width={400}
-                    height={866}
-                    className="w-full h-auto transform group-hover:scale-105 transition-transform duration-700"
+                    src={item.image.src}
+                    alt={item.image.alt}
+                    width={item.image.width}
+                    height={item.image.height}
+                    className="rounded-[24px]"
                   />
                 </div>
               </div>
@@ -256,62 +244,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white relative overflow-hidden">
-        {/* Background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-5xl md:text-7xl font-black mb-8">
-            Ready to Start Your Journey?
-          </h2>
-          <p className="text-2xl mb-12 opacity-95">
-            Download Quests today and turn your goals into shared adventures
+      <section id="download" className="py-20">
+        <div className="w-[90%] max-w-[1100px] mx-auto rounded-[40px] bg-[linear-gradient(135deg,#5C85D6,#3366CC)] px-10 py-16 text-center shadow-[0_25px_60px_rgba(24,56,140,0.55)]">
+          <h2 className="text-4xl font-semibold text-white">Ready to start your first Quest?</h2>
+          <p className="mt-4 text-lg text-white/80">
+            Download Quests to turn your goals into a group adventure. Earn rewards, stay accountable, and celebrate progress together.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
               href="https://apps.apple.com"
-            target="_blank"
-            rel="noopener noreferrer"
-              className="px-12 py-6 bg-white text-purple-600 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-300"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 rounded-xl bg-white px-6 py-3 font-semibold text-[var(--accent)] transition-transform duration-[var(--transition-base)] hover:-translate-y-0.5"
             >
-              📱 Download for iOS
-          </a>
-          <a
+              <span>App Store</span>
+            </a>
+            <a
               href="https://play.google.com"
-            target="_blank"
-            rel="noopener noreferrer"
-              className="px-12 py-6 bg-black/30 backdrop-blur-sm text-white rounded-2xl font-bold text-xl border-2 border-white/40 hover:bg-white/10 hover:-translate-y-2 transition-all duration-300"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 rounded-xl border border-white/60 px-6 py-3 font-semibold text-white transition-transform duration-[var(--transition-base)] hover:-translate-y-0.5 hover:bg-white/10"
             >
-              🤖 Download for Android
+              <span>Google Play</span>
             </a>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-semibold text-white transition-transform duration-[var(--transition-base)] hover:-translate-y-0.5 hover:bg-white/10"
+            >
+              Talk with us →
+            </Link>
           </div>
-
-          {/* Footer Links */}
-          <div className="flex flex-wrap justify-center gap-8 text-sm opacity-80">
-            <a href="mailto:hello@thequestsapp.com" className="hover:opacity-100 transition-opacity">
-              Contact
-            </a>
-            <span>·</span>
-            <a href="mailto:privacy@thequestsapp.com" className="hover:opacity-100 transition-opacity">
-              Privacy
-            </a>
-            <span>·</span>
-            <a href="mailto:legal@thequestsapp.com" className="hover:opacity-100 transition-opacity">
-              Terms
-            </a>
-          </div>
-
-          <p className="mt-8 text-sm opacity-60">
-            © {new Date().getFullYear()} Quests App. Built with ❤️ by Nothing Serious LLC.
-          </p>
         </div>
       </section>
-      </main>
+    </main>
   );
 }
-

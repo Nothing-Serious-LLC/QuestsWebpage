@@ -1,28 +1,30 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://thequestsapp.com"),
-  title: "Quests - Turn Goals into Shared Adventures",
-  description: "The social habit tracker that makes self-improvement fun. Join friends in daily challenges, earn rewards, and build better habits together.",
+  title: "Quests - Social Wellness Challenge App",
+  description: "The social-wellness challenge app. Challenge yourself. Improve together. Join friends in daily wellness challenges and build better habits.",
   openGraph: {
     type: "website",
     url: "https://thequestsapp.com/",
-    title: "Quests - Turn Goals into Shared Adventures",
-    description: "The social habit tracker that makes self-improvement fun.",
+    title: "Quests - Social Wellness Challenge App",
+    description: "The social-wellness challenge app. Challenge yourself. Improve together.",
     images: [
       {
         url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Quests App",
+        width: 692,
+        height: 1500,
+        alt: "Quests App social preview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quests - Turn Goals into Shared Adventures",
-    description: "The social habit tracker that makes self-improvement fun.",
+    title: "Quests - Social Wellness Challenge App",
+    description: "The social-wellness challenge app. Challenge yourself. Improve together.",
     images: ["/og-image.png"],
   },
   icons: {
@@ -36,9 +38,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#3366CC",
-  width: "device-width",
-  initialScale: 1,
+  themeColor: "#3354ff",
 };
 
 export default function RootLayout({
@@ -47,9 +47,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
       <body className="antialiased">
+        <Navigation />
         {children}
+        <Footer />
       </body>
     </html>
   );
