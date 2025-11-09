@@ -34,6 +34,91 @@
     <meta name="theme-color" content="#0d1f3a" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Quests",
+      "url": "https://thequestsapp.com",
+      "logo": "https://thequestsapp.com/icon.png",
+      "description": "Quests makes self-improvement social, fun, and rewarding. Join friends for daily check-ins, earn badges, and build lasting habits together.",
+      "sameAs": [
+        "https://www.instagram.com/thequestsapp",
+        "https://twitter.com/thequestsapp",
+        "https://www.tiktok.com/@thequestsapp"
+      ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MobileApplication",
+      "name": "Quests",
+      "operatingSystem": "iOS, Android",
+      "applicationCategory": "HealthApplication",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1200"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": "Turn habit-building into a shared adventure. Build lasting habits with friends through daily check-ins, social accountability, and friendly competition. 65% more likely to succeed with a friend."
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Quests",
+      "url": "https://thequestsapp.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://thequestsapp.com/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does social accountability help build habits?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Studies show that teaming up with others dramatically boosts your chances of forming lasting habits by 65%. Quests is built on this principle of social accountability, allowing you to join friends for daily check-ins and track progress together."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a Quest?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A Quest is a shared habit-building challenge you can join with friends. Popular quests include 75 Hard, Dry January, reading challenges, and custom habits. Each quest includes daily check-ins, progress tracking, and social features to keep you accountable."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Quests free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Quests is free to download and use. Join friends, track habits, and build streaks together at no cost."
+          }
+        }
+      ]
+    }
+    </script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -47,7 +132,6 @@
         <div class="site-header__inner">
           <a class="brand" href="#hero" aria-label="Quests home">
             <span class="brand__glyph" aria-hidden="true"></span>
-            <span class="brand__name">Quests</span>
           </a>
           <a class="download-chip" href="#cta">Download the app</a>
         </div>
@@ -56,29 +140,29 @@
       <main>
         <section id="hero" class="hero">
           <div class="hero__quest-cards">
-            <article class="quest-card" data-card="1">
-              <div class="quest-card__bg" style="background-image: url('bg-4.png');"></div>
+            <article class="quest-card" data-card="1" role="article" aria-label="75 Hard challenge quest">
+              <div class="quest-card__bg" style="background-image: url('bg-4.png');" role="img" aria-label="75 Hard quest background"></div>
               <div class="quest-card__content">
-                <div class="quest-card__icon">
-                  <i class="mdi mdi-skull-crossbones"></i>
+                <div class="quest-card__icon" role="img" aria-label="Skull icon for 75 Hard challenge">
+                  <i class="mdi mdi-skull-crossbones" aria-hidden="true"></i>
                 </div>
                 <h3 class="quest-card__title">75 Hard</h3>
               </div>
             </article>
-            <article class="quest-card" data-card="2">
-              <div class="quest-card__bg" style="background-image: url('bg-3.png');"></div>
+            <article class="quest-card" data-card="2" role="article" aria-label="Daily Gratitude quest">
+              <div class="quest-card__bg" style="background-image: url('bg-3.png');" role="img" aria-label="Daily Gratitude quest background"></div>
               <div class="quest-card__content">
-                <div class="quest-card__icon">
-                  <i class="mdi mdi-heart"></i>
+                <div class="quest-card__icon" role="img" aria-label="Heart icon for gratitude practice">
+                  <i class="mdi mdi-heart" aria-hidden="true"></i>
                 </div>
                 <h3 class="quest-card__title">Daily Gratitude</h3>
               </div>
             </article>
-            <article class="quest-card" data-card="3">
-              <div class="quest-card__bg" style="background-image: url('bg-2.png');"></div>
+            <article class="quest-card" data-card="3" role="article" aria-label="Dry January quest">
+              <div class="quest-card__bg" style="background-image: url('bg-2.png');" role="img" aria-label="Dry January quest background"></div>
               <div class="quest-card__content">
-                <div class="quest-card__icon">
-                  <i class="mdi mdi-glass-cocktail-off"></i>
+                <div class="quest-card__icon" role="img" aria-label="No alcohol icon for Dry January">
+                  <i class="mdi mdi-glass-cocktail-off" aria-hidden="true"></i>
                 </div>
                 <h3 class="quest-card__title">Dry January</h3>
               </div>
@@ -110,25 +194,25 @@
               </p>
             </div>
             <div class="intro__visual">
-              <div class="intro__day-count">Day 10 of 30</div>
-              <div class="intro__avatar-group">
-                <div class="intro__avatar intro__avatar--1">
-                  <i class="mdi mdi-account"></i>
+              <div class="intro__day-count" role="status" aria-label="Progress tracker">Day 10 of 30</div>
+              <div class="intro__avatar-group" role="group" aria-label="Friend avatars showing daily check-in status">
+                <div class="intro__avatar intro__avatar--1" role="img" aria-label="Friend 1 avatar">
+                  <i class="mdi mdi-account" aria-hidden="true"></i>
                 </div>
-                <div class="intro__avatar intro__avatar--2">
-                  <i class="mdi mdi-account"></i>
+                <div class="intro__avatar intro__avatar--2" role="img" aria-label="Friend 2 avatar">
+                  <i class="mdi mdi-account" aria-hidden="true"></i>
                 </div>
-                <div class="intro__avatar intro__avatar--3">
-                  <i class="mdi mdi-account"></i>
+                <div class="intro__avatar intro__avatar--3" role="img" aria-label="Friend 3 avatar">
+                  <i class="mdi mdi-account" aria-hidden="true"></i>
                 </div>
-                <div class="intro__avatar intro__avatar--4">
-                  <i class="mdi mdi-account"></i>
+                <div class="intro__avatar intro__avatar--4" role="img" aria-label="Friend 4 avatar">
+                  <i class="mdi mdi-account" aria-hidden="true"></i>
                 </div>
-                <div class="intro__avatar intro__avatar--5">
-                  <i class="mdi mdi-account"></i>
+                <div class="intro__avatar intro__avatar--5" role="img" aria-label="Friend 5 avatar">
+                  <i class="mdi mdi-account" aria-hidden="true"></i>
                 </div>
               </div>
-              <div class="intro__check-in-count"><span class="check-in-number">0</span>/5 checked in today</div>
+              <div class="intro__check-in-count" role="status" aria-live="polite"><span class="check-in-number">0</span>/5 checked in today</div>
             </div>
           </div>
         </section>
@@ -157,8 +241,8 @@
             <h2 class="features__heading">Everything you need to build habits together</h2>
             <div class="features__list">
               <article class="feature-card feature-card--slide" data-slide="left">
-                <div class="feature-card__icon">
-                  <i class="mdi mdi-fire"></i>
+                <div class="feature-card__icon" role="img" aria-label="Fire icon representing daily streak tracking">
+                  <i class="mdi mdi-fire" aria-hidden="true"></i>
                 </div>
                 <div class="feature-card__content">
                   <h3 class="feature-card__title">Daily Check-Ins</h3>
@@ -168,8 +252,8 @@
                 </div>
               </article>
               <article class="feature-card feature-card--slide" data-slide="right">
-                <div class="feature-card__icon">
-                  <i class="mdi mdi-message-fast"></i>
+                <div class="feature-card__icon" role="img" aria-label="Message icon representing instant friend invitations">
+                  <i class="mdi mdi-message-fast" aria-hidden="true"></i>
                 </div>
                 <div class="feature-card__content">
                   <h3 class="feature-card__title">Instant Invites</h3>
@@ -179,8 +263,8 @@
                 </div>
               </article>
               <article class="feature-card feature-card--slide" data-slide="left">
-                <div class="feature-card__icon">
-                  <i class="mdi mdi-medal"></i>
+                <div class="feature-card__icon" role="img" aria-label="Medal icon representing achievement rewards">
+                  <i class="mdi mdi-medal" aria-hidden="true"></i>
                 </div>
                 <div class="feature-card__content">
                   <h3 class="feature-card__title">Earn Points & Badges</h3>
@@ -190,8 +274,8 @@
                 </div>
               </article>
               <article class="feature-card feature-card--slide" data-slide="right">
-                <div class="feature-card__icon">
-                  <i class="mdi mdi-podium"></i>
+                <div class="feature-card__icon" role="img" aria-label="Podium icon representing competitive leaderboards">
+                  <i class="mdi mdi-podium" aria-hidden="true"></i>
                 </div>
                 <div class="feature-card__content">
                   <h3 class="feature-card__title">Climb the Leaderboards</h3>
@@ -207,14 +291,15 @@
         <section id="cta" class="cta">
           <div class="cta__container">
             <div class="cta__logo">
-              <svg class="cta__glyph-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <svg class="cta__glyph-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Quests app logo">
+                <title>Quests Logo</title>
                 <defs>
                   <clipPath id="revealClip">
                     <rect x="0" y="0" width="100" height="0" id="clipRect" />
                   </clipPath>
                 </defs>
                 <g clip-path="url(#revealClip)">
-                  <image href="logo-glyph.png" width="100" height="100" />
+                  <image href="logo-glyph.png" width="100" height="100" alt="Quests logo icon" />
                 </g>
               </svg>
             </div>
