@@ -30,6 +30,10 @@
     <link rel="icon" type="image/png" href="icon.png" />
     <link rel="apple-touch-icon" href="icon.png" />
     
+    <!-- Theme color for mobile browsers -->
+    <meta name="theme-color" content="#0d1f3a" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -135,6 +139,7 @@
               <div class="why__stat-display">
                 <p class="why__stat-number"><span class="why__stat-counter">0</span><span class="why__stat-percent">%</span></p>
                 <p class="why__stat-caption">more likely to build a lasting habit with a friend<sup>1</sup></p>
+                <p class="why__mobile-text">Studies show that teaming up with a <strong>friend</strong> increases your chance of forming <strong>lasting habits</strong> by 65%. Quests is built on this principle of <strong>social accountability</strong>.<sup>1</sup></p>
               </div>
             </div>
             <div class="why__text-block">
@@ -336,13 +341,19 @@
       // Feature cards slide-in animation
       const featureCards = document.querySelectorAll('.feature-card--slide');
       
+      // Adjust threshold based on screen size
+      const isMobile = window.innerWidth <= 640;
+      const observerOptions = isMobile 
+        ? { threshold: 0.3, rootMargin: '-40px' }
+        : { threshold: 0.8, rootMargin: '-120px' };
+      
       const featureObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add('feature-card--visible');
           }
         });
-      }, { threshold: 0.8, rootMargin: '-120px' });
+      }, observerOptions);
       
       featureCards.forEach(card => {
         featureObserver.observe(card);
@@ -351,6 +362,7 @@
       // Smooth scroll for download button
       document.querySelector('.download-chip')?.addEventListener('click', (e) => {
         e.preventDefault();
+        e.target.blur(); // Remove focus immediately after click
         const ctaElement = document.getElementById('cta');
         if (!ctaElement) return;
         

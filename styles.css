@@ -143,6 +143,8 @@ main > section {
   letter-spacing: 0.22em;
   transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
   box-shadow: var(--shadow-sm);
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .download-chip:hover,
@@ -151,6 +153,10 @@ main > section {
   border-color: var(--accent);
   box-shadow: 0 18px 42px -22px rgba(4, 16, 42, 0.7);
   transform: translateY(-2px);
+}
+
+.download-chip:active {
+  transform: translateY(0);
 }
 
 .hero {
@@ -893,6 +899,10 @@ main > section {
   margin-left: 4px;
 }
 
+.why__mobile-text {
+  display: none;
+}
+
 .why__stat-caption {
   margin: 0;
   font-size: clamp(1.15rem, 2vw, 1.4rem);
@@ -1402,11 +1412,38 @@ main > section {
   }
 
   .site-header {
-    padding: 16px 16px;
+    padding: 12px 16px;
+    background: transparent;
   }
 
   .site-header__inner {
     justify-content: space-between;
+  }
+  
+  .brand__glyph {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .brand__name {
+    font-size: 1rem;
+  }
+  
+  .download-chip {
+    padding: 8px 14px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+  
+  .download-chip:focus {
+    background: var(--surface-medium);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
+    transform: none;
+  }
+  
+  .download-chip:active {
+    background: var(--surface-medium);
   }
 
   .hero__benefit {
@@ -1421,4 +1458,291 @@ main > section {
     flex-direction: column;
     text-align: center;
   }
+  
+  /* Hero section mobile optimizations */
+  .hero {
+    padding-top: 20px;
+    padding-bottom: 140px;
+    gap: 32px;
+    min-height: auto;
+    justify-content: flex-start;
+  }
+  
+  .hero__quest-cards {
+    width: min(300px, 88vw);
+    height: 180px;
+    margin-bottom: 16px;
+    margin-top: 0;
+  }
+  
+  .hero__content {
+    margin-top: 0;
+    padding: 0 20px;
+  }
+  
+  .quest-card {
+    height: 180px;
+  }
+  
+  .quest-card__icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .quest-card__icon i {
+    font-size: 28px;
+  }
+  
+  .quest-card__title {
+    font-size: 15px;
+  }
+  
+  .hero__title {
+    font-size: clamp(1.75rem, 6.5vw, 2.1rem);
+    margin-bottom: 20px;
+  }
+  
+  .button--cta {
+    padding: 18px 36px;
+    font-size: 17px;
+    width: 100%;
+  }
+  
+  /* Intro section mobile optimizations */
+  .intro {
+    padding-top: 80px;
+    padding-bottom: 40px;
+    min-height: auto;
+  }
+  
+  .intro__grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .intro__visual {
+    order: -1;
+    margin-bottom: 48px;
+    gap: 8px;
+  }
+  
+  .intro__text-block {
+    order: 1;
+    text-align: center;
+    padding: 0 20px;
+  }
+  
+  .intro__heading,
+  .why__heading,
+  .features__heading {
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    margin-bottom: 16px;
+  }
+  
+  .intro__description,
+  .why__description {
+    font-size: clamp(1rem, 4vw, 1.15rem);
+  }
+  
+  .intro__avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 32px;
+  }
+  
+  .intro__avatar--2,
+  .intro__avatar--3,
+  .intro__avatar--4,
+  .intro__avatar--5 {
+    margin-left: -20px;
+  }
+  
+  .intro__day-count {
+    font-size: 13px;
+    padding: 8px 18px;
+  }
+  
+  .intro__avatar-group {
+    margin-bottom: 20px;
+  }
+  
+  .intro__check-in-count {
+    font-size: 12px;
+  }
+  
+  /* Why section mobile optimizations */
+  .why {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+  
+  .why__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .why__visual {
+    order: -1;
+  }
+  
+  .why__text-block {
+    order: 1;
+    text-align: center;
+    padding: 0 20px;
+  }
+  
+  .why__heading {
+    display: none;
+  }
+  
+  .why__stat-number {
+    font-size: clamp(5rem, 18vw, 7rem);
+    margin-bottom: 20px;
+  }
+  
+  .why__stat-caption {
+    display: none;
+  }
+  
+  .why__stat-number {
+    margin-bottom: 32px;
+  }
+  
+  .why__mobile-text {
+    display: block;
+    font-size: clamp(1.05rem, 4.5vw, 1.25rem);
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin: 32px 0 0;
+    font-weight: 400;
+  }
+  
+  .why__mobile-text strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+  
+  .why__mobile-text sup {
+    color: var(--accent-light);
+    font-weight: 700;
+    font-size: 0.7em;
+    margin-left: 2px;
+  }
+  
+  .why__description {
+    display: none;
+  }
+  
+  .why__text-block {
+    display: none;
+  }
+  
+  .why__footnote {
+    margin-top: 8px;
+    font-size: 9px;
+    opacity: 0.5;
+    text-align: center;
+  }
+  
+  .site-footer__meta::after {
+    content: '¹ American Society of Training and Development, 2014';
+    display: block;
+    font-size: 9px;
+    color: var(--text-soft);
+    opacity: 0.5;
+    text-align: center;
+    margin-top: 8px;
+  }
+  
+  /* Features section mobile optimizations */
+  .features {
+    padding-top: 40px;
+    padding-bottom: 60px;
+  }
+  
+  .features__heading {
+    margin-bottom: 32px;
+    font-size: clamp(2rem, 7.5vw, 2.5rem);
+    padding: 0 8px;
+  }
+  
+  .features__list {
+    gap: 16px;
+    padding: 0 8px;
+  }
+  
+  .feature-card {
+    padding: 20px;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    text-align: left;
+    gap: 20px;
+  }
+  
+  .feature-card__content {
+    order: 2;
+  }
+  
+  .feature-card__icon {
+    order: 1;
+    width: 60px;
+    height: 60px;
+    margin: 0;
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+  }
+  
+  .feature-card__icon i {
+    font-size: 32px;
+  }
+  
+  .feature-card__title {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .feature-card__text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  
+  /* CTA section mobile optimizations */
+  .cta__glyph-svg {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .cta__title {
+    font-size: clamp(2.25rem, 8vw, 2.75rem);
+  }
+  
+  /* Footer mobile optimizations */
+  .site-footer__links {
+    gap: 16px;
+    font-size: 11px;
+  }
+  
+  .site-footer__social {
+    gap: 16px;
+  }
+  
+  .site-footer__social a {
+    width: 38px;
+    height: 38px;
+  }
+  
+  .site-footer__social i {
+    font-size: 18px;
+  }
+  
+  .site-footer__social svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .site-footer__meta {
+    font-size: 11px;
+  }
 }
+
