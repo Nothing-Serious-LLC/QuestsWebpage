@@ -5,13 +5,13 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://thequestsapp.com"),
-  title: "Quests - Social Wellness Challenge App",
-  description: "The social-wellness challenge app. Challenge yourself. Improve together. Join friends in daily wellness challenges and build better habits.",
+  title: "Quests - Group Challenges",
+  description: "Build habits with friends. Join group challenges, check in daily, and build lasting habits together.",
   openGraph: {
     type: "website",
     url: "https://thequestsapp.com/",
-    title: "Quests - Social Wellness Challenge App",
-    description: "The social-wellness challenge app. Challenge yourself. Improve together.",
+    title: "Quests - Group Challenges",
+    description: "Build habits with friends. Join group challenges and build lasting habits together.",
     images: [
       {
         url: "/og-image.png",
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quests - Social Wellness Challenge App",
-    description: "The social-wellness challenge app. Challenge yourself. Improve together.",
+    title: "Quests - Group Challenges",
+    description: "Build habits with friends. Join group challenges and build lasting habits together.",
     images: ["/og-image.png"],
   },
   icons: {
