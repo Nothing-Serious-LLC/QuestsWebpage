@@ -279,7 +279,18 @@
         }
       })();
 
-      // Direct link - no JavaScript needed for Wallet passes
+      // iOS Safari Wallet pass handling
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        // On iOS, Wallet passes should open automatically when tapped
+        // Make sure the link goes directly to the .pkpass file
+        const walletLink = document.querySelector('a[href*=".pkpass"]');
+        if (walletLink) {
+          walletLink.addEventListener('click', function(e) {
+            // Let iOS handle it natively
+            // Don't prevent default - iOS will open Wallet
+          });
+        }
+      }
     </script>
   </body>
 </html>
