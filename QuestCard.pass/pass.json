@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "pass.com.thequestsapp.questcard",
+  "serialNumber": "quest-card-001",
+  "teamIdentifier": "YAJG48SHDF",
+  "organizationName": "Nothing Serious LLC",
+  "description": "Quest Card - Download the Quests app",
+  "logoText": "QUESTS",
+  "foregroundColor": "rgb(255, 255, 255)",
+  "backgroundColor": "rgb(13, 31, 58)",
+  "labelColor": "rgb(200, 200, 200)",
+  "generic": {
+    "backFields": [
+      {
+        "key": "description",
+        "label": "About Quests",
+        "value": "Turn your health goals into shared challenges. Join friends for daily check-ins, earn badges, and build lasting habits together."
+      },
+      {
+        "key": "appstore",
+        "label": "Download App",
+        "value": "Scan the QR code to download: https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553"
+      },
+      {
+        "key": "share",
+        "label": "Share This Card",
+        "value": "Open this pass in Wallet, tap the (i) icon, then tap 'Share Pass' to send via AirDrop or Messages."
+      }
+    ]
+  },
+  "barcode": {
+    "message": "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553",
+    "format": "PKBarcodeFormatQR",
+    "messageEncoding": "iso-8859-1",
+    "altText": "Scan to download Quests app"
+  },
+  "associatedStoreIdentifiers": [6745767553]
+}
