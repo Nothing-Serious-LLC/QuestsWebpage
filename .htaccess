@@ -1,0 +1,2 @@
+# Apple Wallet Pass MIME type
+AddType application/vnd.apple.pkpass .pkpass
