@@ -10,6 +10,9 @@
   "backgroundColor": "rgb(13, 31, 58)",
   "labelColor": "rgb(200, 200, 200)",
   "generic": {
+    "primaryFields": [],
+    "secondaryFields": [],
+    "auxiliaryFields": [],
     "backFields": [
       {
         "key": "description",

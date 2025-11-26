@@ -221,10 +221,10 @@
               </div>
             </div>
 
-            <button id="download-pass" class="download-button" onclick="downloadPass()">
+            <a href="/QuestCard.pkpass" class="download-button" style="text-decoration: none; display: flex;">
               <i class="mdi mdi-wallet" style="font-size: 20px;"></i>
               <span>Add to Apple Wallet</span>
-            </button>
+            </a>
 
           </div>
         </div>
@@ -277,16 +277,7 @@
         }
       })();
 
-      function downloadPass() {
-        // Direct link to .pkpass file - iOS will handle it automatically
-        window.location.href = '/QuestCard.pkpass';
-      }
-
-      // Detect if on iOS and show AirDrop instructions
-      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        // iOS-specific enhancements could go here
-        console.log('iOS detected - AirDrop sharing enabled');
-      }
+      // Direct link - no JavaScript needed for Wallet passes
     </script>
   </body>
 </html>
