@@ -88,8 +88,9 @@ if [ -z "$CERT_PATH" ] || [ -z "$WWDR_PATH" ]; then
     echo "   (Will show as unsigned in Wallet, but structure is correct)"
     
     # Create unsigned .pkpass file (just a zip)
-    cd "$TEMP_DIR"
-    zip -r "$OUTPUT_DIR/${PASS_NAME}.pkpass" pass > /dev/null
+    # Files must be at ROOT of zip, not in subdirectory
+    cd "$PASS_CONTENTS"
+    zip -r "$OUTPUT_DIR/${PASS_NAME}.pkpass" . > /dev/null
     
     echo "✅ Created: ${OUTPUT_DIR}${PASS_NAME}.pkpass (UNSIGNED)"
     echo ""
@@ -218,7 +219,8 @@ fi
 echo "   ✅ Extracted key and certificate"
 
 # Sign the manifest.json
-# The signature must be in PKCS7 format
+# The signature must be in PKCS7/DER format (detached signature)
+# -certfile includes WWDR in the certificate chain
 openssl smime -binary -sign -certfile "$WWDR_PATH" \
     -signer "$CERT_PEM" -inkey "$KEY_PATH" \
     -in manifest.json -out signature -outform DER
@@ -232,9 +234,10 @@ fi
 echo "✅ Manifest signed successfully"
 
 # Step 4: Create the .pkpass file (it's just a zip with specific contents)
+# IMPORTANT: Files must be at ROOT of zip, not in a subdirectory
 echo "📦 Creating .pkpass package..."
-cd "$TEMP_DIR"
-zip -r "$OUTPUT_DIR/${PASS_NAME}.pkpass" pass > /dev/null
+cd "$PASS_CONTENTS"
+zip -r "$OUTPUT_DIR/${PASS_NAME}.pkpass" . > /dev/null
 
 # Cleanup
 rm -rf "$TEMP_DIR"
