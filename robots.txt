@@ -3,5 +3,7 @@ User-agent: *
 Allow: /
 Sitemap: https://thequestsapp.com/sitemap.xml
 
-# Disallow admin/internal pages (add as needed)
-# Disallow: /admin/
+# Disallow internal pages
+Disallow: /get-card.html
+Disallow: /share.html
+Disallow: /QuestCard.pkpass

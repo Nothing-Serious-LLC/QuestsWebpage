@@ -116,11 +116,11 @@ main > section {
   height: 38px;
   display: inline-block;
   background-color: var(--white);
-  mask-image: url('logo-glyph.png');
+  mask-image: url('Quests%20Logo.svg');
   mask-size: contain;
   mask-position: center;
   mask-repeat: no-repeat;
-  -webkit-mask-image: url('logo-glyph.png');
+  -webkit-mask-image: url('Quests%20Logo.svg');
   -webkit-mask-size: contain;
   -webkit-mask-position: center;
   -webkit-mask-repeat: no-repeat;
