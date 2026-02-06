@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download Quests</title>
+    <meta name="description" content="Download Quests to join your invite." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#04102a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --blue-900: #04102a;
+        --blue-800: #14213c;
+        --accent: #3366cc;
+        --accent-light: #5c85d6;
+        --text-strong: #ffffff;
+        --text-muted: rgba(167, 177, 208, 0.8);
+        --surface: rgba(32, 44, 79, 0.82);
+        --border: rgba(48, 61, 98, 0.85);
+        --shadow: 0 32px 70px -40px rgba(4, 16, 42, 0.75);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text-strong);
+        background:
+          radial-gradient(circle at 20% 20%, rgba(92, 133, 214, 0.12), transparent 55%),
+          radial-gradient(circle at 80% 10%, rgba(102, 136, 238, 0.12), transparent 45%),
+          linear-gradient(150deg, var(--blue-900) 0%, var(--blue-800) 60%, #1a3a7d 100%);
+        padding: 32px 20px;
+      }
+
+      .card {
+        width: min(520px, 100%);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 36px 32px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .brand__glyph {
+        width: 40px;
+        height: 40px;
+        background-color: #ffffff;
+        mask-image: url("/Quests%20Logo.svg");
+        mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+        -webkit-mask-image: url("/Quests%20Logo.svg");
+        -webkit-mask-size: contain;
+        -webkit-mask-position: center;
+        -webkit-mask-repeat: no-repeat;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 18px 40px -20px rgba(51, 102, 204, 0.8);
+        transition: transform 0.2s ease, filter 0.2s ease;
+      }
+
+      .button:hover,
+      .button:focus-visible {
+        transform: translateY(-2px);
+        filter: brightness(1.05);
+      }
+
+      .subtle {
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="main">
+      <div class="brand" aria-label="Quests">
+        <span class="brand__glyph" aria-hidden="true"></span>
+        <span>Quests</span>
+      </div>
+      <h1>Download Quests</h1>
+      <p>Open Quests to accept your invite and start the quest.</p>
+      <a class="button" href="https://apps.apple.com/app/id6745767553" target="_blank" rel="noreferrer">
+        Download on the App Store
+      </a>
+      <p class="subtle">Already have the app? Open Quests and paste your invite code.</p>
+    </main>
+  </body>
+</html>

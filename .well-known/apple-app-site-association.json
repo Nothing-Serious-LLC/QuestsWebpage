@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appID": "YAJG48SHDF.info.nothingserious.quests",
+        "paths": ["/q/*", "/quest*", "/"]
+      }
+    ]
+  }
+}
