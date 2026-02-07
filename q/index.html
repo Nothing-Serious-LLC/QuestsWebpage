@@ -59,7 +59,7 @@
         display: grid;
         justify-items: center;
         text-align: center;
-        gap: 12px;
+        gap: 16px;
       }
 
       .hero__icon {
@@ -74,7 +74,7 @@
           0 32px 70px -40px rgba(4, 16, 42, 0.9),
           inset 0 0 30px rgba(66, 104, 210, 0.22);
         position: relative;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
       }
 
       .hero__icon::after {
@@ -87,12 +87,18 @@
       }
 
       .hero__glyph {
-        font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        font-size: 5.2rem;
-        font-weight: 700;
-        color: #ffffff;
-        line-height: 1;
-        text-shadow: 0 10px 18px rgba(8, 18, 40, 0.4);
+        width: 112px;
+        height: 112px;
+        background-color: #ffffff;
+        mask-image: url("/Quests%20Logo.svg");
+        mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+        -webkit-mask-image: url("/Quests%20Logo.svg");
+        -webkit-mask-size: contain;
+        -webkit-mask-position: center;
+        -webkit-mask-repeat: no-repeat;
+        filter: drop-shadow(0 10px 18px rgba(8, 18, 40, 0.4));
       }
 
       .hero__title {
@@ -100,7 +106,7 @@
         font-family: "Bricolage Grotesque", "Manrope", sans-serif;
         font-size: clamp(2.4rem, 5vw, 3.4rem);
         letter-spacing: -0.02em;
-        margin-bottom: 0;
+        margin-bottom: 2px;
       }
 
       .hero__note {
@@ -109,7 +115,7 @@
         font-size: 0.9rem;
         color: rgba(167, 177, 208, 0.7);
         line-height: 1.5;
-        margin-top: 12px;
+        margin-top: 2px;
       }
 
       .button {
@@ -126,7 +132,7 @@
         min-width: min(360px, 100%);
         box-shadow: 0 22px 52px -28px rgba(51, 102, 204, 0.9);
         transition: transform 0.2s ease, filter 0.2s ease;
-        margin-top: 18px;
+        margin-top: 8px;
       }
 
       .button:hover,
@@ -140,13 +146,13 @@
   <body>
     <main class="hero" role="main">
       <div class="hero__icon" aria-hidden="true">
-        <span class="hero__glyph">Q</span>
+        <span class="hero__glyph"></span>
       </div>
       <h1 class="hero__title">Download Quests</h1>
       <a class="button" href="https://apps.apple.com/app/id6745767553" target="_blank" rel="noreferrer">
         App Store
       </a>
-      <p class="hero__note">Accept your invite and start your first quest with friends</p>
+      <p class="hero__note">Accept your invite and start your first quest with friends.</p>
     </main>
   </body>
 </html>
