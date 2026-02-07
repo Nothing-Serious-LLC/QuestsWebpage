@@ -53,16 +53,17 @@
       }
 
       .card {
-        width: min(560px, 100%);
+        width: min(480px, 100%);
         background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: 28px;
-        padding: 40px 36px;
+        border-radius: 24px;
+        padding: 32px 24px;
         text-align: center;
         box-shadow: var(--shadow);
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        align-items: center;
+        gap: 16px;
       }
 
       .hero {
@@ -70,13 +71,13 @@
         display: grid;
         justify-items: center;
         text-align: center;
-        gap: 8px;
+        gap: 0;
       }
 
       .hero__icon {
-        width: 184px;
-        height: 184px;
-        border-radius: 46px;
+        width: 112px;
+        height: 112px;
+        border-radius: 28px;
         display: grid;
         place-items: center;
         background: linear-gradient(145deg, rgba(64, 92, 182, 0.28), rgba(11, 24, 56, 0.9));
@@ -85,21 +86,21 @@
           0 32px 70px -40px rgba(4, 16, 42, 0.9),
           inset 0 0 30px rgba(66, 104, 210, 0.22);
         position: relative;
-        margin-bottom: 6px;
+        margin-bottom: 24px;
       }
 
       .hero__icon::after {
         content: "";
         position: absolute;
-        inset: -16px;
-        border-radius: 54px;
+        inset: -12px;
+        border-radius: 38px;
         background: radial-gradient(circle, rgba(80, 120, 255, 0.25), transparent 65%);
         z-index: -1;
       }
 
       .hero__glyph {
-        width: 112px;
-        height: 112px;
+        width: 66px;
+        height: 66px;
         background-color: #ffffff;
         mask-image: url("/Quests%20Logo.svg");
         mask-size: contain;
@@ -113,34 +114,32 @@
       }
 
       .hero__title {
-        margin: 0;
+        margin: 0 0 24px 0;
         font-family: "Bricolage Grotesque", "Manrope", sans-serif;
-        font-size: clamp(2.4rem, 5vw, 3.4rem);
+        font-size: clamp(1.75rem, 5vw, 2.8rem);
         letter-spacing: -0.02em;
-        margin-bottom: 2px;
       }
 
       .hero__note {
-        margin: 0;
+        margin: 12px 0 0 0;
         max-width: 420px;
-        font-size: 0.9rem;
+        font-size: 0.875rem;
         color: rgba(167, 177, 208, 0.7);
         line-height: 1.5;
-        margin-top: 2px;
       }
 
       .brand {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 14px;
+        gap: 12px;
         font-weight: 800;
         letter-spacing: -0.03em;
       }
 
       .brand__glyph {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         background-color: #ffffff;
         mask-image: url("/Quests%20Logo.svg");
         mask-size: contain;
@@ -154,28 +153,31 @@
 
       h1 {
         margin: 0;
-        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+        font-size: clamp(1.5rem, 3.5vw, 2rem);
       }
 
       p {
         margin: 0;
         color: var(--text-muted);
-        font-size: 1rem;
+        font-size: 0.925rem;
         line-height: 1.6;
+        max-width: 340px;
       }
 
       .button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 14px 24px;
+        padding: 14px 28px;
         border-radius: 999px;
         background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
         color: #ffffff;
         font-weight: 700;
+        font-size: 0.95rem;
         text-decoration: none;
         box-shadow: 0 18px 40px -20px rgba(51, 102, 204, 0.8);
         transition: transform 0.2s ease, filter 0.2s ease;
+        min-width: 200px;
       }
 
       .button:hover,
@@ -185,15 +187,61 @@
       }
 
       .hero .button {
-        padding: 18px 34px;
-        font-size: 1.05rem;
-        min-width: min(360px, 100%);
+        padding: 16px 32px;
+        font-size: 1rem;
+        min-width: min(320px, 100%);
         box-shadow: 0 22px 52px -28px rgba(51, 102, 204, 0.9);
-        margin-top: 8px;
       }
 
       .hidden {
         display: none;
+      }
+
+      @media (min-width: 480px) {
+        .card {
+          padding: 44px 40px;
+          border-radius: 28px;
+          gap: 20px;
+        }
+        .hero__icon {
+          width: 148px;
+          height: 148px;
+          border-radius: 37px;
+          margin-bottom: 32px;
+        }
+        .hero__icon::after {
+          inset: -16px;
+          border-radius: 50px;
+        }
+        .hero__glyph {
+          width: 88px;
+          height: 88px;
+        }
+        .hero__title {
+          margin-bottom: 28px;
+        }
+        .hero .button {
+          padding: 18px 36px;
+          font-size: 1.05rem;
+          min-width: min(360px, 100%);
+        }
+        .hero__note {
+          margin-top: 14px;
+          font-size: 0.9rem;
+        }
+        .brand__glyph {
+          width: 40px;
+          height: 40px;
+        }
+        h1 {
+          font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+        }
+        p {
+          font-size: 1rem;
+        }
+        .button {
+          padding: 16px 32px;
+        }
       }
     </style>
   </head>
