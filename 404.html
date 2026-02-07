@@ -76,9 +76,9 @@
       }
 
       .hero__icon {
-        width: 240px;
-        height: 240px;
-        border-radius: 54px;
+        width: 140px;
+        height: 140px;
+        border-radius: 35px;
         display: grid;
         place-items: center;
         background: linear-gradient(145deg, rgba(64, 92, 182, 0.28), rgba(11, 24, 56, 0.9));
@@ -93,15 +93,15 @@
       .hero__icon::after {
         content: "";
         position: absolute;
-        inset: -18px;
-        border-radius: 64px;
+        inset: -14px;
+        border-radius: 44px;
         background: radial-gradient(circle, rgba(80, 120, 255, 0.25), transparent 65%);
         z-index: -1;
       }
 
       .hero__glyph {
-        width: 144px;
-        height: 144px;
+        width: 84px;
+        height: 84px;
         background-color: #ffffff;
         mask-image: url("/Quests%20Logo.svg");
         mask-size: contain;
@@ -114,16 +114,9 @@
         filter: drop-shadow(0 10px 18px rgba(8, 18, 40, 0.4));
       }
 
-      .hero__title {
-        margin: 0;
-        font-family: "Bricolage Grotesque", "Manrope", sans-serif;
-        font-size: clamp(1.25rem, 3vw, 1.75rem);
-        letter-spacing: -0.02em;
-      }
-
       .hero__note {
         margin: 0;
-        max-width: 420px;
+        max-width: 240px;
         font-size: 0.9rem;
         color: rgba(167, 177, 208, 0.7);
         line-height: 1.5;
@@ -204,9 +197,9 @@
           padding: 40px 36px;
         }
         .hero__icon {
-          width: 184px;
-          height: 184px;
-          border-radius: 46px;
+          width: 160px;
+          height: 160px;
+          border-radius: 40px;
           margin-bottom: 4px;
         }
         .hero__icon::after {
@@ -230,11 +223,10 @@
       <div class="hero__icon" aria-hidden="true">
         <span class="hero__glyph"></span>
       </div>
-      <h1 class="hero__title">Download Quests</h1>
       <a class="button" href="https://apps.apple.com/app/id6745767553" target="_blank" rel="noreferrer">
-        App Store
+        Download Quests
       </a>
-      <p class="hero__note">Accept your invite and start your first quest with friends.</p>
+      <p class="hero__note">Accept your invite and start your<br>first quest with friends.</p>
     </main>
 
     <main class="card" id="not-found-card" role="main">
