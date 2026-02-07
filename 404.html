@@ -42,6 +42,15 @@
         padding: 32px 20px;
       }
 
+      .invite {
+        width: min(520px, 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        text-align: center;
+      }
+
       .card {
         width: min(560px, 100%);
         background: var(--surface);
@@ -56,20 +65,19 @@
       }
 
       .logo-hero {
-        width: 104px;
-        height: 104px;
-        border-radius: 28px;
+        width: 140px;
+        height: 140px;
+        border-radius: 36px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: rgba(51, 102, 204, 0.2);
-        box-shadow: 0 24px 60px -40px rgba(4, 16, 42, 0.9);
-        margin: 0 auto 4px;
+        background: rgba(51, 102, 204, 0.22);
+        box-shadow: 0 28px 70px -44px rgba(4, 16, 42, 0.95);
       }
 
       .logo-hero__glyph {
-        width: 60px;
-        height: 60px;
+        width: 82px;
+        height: 82px;
         background-color: #ffffff;
         mask-image: url("/Quests%20Logo.svg");
         mask-size: contain;
@@ -136,8 +144,11 @@
         filter: brightness(1.05);
       }
 
-      .button {
-        min-width: min(320px, 100%);
+      .invite .button {
+        padding: 18px 32px;
+        font-size: 1.05rem;
+        min-width: min(360px, 100%);
+        box-shadow: 0 22px 52px -28px rgba(51, 102, 204, 0.9);
       }
 
       .hidden {
@@ -146,12 +157,10 @@
     </style>
   </head>
   <body>
-    <main class="card hidden" id="invite-card" role="main">
+    <main class="invite hidden" id="invite-card" role="main">
       <div class="logo-hero" aria-hidden="true">
         <span class="logo-hero__glyph"></span>
       </div>
-      <h1>Download Quests</h1>
-      <p>Join your invite in the app.</p>
       <a class="button" href="https://apps.apple.com/app/id6745767553" target="_blank" rel="noreferrer">
         Download on the App Store
       </a>
