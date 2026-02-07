@@ -63,9 +63,9 @@
       }
 
       .hero__icon {
-        width: 160px;
-        height: 160px;
-        border-radius: 40px;
+        width: 240px;
+        height: 240px;
+        border-radius: 54px;
         display: grid;
         place-items: center;
         background: linear-gradient(145deg, rgba(64, 92, 182, 0.28), rgba(11, 24, 56, 0.9));
@@ -80,15 +80,15 @@
       .hero__icon::after {
         content: "";
         position: absolute;
-        inset: -15px;
-        border-radius: 48px;
+        inset: -18px;
+        border-radius: 64px;
         background: radial-gradient(circle, rgba(80, 120, 255, 0.25), transparent 65%);
         z-index: -1;
       }
 
       .hero__glyph {
-        width: 96px;
-        height: 96px;
+        width: 144px;
+        height: 144px;
         background-color: #ffffff;
         mask-image: url("/Quests%20Logo.svg");
         mask-size: contain;
@@ -104,7 +104,7 @@
       .hero__title {
         margin: 0;
         font-family: "Bricolage Grotesque", "Manrope", sans-serif;
-        font-size: clamp(2rem, 5vw, 3.4rem);
+        font-size: clamp(1.25rem, 3vw, 1.75rem);
         letter-spacing: -0.02em;
       }
 
@@ -120,14 +120,14 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 18px 34px;
+        padding: 12px 28px;
         border-radius: 999px;
         background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
         color: #ffffff;
-        font-size: 1.05rem;
+        font-size: 0.9rem;
         font-weight: 700;
         text-decoration: none;
-        min-width: min(360px, 100%);
+        min-width: min(220px, 100%);
         box-shadow: 0 22px 52px -28px rgba(51, 102, 204, 0.9);
         transition: transform 0.2s ease, filter 0.2s ease;
         margin-top: 20px;
@@ -153,6 +153,11 @@
         .hero__glyph {
           width: 112px;
           height: 112px;
+        }
+        .button {
+          padding: 18px 34px;
+          font-size: 1.05rem;
+          min-width: min(360px, 100%);
         }
       }
 
