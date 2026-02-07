@@ -98,12 +98,18 @@
       }
 
       .hero__glyph {
-        font-family: "Bricolage Grotesque", "Manrope", sans-serif;
-        font-size: 5.4rem;
-        font-weight: 700;
-        color: #ffffff;
-        line-height: 1;
-        text-shadow: 0 10px 18px rgba(8, 18, 40, 0.4);
+        width: 112px;
+        height: 112px;
+        background-color: #ffffff;
+        mask-image: url("/Quests%20Logo.svg");
+        mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+        -webkit-mask-image: url("/Quests%20Logo.svg");
+        -webkit-mask-size: contain;
+        -webkit-mask-position: center;
+        -webkit-mask-repeat: no-repeat;
+        filter: drop-shadow(0 10px 18px rgba(8, 18, 40, 0.4));
       }
 
       .hero__title {
@@ -194,7 +200,7 @@
   <body>
     <main class="hero hidden" id="invite-card" role="main">
       <div class="hero__icon" aria-hidden="true">
-        <span class="hero__glyph">Q</span>
+        <span class="hero__glyph"></span>
       </div>
       <h1 class="hero__title">Download Quests</h1>
       <a class="button" href="https://apps.apple.com/app/id6745767553" target="_blank" rel="noreferrer">
