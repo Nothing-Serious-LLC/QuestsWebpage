@@ -43,7 +43,7 @@
       }
 
       .invite {
-        width: min(520px, 100%);
+        width: min(540px, 100%);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -65,9 +65,9 @@
       }
 
       .logo-hero {
-        width: 140px;
-        height: 140px;
-        border-radius: 36px;
+        width: 180px;
+        height: 180px;
+        border-radius: 44px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -76,8 +76,8 @@
       }
 
       .logo-hero__glyph {
-        width: 82px;
-        height: 82px;
+        width: 104px;
+        height: 104px;
         background-color: #ffffff;
         mask-image: url("/Quests%20Logo.svg");
         mask-size: contain;
@@ -87,6 +87,13 @@
         -webkit-mask-size: contain;
         -webkit-mask-position: center;
         -webkit-mask-repeat: no-repeat;
+      }
+
+      .brand-name {
+        font-size: clamp(1.4rem, 2.6vw, 2rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-strong);
       }
 
       .brand {
@@ -161,6 +168,7 @@
       <div class="logo-hero" aria-hidden="true">
         <span class="logo-hero__glyph"></span>
       </div>
+      <div class="brand-name">Quests</div>
       <a class="button" href="https://apps.apple.com/app/id6745767553" target="_blank" rel="noreferrer">
         Download on the App Store
       </a>
