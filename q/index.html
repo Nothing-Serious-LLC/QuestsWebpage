@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Join Quest - Quests</title>
     <meta name="description" content="You've been invited to a Quest. Preview and join on Quests." />
     <meta name="robots" content="noindex" />
-    <meta name="theme-color" content="#0d1f3a" />
+    <meta name="theme-color" content="#04102a" />
     <meta name="apple-itunes-app" content="app-id=6745767553" />
 
     <!-- Open Graph -->
@@ -30,6 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet" />
     <style>
       /* ========================================
          CSS Variables — Quests brand tokens
@@ -95,12 +96,14 @@
 
       html {
         -webkit-text-size-adjust: 100%;
+        background: #04102a;
       }
 
       body {
         font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         color: var(--text-strong);
-        background: var(--blue-900);
+        background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800) 60%, #1a3a7d 100%);
+        background-attachment: fixed;
         min-height: 100vh;
         min-height: 100dvh;
         line-height: 1.5;
@@ -126,7 +129,7 @@
          ======================================== */
       .page-bg {
         position: fixed;
-        inset: 0;
+        inset: -100px;
         z-index: -1;
         background:
           radial-gradient(circle at 20% 20%, rgba(92, 133, 214, 0.1), transparent 55%),
@@ -137,7 +140,7 @@
       .page-bg::after {
         content: "";
         position: fixed;
-        inset: 0;
+        inset: -100px;
         background:
           radial-gradient(circle at 25% 15%, rgba(70, 108, 214, 0.16), transparent 55%),
           radial-gradient(circle at 85% 25%, rgba(76, 132, 255, 0.12), transparent 45%);
@@ -166,15 +169,11 @@
         width: 100%;
         margin: 0;
         padding: 20px clamp(24px, 5vw, 64px);
+        padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+        padding-left: calc(env(safe-area-inset-left, 0px) + clamp(24px, 5vw, 64px));
+        padding-right: calc(env(safe-area-inset-right, 0px) + clamp(24px, 5vw, 64px));
         gap: 24px;
-        position: sticky;
-        top: 0;
-        left: 0;
-        right: 0;
-        backdrop-filter: blur(18px);
-        background: linear-gradient(180deg, rgba(4, 16, 42, 0.88) 0%, rgba(4, 16, 42, 0) 100%);
-        border-radius: 0 0 24px 24px;
-        box-shadow: var(--shadow-sm);
+        background: transparent;
         z-index: 20;
       }
 
@@ -409,8 +408,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 44px;
+        font-size: 42px;
         line-height: 1;
+        color: #ffffff;
         background: linear-gradient(145deg, rgba(64, 92, 182, 0.28), rgba(11, 24, 56, 0.9));
         border: 1px solid var(--border-accent);
         box-shadow:
@@ -446,70 +446,11 @@
       }
 
       /* ========================================
-         STATUS BADGE
-         ======================================== */
-      #quest-status {
-        display: flex;
-        justify-content: center;
-        padding: 12px 0 4px;
-      }
-
-      .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 6px 16px;
-        border-radius: var(--pill-radius);
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-      }
-
-      .status-badge--active {
-        background: rgba(52, 199, 89, 0.15);
-        color: var(--accent-success);
-        border: 1px solid rgba(52, 199, 89, 0.3);
-      }
-
-      .status-badge--active .status-badge__dot {
-        background: var(--accent-success);
-        box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.55);
-        animation: pulse-dot 1.9s infinite;
-      }
-
-      .status-badge--upcoming {
-        background: rgba(255, 159, 10, 0.15);
-        color: var(--accent-warning);
-        border: 1px solid rgba(255, 159, 10, 0.3);
-      }
-
-      .status-badge--upcoming .status-badge__dot {
-        background: var(--accent-warning);
-      }
-
-      .status-badge--ended {
-        background: rgba(167, 177, 208, 0.1);
-        color: var(--text-soft);
-        border: 1px solid var(--border-soft);
-      }
-
-      .status-badge--ended .status-badge__dot {
-        background: var(--text-soft);
-      }
-
-      .status-badge__dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-      }
-
-      /* ========================================
          META — date, duration, frequency cards
          ======================================== */
       #quest-meta {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 1px;
         background: var(--border-soft);
         border-radius: var(--card-radius);
@@ -521,9 +462,13 @@
       .meta-row {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 14px 18px;
+        gap: 12px;
+        padding: 12px 16px;
         background: var(--surface-medium);
+      }
+
+      .meta-row--full {
+        grid-column: 1 / -1;
       }
 
       .meta-row__icon {
@@ -535,8 +480,23 @@
         border-radius: 10px;
         background: rgba(51, 102, 204, 0.12);
         color: var(--accent-light);
-        font-size: 18px;
+        font-size: 20px;
         flex-shrink: 0;
+      }
+
+      .meta-row__icon--avatar {
+        border-radius: 50%;
+        background: var(--surface-strong);
+        border: 2px solid var(--border-soft);
+        overflow: hidden;
+        font-size: 16px;
+        color: var(--text-muted);
+      }
+
+      .meta-row__icon--avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       .meta-row__text {
@@ -561,114 +521,11 @@
         text-overflow: ellipsis;
       }
 
-      /* ========================================
-         CREATOR — avatar + name
-         ======================================== */
-      #quest-creator {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 16px 0;
-      }
-
-      .creator-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: var(--surface-strong);
-        border: 2px solid var(--border-soft);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
-
-      .creator-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
       .creator-avatar__fallback {
-        font-size: 18px;
-        color: var(--text-muted);
-      }
-
-      .creator-info {
-        flex: 1;
-        min-width: 0;
-      }
-
-      .creator-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: var(--text-soft);
-        margin-bottom: 1px;
-      }
-
-      .creator-name {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-strong);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      /* ========================================
-         SOCIAL — participant count + avatars
-         ======================================== */
-      #quest-social {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 18px;
-        border-radius: var(--card-radius-sm);
-        background: var(--surface-soft);
-        border: 1px solid var(--border-soft);
-        margin-bottom: 20px;
-      }
-
-      .social-avatars {
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
-      }
-
-      .social-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: var(--surface-strong);
-        border: 2px solid var(--blue-800);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        color: var(--text-muted);
-        overflow: hidden;
-      }
-
-      .social-avatar + .social-avatar {
-        margin-left: -8px;
-      }
-
-      .social-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .social-text {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-      }
-
-      .social-text strong {
-        color: var(--text-strong);
-        font-weight: 600;
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1;
       }
 
       /* ========================================
@@ -686,30 +543,6 @@
       #phone-gate {
         padding: 24px 0;
         animation: fadeInUp 0.4s ease-out;
-      }
-
-      .gate-card {
-        padding: 24px;
-        border-radius: var(--card-radius);
-        background: var(--surface-strong);
-        border: 1px solid var(--border-strong);
-        backdrop-filter: blur(20px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .gate-title {
-        font-family: "Bricolage Grotesque", sans-serif;
-        font-size: 1.1rem;
-        font-weight: 700;
-        margin: 0 0 6px;
-        color: var(--text-strong);
-      }
-
-      .gate-subtitle {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin: 0 0 20px;
-        line-height: 1.5;
       }
 
       .phone-input-group {
@@ -731,6 +564,10 @@
         transition: border-color 0.2s ease;
       }
 
+      .phone-input {
+        scroll-margin-top: 120px;
+      }
+
       .phone-input::placeholder {
         color: var(--text-soft);
       }
@@ -738,35 +575,6 @@
       .phone-input:focus {
         border-color: var(--accent-light);
         box-shadow: 0 0 0 3px rgba(92, 133, 214, 0.15);
-      }
-
-      .phone-submit {
-        padding: 14px 22px;
-        border-radius: 14px;
-        border: none;
-        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-        color: var(--text-strong);
-        font-family: inherit;
-        font-size: 0.9rem;
-        font-weight: 700;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: transform 0.2s ease, filter 0.2s ease;
-        flex-shrink: 0;
-      }
-
-      .phone-submit:hover:not(:disabled) {
-        transform: translateY(-1px);
-        filter: brightness(1.08);
-      }
-
-      .phone-submit:active:not(:disabled) {
-        transform: translateY(0);
-      }
-
-      .phone-submit:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
       }
 
       .gate-privacy {
@@ -839,12 +647,19 @@
         transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
       }
 
-      .cta-button:hover {
+      .cta-button--disabled {
+        opacity: 0.35;
+        pointer-events: none;
+        cursor: not-allowed;
+        filter: saturate(0.3);
+      }
+
+      .cta-button:not(.cta-button--disabled):hover {
         transform: translateY(-4px);
         box-shadow: 0 46px 95px -32px rgba(4, 16, 42, 0.75);
       }
 
-      .cta-button:active {
+      .cta-button:not(.cta-button--disabled):active {
         transform: translateY(0);
       }
 
@@ -947,6 +762,7 @@
       .footer {
         text-align: center;
         padding: 20px 0;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
         flex-shrink: 0;
         width: 100%;
         max-width: var(--page-max);
@@ -974,7 +790,7 @@
       @media (max-width: 960px) {
         .site-header {
           padding: 18px clamp(20px, 6vw, 40px);
-          border-radius: 0 0 20px 20px;
+          padding-top: calc(env(safe-area-inset-top, 0px) + 18px);
         }
 
         .site-header__inner {
@@ -990,7 +806,7 @@
       @media (max-width: 640px) {
         .site-header {
           padding: 12px 16px;
-          background: transparent;
+          padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
         }
 
         .site-header__inner {
@@ -1056,9 +872,6 @@
           padding: 16px 20px;
         }
 
-        .gate-card {
-          padding: 28px;
-        }
       }
 
       @media (min-width: 768px) {
@@ -1126,61 +939,22 @@
         80% { transform: translateX(4px); }
       }
 
-      /* Submit button inner elements */
-      .phone-submit {
-        position: relative;
+
+
+      /* Turnstile container (invisible mode) */
+      #turnstile-container {
+        position: absolute;
+        width: 0;
+        height: 0;
         overflow: hidden;
-      }
-
-      .phone-submit__text {
-        transition: opacity 0.2s ease;
-      }
-
-      .phone-submit__spinner,
-      .phone-submit__check {
-        display: none;
-      }
-
-      /* Loading state */
-      .phone-submit--loading .phone-submit__text { display: none; }
-      .phone-submit--loading .phone-submit__spinner {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: #fff;
-        border-radius: 50%;
-        animation: spin 0.6s linear infinite;
-      }
-
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-
-      /* Success state */
-      .phone-submit--success {
-        background: var(--accent-success) !important;
+        opacity: 0;
         pointer-events: none;
       }
 
-      .phone-submit--success .phone-submit__text { display: none; }
-      .phone-submit--success .phone-submit__check {
-        display: inline-block;
-        font-size: 18px;
-        line-height: 1;
-      }
-
-      /* Turnstile container spacing */
-      #turnstile-container {
-        margin: 8px 0;
-        display: flex;
-        justify-content: center;
-        min-height: 0;
-        transition: min-height 0.3s ease;
-      }
-
-      #turnstile-container:not(:empty) {
-        min-height: 65px;
+      /* CTA loading state */
+      .cta-button--loading {
+        opacity: 0.7;
+        pointer-events: none;
       }
 
       /* Confirmation fade-in */
@@ -1200,7 +974,6 @@
             <span class="brand__glyph" aria-hidden="true"></span>
             <span class="brand__name">Quests</span>
           </a>
-          <a class="download-chip" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer">Download the app</a>
         </div>
       </header>
 
@@ -1233,16 +1006,6 @@
         <!-- ===== QUEST CONTENT (hidden until loaded) ===== -->
         <div id="quest-content" class="state-hidden">
 
-          <!-- Status badge -->
-          <div id="quest-status" aria-live="polite">
-            <!-- Populated by JS, e.g.:
-            <span class="status-badge status-badge--active">
-              <span class="status-badge__dot" aria-hidden="true"></span>
-              Active
-            </span>
-            -->
-          </div>
-
           <!-- Hero: icon, title, description -->
           <section id="quest-hero" aria-label="Quest details">
             <div class="quest-icon" id="quest-icon" role="img" aria-label="Quest icon">
@@ -1252,49 +1015,44 @@
             <p class="quest-description" id="quest-description"><!-- Quest description --></p>
           </section>
 
-          <!-- Meta rows: date, duration, frequency -->
+          <!-- Quest info card -->
           <div id="quest-meta" role="list" aria-label="Quest details">
+            <div class="meta-row meta-row--full" role="listitem">
+              <div class="meta-row__icon meta-row__icon--avatar" aria-hidden="true" id="creator-avatar">
+                <span class="creator-avatar__fallback">&#128100;</span>
+              </div>
+              <div class="meta-row__text">
+                <div class="meta-row__label">Created by</div>
+                <div class="meta-row__value" id="creator-name">--</div>
+              </div>
+            </div>
             <div class="meta-row" role="listitem">
-              <div class="meta-row__icon" aria-hidden="true">&#128197;</div>
+              <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-account-group"></i></div>
+              <div class="meta-row__text">
+                <div class="meta-row__label">Participants</div>
+                <div class="meta-row__value" id="social-count">0</div>
+              </div>
+            </div>
+            <div class="meta-row" role="listitem" id="meta-status-row">
+              <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-information-outline"></i></div>
+              <div class="meta-row__text">
+                <div class="meta-row__label">Status</div>
+                <div class="meta-row__value" id="meta-status" aria-live="polite">--</div>
+              </div>
+            </div>
+            <div class="meta-row" role="listitem">
+              <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-calendar-clock"></i></div>
               <div class="meta-row__text">
                 <div class="meta-row__label">Starts</div>
                 <div class="meta-row__value" id="meta-date">--</div>
               </div>
             </div>
             <div class="meta-row" role="listitem">
-              <div class="meta-row__icon" aria-hidden="true">&#9202;</div>
+              <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-timer-sand"></i></div>
               <div class="meta-row__text">
                 <div class="meta-row__label">Duration</div>
                 <div class="meta-row__value" id="meta-duration">--</div>
               </div>
-            </div>
-            <div class="meta-row" role="listitem">
-              <div class="meta-row__icon" aria-hidden="true">&#128260;</div>
-              <div class="meta-row__text">
-                <div class="meta-row__label">Frequency</div>
-                <div class="meta-row__value" id="meta-frequency">--</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Creator -->
-          <div id="quest-creator" aria-label="Quest creator">
-            <div class="creator-avatar" id="creator-avatar">
-              <span class="creator-avatar__fallback" aria-hidden="true">&#128100;</span>
-            </div>
-            <div class="creator-info">
-              <div class="creator-label">Created by</div>
-              <div class="creator-name" id="creator-name">--</div>
-            </div>
-          </div>
-
-          <!-- Social proof -->
-          <div id="quest-social" aria-label="Participants">
-            <div class="social-avatars" id="social-avatars">
-              <!-- Populated by JS -->
-            </div>
-            <div class="social-text">
-              <strong id="social-count">0</strong> <span id="social-label">people joined</span>
             </div>
           </div>
 
@@ -1305,59 +1063,46 @@
             <p class="ended-text">This quest is no longer accepting new participants. Download Quests to start your own.</p>
           </div>
 
-          <!-- Phone gate (hidden initially, shown after preview loads) -->
+          <!-- Phone + Download unified flow -->
           <div id="phone-gate" class="state-hidden">
-            <div class="gate-card">
-              <!-- Default: phone input form -->
-              <div id="gate-form">
-                <h2 class="gate-title">Continue in the app</h2>
-                <p class="gate-subtitle">Enter your phone number to connect this quest to your account when you sign in.</p>
-                <div class="phone-input-group" id="phone-input-group">
-                  <label for="phone-input" class="sr-only">Phone number</label>
-                  <input
-                    id="phone-input"
-                    class="phone-input"
-                    type="tel"
-                    inputmode="tel"
-                    autocomplete="tel"
-                    placeholder="+1 (555) 000-0000"
-                    aria-label="Phone number"
-                    aria-describedby="phone-error"
-                  />
-                  <button class="phone-submit" id="phone-submit" type="button" aria-label="Submit phone number">
-                    <span class="phone-submit__text">Submit</span>
-                    <span class="phone-submit__spinner" aria-hidden="true"></span>
-                    <span class="phone-submit__check" aria-hidden="true">&#10003;</span>
-                  </button>
-                </div>
-                <p id="phone-error" class="phone-error state-hidden" role="alert" aria-live="polite"></p>
-                <div id="turnstile-container"></div>
-                <p class="gate-privacy">Your number is only used to connect this invite in the app. We never share or sell your data.</p>
+            <div id="gate-form">
+              <div class="phone-input-group" id="phone-input-group">
+                <label for="phone-input" class="sr-only">Phone number</label>
+                <input
+                  id="phone-input"
+                  class="phone-input"
+                  type="tel"
+                  inputmode="tel"
+                  autocomplete="tel"
+                  placeholder="+1 (555) 000-0000"
+                  aria-label="Phone number"
+                  aria-describedby="phone-error"
+                />
               </div>
-              <!-- Success state (hidden by default) -->
-              <div id="gate-confirmed" class="state-hidden">
-                <div class="gate-success">
-                  <div class="gate-success__icon" aria-hidden="true">&#10003;</div>
-                  <p class="gate-success__title">You're all set</p>
-                  <p class="gate-success__text">Download Quests and sign in with this number to join automatically.</p>
-                </div>
+              <p id="phone-error" class="phone-error state-hidden" role="alert" aria-live="polite"></p>
+              <p class="gate-privacy">Enter your number to join this quest when you sign up. Your phone number is only used to link this invite to your account. We won't call, text, or share your number. By submitting, you agree to our <a href="https://thequestsapp.com/privacy.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Privacy Policy</a> and <a href="https://thequestsapp.com/terms.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Terms of Service</a>.</p>
+              <div id="turnstile-container"></div>
+            </div>
+            <div id="gate-confirmed" class="state-hidden">
+              <div class="gate-success">
+                <div class="gate-success__icon" aria-hidden="true">&#10003;</div>
+                <p class="gate-success__title">You're all set</p>
+                <p class="gate-success__text">Download Quests and sign up with this number to join automatically.</p>
               </div>
             </div>
           </div>
 
-          <!-- Install handoff -->
+          <!-- Unified CTA -->
           <div id="install-handoff">
-            <a
-              class="cta-button"
+            <button
+              class="cta-button cta-button--disabled"
               id="download-cta"
-              href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Download Quests on the App Store"
+              type="button"
+              aria-label="Submit phone and download Quests"
             >
               <span class="cta-button__icon" aria-hidden="true">&#63743;</span>
-              Download Quests and Join
-            </a>
+              <span id="cta-text">Download Quests and Join</span>
+            </button>
             <button
               class="link-secondary"
               id="open-app-link"
@@ -1426,19 +1171,7 @@
         var openAppBtn = document.getElementById('open-app-link');
         if (openAppBtn) {
           openAppBtn.addEventListener('click', function () {
-            if (!shareCode) {
-              window.location.href = APP_STORE_URL;
-              return;
-            }
-            var universalLink = 'https://invite.thequestsapp.com/q/' + shareCode;
-            window.location.href = universalLink;
-
-            // If app didn't intercept within 1.5s, redirect to App Store
-            setTimeout(function () {
-              if (!document.hidden) {
-                window.location.href = APP_STORE_URL;
-              }
-            }, 1500);
+            window.location.href = APP_STORE_URL;
           });
         }
 
@@ -1520,8 +1253,6 @@
               weekday: 'short',
               month: 'short',
               day: 'numeric',
-              hour: 'numeric',
-              minute: '2-digit',
             }).format(new Date(iso));
           } catch (e) {
             return '--';
@@ -1536,12 +1267,6 @@
             return weeks + ' week' + (weeks > 1 ? 's' : '');
           }
           return days + ' days';
-        }
-
-        function formatFrequency(freq) {
-          if (!freq) return '--';
-          var map = { DAILY: 'Daily', WEEKLY: 'Weekly', MONTHLY: 'Monthly', ONE_TIME: 'One-time' };
-          return map[freq] || freq.charAt(0).toUpperCase() + freq.slice(1).toLowerCase();
         }
 
         function getQuestStatus(data) {
@@ -1590,9 +1315,14 @@
 
         // ---- Render quest data into DOM ----
         function renderQuest(data) {
-          // Icon (emoji)
+          // Icon (Material Community Icons)
           var iconEl = document.getElementById('quest-icon');
-          iconEl.textContent = data.icon || '';
+          iconEl.textContent = '';
+          if (data.icon) {
+            var mdiIcon = document.createElement('i');
+            mdiIcon.className = 'mdi mdi-' + data.icon;
+            iconEl.appendChild(mdiIcon);
+          }
           if (data.icon_color && /^#[0-9a-fA-F]{6}$/.test(data.icon_color)) {
             iconEl.style.background =
               'linear-gradient(145deg, ' + data.icon_color + '33, ' + data.icon_color + '18)';
@@ -1605,59 +1335,60 @@
           // Meta rows
           document.getElementById('meta-date').textContent = formatDateTime(data.start_time);
           document.getElementById('meta-duration').textContent = formatDuration(data.duration_days);
-          document.getElementById('meta-frequency').textContent = formatFrequency(data.frequency);
 
-          // Creator avatar
+          // Creator avatar (in meta row) — matches app Avatar component pattern
           var avatarWrap = document.getElementById('creator-avatar');
           var fallbackSpan = avatarWrap.querySelector('.creator-avatar__fallback');
-          document.getElementById('creator-name').textContent = data.creator_name || 'Anonymous';
+          var creatorName = data.creator_name || 'Anonymous';
+          document.getElementById('creator-name').textContent = creatorName;
+
+          // Deterministic background color from name (theme-aligned blues)
+          var avatarColors = ['#3366CC', '#4A7FD4', '#5C85D6', '#2E5CB8', '#3D6FCC', '#527ACC'];
+          function nameToColor(name) {
+            var hash = 0;
+            for (var i = 0; i < name.length; i++) {
+              hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return avatarColors[Math.abs(hash) % avatarColors.length];
+          }
 
           if (data.creator_avatar && data.creator_avatar.indexOf('https://') === 0) {
             var img = document.createElement('img');
             img.src = data.creator_avatar;
-            img.alt = data.creator_name || 'Creator';
+            img.alt = creatorName;
             img.onerror = function () {
               img.remove();
-              if (fallbackSpan) fallbackSpan.style.display = '';
+              if (fallbackSpan) {
+                fallbackSpan.style.display = '';
+                fallbackSpan.textContent = creatorName.charAt(0).toUpperCase();
+                avatarWrap.style.background = nameToColor(creatorName);
+              }
             };
             if (fallbackSpan) fallbackSpan.style.display = 'none';
             avatarWrap.appendChild(img);
-          } else if (data.creator_name && fallbackSpan) {
-            fallbackSpan.textContent = data.creator_name.charAt(0).toUpperCase();
+          } else if (fallbackSpan) {
+            fallbackSpan.textContent = creatorName.charAt(0).toUpperCase();
+            avatarWrap.style.background = nameToColor(creatorName);
           }
 
-          // Social proof — participant count
+          // Participant count (in meta row)
           var count = data.participant_count || 0;
           document.getElementById('social-count').textContent = count;
-          document.getElementById('social-label').textContent =
-            count === 1 ? 'person joined' : 'people joined';
 
-          // Placeholder avatar circles
-          var avatarsEl = document.getElementById('social-avatars');
-          var showCount = Math.min(count, 3);
-          for (var i = 0; i < showCount; i++) {
-            var circle = document.createElement('div');
-            circle.className = 'social-avatar';
-            circle.setAttribute('aria-hidden', 'true');
-            circle.textContent = '\uD83D\uDC64';
-            avatarsEl.appendChild(circle);
-          }
-
-          // Status badge
+          // Status — render inline in meta row
           var status = getQuestStatus(data);
-          var statusEl = document.getElementById('quest-status');
-          var label = status === 'ended' ? 'Ended'
+          var statusLabel = status === 'ended' ? 'Ended'
                     : status === 'upcoming' ? 'Upcoming'
                     : 'Active';
-          statusEl.textContent = '';
-          var badge = document.createElement('span');
-          badge.className = 'status-badge status-badge--' + status;
-          var dot = document.createElement('span');
-          dot.className = 'status-badge__dot';
-          dot.setAttribute('aria-hidden', 'true');
-          badge.appendChild(dot);
-          badge.appendChild(document.createTextNode(label));
-          statusEl.appendChild(badge);
+          var metaStatusEl = document.getElementById('meta-status');
+          metaStatusEl.textContent = statusLabel;
+          var statusColor = status === 'active' ? 'var(--accent-light)'
+                    : status === 'upcoming' ? 'var(--accent-warning)'
+                    : 'var(--text-soft)';
+          metaStatusEl.style.color = statusColor;
+          // Update status row icon color to match
+          var statusIcon = document.getElementById('meta-status-row').querySelector('.meta-row__icon');
+          if (statusIcon) statusIcon.style.color = statusColor;
 
           // Ended quest: show notice, hide phone gate & install handoff
           if (status === 'ended') {
@@ -1741,12 +1472,14 @@
            DOM references
            ============================================ */
         var phoneInput    = document.getElementById('phone-input');
-        var phoneSubmit   = document.getElementById('phone-submit');
         var phoneError    = document.getElementById('phone-error');
         var inputGroup    = document.getElementById('phone-input-group');
         var gateForm      = document.getElementById('gate-form');
         var gateConfirmed = document.getElementById('gate-confirmed');
         var turnstileBox  = document.getElementById('turnstile-container');
+        var ctaBtn        = document.getElementById('download-cta');
+        var ctaText       = document.getElementById('cta-text');
+        var APP_STORE_URL = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
 
         /* ============================================
            State
@@ -1768,14 +1501,20 @@
           return str.replace(/\D/g, '');
         }
 
-        function formatPhoneDisplay(value) {
+        // Extract the 10 user digits, ignoring the "+1" formatting prefix
+        function getInputDigits(value) {
           var digits = stripNonDigits(value);
-          // Strip leading 1 for display formatting (US)
-          if (digits.length > 10 && digits.charAt(0) === '1') {
+          // Our "+1 (" prefix contributes a "1" — always strip leading 1
+          // Safe because US area codes never start with 0 or 1
+          if (digits.length >= 1 && digits.charAt(0) === '1') {
             digits = digits.substring(1);
           }
           if (digits.length > 10) digits = digits.substring(0, 10);
+          return digits;
+        }
 
+        function formatPhoneDisplay(value) {
+          var digits = getInputDigits(value);
           if (digits.length === 0) return '';
           if (digits.length <= 3) return '+1 (' + digits;
           if (digits.length <= 6) return '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3);
@@ -1783,11 +1522,7 @@
         }
 
         function normalizeToE164(value) {
-          var digits = stripNonDigits(value);
-          // Strip leading 1 if 11 digits
-          if (digits.length === 11 && digits.charAt(0) === '1') {
-            digits = digits.substring(1);
-          }
+          var digits = getInputDigits(value);
           if (digits.length !== 10) return null;
           return '+1' + digits;
         }
@@ -1795,32 +1530,42 @@
         /* ============================================
            Input event — auto-format as user types
            ============================================ */
+        // On mobile, scroll input above the virtual keyboard once it's fully open
+        if (window.visualViewport) {
+          var vvTimer;
+          window.visualViewport.addEventListener('resize', function () {
+            clearTimeout(vvTimer);
+            vvTimer = setTimeout(function () {
+              if (document.activeElement === phoneInput) {
+                phoneInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }, 150);
+          });
+        }
+
         phoneInput.addEventListener('input', function () {
-          var cursor = phoneInput.selectionStart;
-          var raw = phoneInput.value;
-          var formatted = formatPhoneDisplay(raw);
+          var formatted = formatPhoneDisplay(phoneInput.value);
           phoneInput.value = formatted;
-
-          // Clear error state on new input
+          // Always position cursor at end — simple and reliable
+          phoneInput.setSelectionRange(formatted.length, formatted.length);
           clearError();
-
-          // Approximate cursor position after formatting
-          var newCursor = formatted.length;
-          if (cursor < raw.length) {
-            var digitsBeforeCursor = stripNonDigits(raw.substring(0, cursor)).length;
-            var count = 0;
-            for (var i = 0; i < formatted.length; i++) {
-              if (/\d/.test(formatted.charAt(i))) count++;
-              if (count >= digitsBeforeCursor) { newCursor = i + 1; break; }
-            }
-          }
-          phoneInput.setSelectionRange(newCursor, newCursor);
+          updateCtaState();
         });
+
+        function updateCtaState() {
+          var phone = normalizeToE164(phoneInput.value);
+          if (phone) {
+            ctaBtn.classList.remove('cta-button--disabled');
+          } else {
+            ctaBtn.classList.add('cta-button--disabled');
+          }
+        }
 
         // Format on paste
         phoneInput.addEventListener('paste', function () {
           setTimeout(function () {
             phoneInput.value = formatPhoneDisplay(phoneInput.value);
+            updateCtaState();
           }, 0);
         });
 
@@ -1859,21 +1604,24 @@
            Button state helpers
            ============================================ */
         function setButtonLoading() {
-          phoneSubmit.disabled = true;
-          phoneSubmit.classList.add('phone-submit--loading');
-          phoneSubmit.setAttribute('aria-busy', 'true');
+          ctaBtn.disabled = true;
+          ctaBtn.classList.add('cta-button--loading');
+          ctaBtn.setAttribute('aria-busy', 'true');
+          ctaText.textContent = 'Submitting...';
         }
 
         function setButtonDefault() {
-          phoneSubmit.disabled = false;
-          phoneSubmit.classList.remove('phone-submit--loading');
-          phoneSubmit.classList.remove('phone-submit--success');
-          phoneSubmit.setAttribute('aria-busy', 'false');
+          ctaBtn.disabled = false;
+          ctaBtn.classList.remove('cta-button--loading');
+          ctaBtn.setAttribute('aria-busy', 'false');
+          ctaText.textContent = 'Download Quests and Join';
+          updateCtaState();
         }
 
         function setButtonSuccess() {
-          phoneSubmit.classList.remove('phone-submit--loading');
-          phoneSubmit.classList.add('phone-submit--success');
+          ctaBtn.classList.remove('cta-button--loading');
+          ctaBtn.disabled = false;
+          ctaText.textContent = 'Download Quests and Join';
         }
 
         /* ============================================
@@ -1886,6 +1634,7 @@
           turnstileWidget = turnstile.render(turnstileBox, {
             sitekey: '0x4AAAAAACaMy8ev_fZjSv2s',
             theme: 'dark',
+            size: 'invisible',
             callback: function (token) {
               turnstileToken = token;
             },
@@ -1998,11 +1747,13 @@
             }
           }
 
-          // Brief delay to show checkmark, then transition to confirmed
+          // Show confirmation, then redirect to App Store
+          gateForm.classList.add('state-hidden');
+          gateConfirmed.classList.remove('state-hidden');
+
           setTimeout(function () {
-            gateForm.classList.add('state-hidden');
-            gateConfirmed.classList.remove('state-hidden');
-          }, 600);
+            window.location.href = APP_STORE_URL;
+          }, 1200);
         }
 
         /* ============================================
@@ -2052,7 +1803,7 @@
         /* ============================================
            Bind submit button
            ============================================ */
-        phoneSubmit.addEventListener('click', handleSubmit);
+        ctaBtn.addEventListener('click', handleSubmit);
       })();
     </script>
   </body>
