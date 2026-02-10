@@ -72,16 +72,35 @@ function getTurnstileAllowedHosts(env) {
     .filter(Boolean);
 }
 
+function getEnvValue(env, keys) {
+  if (!env) return undefined;
+  for (const key of keys) {
+    if (env[key]) return env[key];
+  }
+  const envKeys = Object.keys(env);
+  for (const key of keys) {
+    for (const envKey of envKeys) {
+      if (envKey.trim() === key) {
+        console.warn(
+          `Env binding name has whitespace: "${envKey}" (expected "${key}")`
+        );
+        return env[envKey];
+      }
+    }
+  }
+  return undefined;
+}
+
 function getTurnstileSecret(env) {
-  return (
-    (env && env.TURNSTILE_SECRET_KEY) ||
-    (env && env.TURNSTILE_SECRET) ||
-    (env && env.CF_TURNSTILE_SECRET_KEY)
-  );
+  return getEnvValue(env, [
+    "TURNSTILE_SECRET_KEY",
+    "CF_TURNSTILE_SECRET_KEY",
+    "TURNSTILE_SECRET",
+  ]);
 }
 
 function getSupabaseKey(env) {
-  return (env && env.cloudflare_key) || (env && env.CLOUDFLARE_KEY);
+  return getEnvValue(env, ["cloudflare_key", "CLOUDFLARE_KEY"]);
 }
 
 async function hashForRateLimit(value) {
@@ -137,7 +156,7 @@ export async function onRequestPost(context) {
       return jsonResponse(500, { error: "misconfigured" });
     }
 
-    const supabaseUrl = context.env.SUPABASE_URL;
+    const supabaseUrl = getEnvValue(context.env, ["SUPABASE_URL"]);
     const supabaseKey = getSupabaseKey(context.env);
     if (!supabaseUrl || !supabaseKey) {
       console.error("Supabase env bindings are missing");
