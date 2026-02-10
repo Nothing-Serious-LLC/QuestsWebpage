@@ -15,6 +15,11 @@
 
 const SHARE_CODE_RE = /^[A-HJ-NP-Za-hj-kmnp-z2-9]{8}$/;
 const E164_RE = /^\+\d{10,15}$/;
+const DEFAULT_TURNSTILE_HOSTS = [
+  "invite.thequestsapp.com",
+  "thequestsapp.com",
+  "www.thequestsapp.com",
+];
 
 const RATE_LIMITS = {
   ip: { limit: 5, ttl: 3600, prefix: "ip" },
@@ -56,6 +61,15 @@ function normalizePhone(raw) {
 
 function getPhoneLast4(normalized) {
   return normalized.slice(-4);
+}
+
+function getTurnstileAllowedHosts(env) {
+  const raw = env && env.TURNSTILE_ALLOWED_HOSTS;
+  if (!raw) return DEFAULT_TURNSTILE_HOSTS;
+  return raw
+    .split(",")
+    .map((host) => host.trim())
+    .filter(Boolean);
 }
 
 async function hashForRateLimit(value) {
@@ -103,6 +117,16 @@ async function checkAndIncrementRate(kv, key, limit, ttlSeconds) {
 
 export async function onRequestPost(context) {
   try {
+    if (!context.env.TURNSTILE_SECRET_KEY) {
+      console.error("TURNSTILE_SECRET_KEY is missing");
+      return jsonResponse(500, { error: "misconfigured" });
+    }
+
+    if (!context.env.SUPABASE_URL || !context.env.cloudflare_key) {
+      console.error("Supabase env bindings are missing");
+      return jsonResponse(500, { error: "misconfigured" });
+    }
+
     // Step 1: Parse JSON body
     let body;
     try {
@@ -156,10 +180,15 @@ export async function onRequestPost(context) {
     }
 
     // Validate Turnstile hostname to prevent cross-site token reuse
+    const allowedHosts = getTurnstileAllowedHosts(context.env);
     if (
       turnstileResult.hostname &&
-      turnstileResult.hostname !== "invite.thequestsapp.com"
+      !allowedHosts.includes(turnstileResult.hostname)
     ) {
+      console.error("Turnstile hostname mismatch:", {
+        hostname: turnstileResult.hostname,
+        allowedHosts,
+      });
       return jsonResponse(403, { error: "turnstile_failed" });
     }
 
