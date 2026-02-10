@@ -185,6 +185,23 @@
         margin-top: 20px;
       }
 
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--accent-light);
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 16px;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .link-btn:hover {
+        color: #ffffff;
+      }
+
       .hidden {
         display: none;
       }
@@ -209,10 +226,15 @@
       <div class="hero__icon" aria-hidden="true">
         <span class="hero__glyph"></span>
       </div>
-      <a class="button" href="https://apps.apple.com/app/id6745767553" target="_blank" rel="noreferrer">
-        Download Quests
+      <p class="hero__note" style="font-size: 1rem; max-width: 280px;">
+        You've been invited to a quest!<br>Download the app to join.
+      </p>
+      <a class="button" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer">
+        Download Quests and Join
       </a>
-      <p class="hero__note">Accept your invite and start your<br>first quest with friends.</p>
+      <button class="link-btn" id="fallback-open-app" type="button">
+        I already have the app
+      </button>
     </main>
 
     <main class="card" id="not-found-card" role="main">
@@ -229,11 +251,32 @@
       (function () {
         var path = window.location.pathname || "/";
         var isInvite = path === "/q" || path === "/q/" || path.indexOf("/q/") === 0;
+        var APP_STORE_URL = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
 
         if (isInvite) {
-          document.title = "Download Quests";
+          document.title = "You're invited to a Quest!";
           document.getElementById("invite-card").classList.remove("hidden");
           document.getElementById("not-found-card").classList.add("hidden");
+
+          // Extract share code for "I already have the app"
+          var codeMatch = path.match(/^\/q\/([A-HJ-NP-Za-hj-kmnp-z2-9]{8})$/);
+          var shareCode = codeMatch ? codeMatch[1] : '';
+
+          var openBtn = document.getElementById('fallback-open-app');
+          if (openBtn) {
+            openBtn.addEventListener('click', function () {
+              if (!shareCode) {
+                window.location.href = APP_STORE_URL;
+                return;
+              }
+              window.location.href = 'https://invite.thequestsapp.com/q/' + shareCode;
+              setTimeout(function () {
+                if (!document.hidden) {
+                  window.location.href = APP_STORE_URL;
+                }
+              }, 1500);
+            });
+          }
         }
       })();
     </script>

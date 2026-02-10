@@ -6,3 +6,13 @@
 
 /.well-known/apple-app-site-association.json
   Content-Type: application/json
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/q/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co; img-src 'self' https://*.supabase.co data:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; form-action 'self' https://apps.apple.com; base-uri 'self'; object-src 'none'
