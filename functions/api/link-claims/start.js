@@ -72,6 +72,18 @@ function getTurnstileAllowedHosts(env) {
     .filter(Boolean);
 }
 
+function getTurnstileSecret(env) {
+  return (
+    (env && env.TURNSTILE_SECRET_KEY) ||
+    (env && env.TURNSTILE_SECRET) ||
+    (env && env.CF_TURNSTILE_SECRET_KEY)
+  );
+}
+
+function getSupabaseKey(env) {
+  return (env && env.cloudflare_key) || (env && env.CLOUDFLARE_KEY);
+}
+
 async function hashForRateLimit(value) {
   const bytes = new TextEncoder().encode(value);
   const buffer = await crypto.subtle.digest("SHA-256", bytes);
@@ -117,12 +129,17 @@ async function checkAndIncrementRate(kv, key, limit, ttlSeconds) {
 
 export async function onRequestPost(context) {
   try {
-    if (!context.env.TURNSTILE_SECRET_KEY) {
-      console.error("TURNSTILE_SECRET_KEY is missing");
+    const turnstileSecret = getTurnstileSecret(context.env);
+    if (!turnstileSecret) {
+      console.error(
+        "Turnstile secret is missing (TURNSTILE_SECRET_KEY | TURNSTILE_SECRET | CF_TURNSTILE_SECRET_KEY)"
+      );
       return jsonResponse(500, { error: "misconfigured" });
     }
 
-    if (!context.env.SUPABASE_URL || !context.env.cloudflare_key) {
+    const supabaseUrl = context.env.SUPABASE_URL;
+    const supabaseKey = getSupabaseKey(context.env);
+    if (!supabaseUrl || !supabaseKey) {
       console.error("Supabase env bindings are missing");
       return jsonResponse(500, { error: "misconfigured" });
     }
@@ -163,7 +180,7 @@ export async function onRequestPost(context) {
     const clientIP = context.request.headers.get("CF-Connecting-IP");
 
     const turnstileBody = new URLSearchParams();
-    turnstileBody.append("secret", context.env.TURNSTILE_SECRET_KEY);
+    turnstileBody.append("secret", turnstileSecret);
     turnstileBody.append("response", turnstileToken);
     if (clientIP) {
       turnstileBody.append("remoteip", clientIP);
@@ -253,9 +270,6 @@ export async function onRequestPost(context) {
     }
 
     // Step 8: Call Supabase RPC start_link_claim
-    const supabaseUrl = context.env.SUPABASE_URL;
-    const supabaseKey = context.env.cloudflare_key;
-
     const rpcResponse = await fetch(
       `${supabaseUrl}/rest/v1/rpc/start_link_claim`,
       {
