@@ -217,3 +217,23 @@ Allowed files in this PR:
 - [ ] `git diff --name-only origin/main...HEAD` shows only invite-scope files
 - [ ] No placeholder credentials remain in committed code
 - [ ] AASA still validates at `https://app-site-association.cdn-apple.com/a/v1/invite.thequestsapp.com`
+
+---
+
+## Post-deploy fixes (2026-02-10)
+
+### Bug fix: Cloudflare Pages secrets trailing whitespace
+
+**Root cause:** `SUPABASE_URL` and `TURNSTILE_SECRET_KEY` were stored with trailing spaces in the key names (1 and 2 trailing spaces respectively). The dashboard trims whitespace visually so names appeared correct, but the Pages runtime uses exact key matching — `context.env.SUPABASE_URL` returned `undefined`.
+
+**Impact:** All `POST /api/link-claims/start` returned `500 { "error": "misconfigured" }`.
+
+**Fix:** Deleted broken-named secrets and re-created with clean names. Verified clean via API byte-level inspection. Redeployed.
+
+**Prevention:** Always verify secret names via `wrangler pages secret list` or Cloudflare API — do not rely on dashboard visual display alone.
+
+### UI polish: success checkmark animation
+
+- Checkmark icon color changed from green (`#34c759`) to brand blue (`--accent` / `#3366cc`)
+- Added bouncy `checkPop` scale animation on the icon (spring-like overshoot)
+- Title and description text stagger in 150ms after the icon pop

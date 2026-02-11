@@ -22,15 +22,15 @@ const DEFAULT_TURNSTILE_HOSTS = [
 ];
 
 const RATE_LIMITS = {
-  ip: { limit: 5, ttl: 3600, prefix: "ip" },
-  phone: { limit: 3, ttl: 86400, prefix: "phone" },
-  codeIp: { limit: 20, ttl: 86400, prefix: "code" },
+  ip: { limit: 10, ttl: 600, prefix: "ip" },
+  phone: { limit: 5, ttl: 600, prefix: "phone" },
+  codeIp: { limit: 30, ttl: 600, prefix: "code" },
 };
 
 // --- Helpers ---
 
 function jsonResponse(status, body, extraHeaders) {
-  return new Response(JSON.stringify(body), {
+  return new Response(JSON.stringify({ _v: "rl-600-v2", ...body }), {
     status,
     headers: { "Content-Type": "application/json", ...extraHeaders },
   });
@@ -133,7 +133,7 @@ async function checkAndIncrementRate(kv, key, limit, ttlSeconds) {
     data.count += 1;
     const remaining = ttlSeconds - (now - data.firstSeen);
     await kv.put(key, JSON.stringify(data), {
-      expirationTtl: Math.max(remaining, 1),
+      expirationTtl: Math.max(remaining, 60),
     });
     return { limited: false };
   }
@@ -307,12 +307,17 @@ export async function onRequestPost(context) {
     );
 
     if (!rpcResponse.ok) {
+      const rpcText = await rpcResponse.text();
       console.error(
         "Supabase RPC error:",
         rpcResponse.status,
-        await rpcResponse.text()
+        rpcText
       );
-      return jsonResponse(500, { error: "internal_error" });
+      return jsonResponse(500, {
+        error: "internal_error",
+        debug_status: rpcResponse.status,
+        debug_message: rpcText.slice(0, 200),
+      });
     }
 
     const result = await rpcResponse.json();
@@ -345,6 +350,10 @@ export async function onRequestPost(context) {
     });
   } catch (err) {
     console.error("Unhandled error in /api/link-claims/start:", err);
-    return jsonResponse(500, { error: "internal_error" });
+    return jsonResponse(500, {
+      error: "internal_error",
+      debug_catch: String(err),
+      debug_stack: err && err.stack ? err.stack.slice(0, 300) : null,
+    });
   }
 }

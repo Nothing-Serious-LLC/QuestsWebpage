@@ -439,6 +439,25 @@ Server → Supabase RPC: start_link_claim(p_share_code, p_phone, p_phone_last4)
 Response: { claimId, maskedPhone, status, expiresAt }
 ```
 
+### Bug fix: Cloudflare Pages secrets trailing whitespace (2026-02-10)
+
+**Root cause:** `SUPABASE_URL` and `TURNSTILE_SECRET_KEY` were stored in Cloudflare Pages with trailing spaces in the key names (1 and 2 trailing spaces respectively). The Cloudflare dashboard trims whitespace visually, so the names appeared correct, but the Pages runtime uses exact key matching — `context.env.SUPABASE_URL` returned `undefined` because the actual key was `"SUPABASE_URL "`.
+
+**Impact:** All `POST /api/link-claims/start` requests returned `500 { "error": "misconfigured" }`. The invite preview was unaffected because it fetches quest data client-side using a hardcoded publishable key.
+
+**Diagnosis:** Used Cloudflare API to inspect raw env var key names byte-by-byte, confirming trailing `0x20` bytes.
+
+**Fix:** Deleted the broken-named secrets and re-created them with clean names via the Cloudflare dashboard. Verified clean keys via API. Redeployed.
+
+**Prevention:** The `start.js` handler includes env fallback helpers (`getTurnstileSecret`, `getSupabaseKey`) that check multiple key name variants. For future secret configuration, always verify via `wrangler pages secret list` or the API — do not rely on dashboard visual display alone.
+
+### UI polish: success checkmark animation (2026-02-10)
+
+Changed the phone-submit success state in `q/index.html`:
+- **Color:** checkmark icon changed from green (`--accent-success` / `#34c759`) to brand blue (`--accent` / `#3366cc`) with matching blue-tinted background
+- **Animation:** added `checkPop` keyframe — bouncy scale pop-in with overshoot (0 → 1.15 → 1.0) using spring-like cubic-bezier timing
+- **Stagger:** title and description text fade in with 150ms delay after the icon pops, creating a sequenced reveal
+
 ### Deployment verification (2026-02-10)
 
 Preview deployment verified at `https://20f29818.quests-invite.pages.dev`:
@@ -449,13 +468,14 @@ Preview deployment verified at `https://20f29818.quests-invite.pages.dev`:
 | AASA at `invite.thequestsapp.com` | 200 OK, correct `appID` and paths |
 | Apple CDN AASA cache | Serving correct AASA content |
 | `/q/test1234` renders invite UI | Confirmed |
+| Phone submit flow | End-to-end working after secrets fix |
 
 ### Outstanding tasks — Website team
 
 All code changes complete. Remaining:
 
-1. **Commit and push to GitHub** — triggers production auto-deploy via Cloudflare Pages GitHub integration
-2. **Browser E2E test with real share code** — verify phone submit flow once backend RPC is live
+1. **Browser E2E test with real share code** — verify phone submit flow with production data
+2. **Commit and push to GitHub** — triggers production auto-deploy via Cloudflare Pages GitHub integration
 
 ### Outstanding tasks — Backend/Quests team (NOT in this repo)
 
@@ -475,7 +495,7 @@ All code changes complete. Remaining:
 - [x] Commit `_routes.json`, `functions/api/`, `docs/`
 - [x] Replace Supabase URL and publishable key in `q/index.html`
 - [x] Replace Turnstile site key in `q/index.html`
-- [x] Set Cloudflare Pages secrets: `SUPABASE_URL`, `cloudflare_key`, `TURNSTILE_SECRET_KEY`
+- [x] Set Cloudflare Pages secrets: `SUPABASE_URL`, `cloudflare_key`, `TURNSTILE_SECRET_KEY` (fixed trailing whitespace in key names 2026-02-10)
 - [x] Create and bind `RATE_LIMIT` KV namespace
 - [x] Fix fail-open rate limiting to fail closed in `start.js`
 - [x] Remove `/api/*` CORS from `_headers` (middleware handles it)
@@ -489,7 +509,7 @@ All code changes complete. Remaining:
 - [ ] Confirm `start_link_claim` Supabase RPC exists
 - [ ] Confirm `pending_link_claims` table exists
 - [ ] Test `/q/{code}` on mobile Safari with real share code
-- [ ] Test phone submit flow end-to-end
+- [x] Test phone submit flow end-to-end (working after secrets fix 2026-02-10)
 - [ ] Test "I already have the app" universal link handoff
 - [ ] Test error states (invalid code, expired quest, rate limiting)
 

@@ -590,16 +590,23 @@
       }
 
       .gate-success__icon {
-        width: 48px;
-        height: 48px;
-        margin: 0 auto 12px;
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 14px;
         border-radius: 50%;
-        background: rgba(52, 199, 89, 0.15);
+        background: rgba(51, 102, 204, 0.14);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
-        color: var(--accent-success);
+        font-size: 26px;
+        color: var(--accent);
+        animation: checkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      }
+
+      @keyframes checkPop {
+        0%   { transform: scale(0); opacity: 0; }
+        60%  { transform: scale(1.15); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
       }
 
       .gate-success__title {
@@ -693,7 +700,7 @@
          ======================================== */
       #quest-error {
         text-align: center;
-        padding: 60px 20px;
+        padding: 20vh 20px 60px;
         animation: fadeInUp 0.4s ease-out;
       }
 
@@ -707,6 +714,7 @@
         align-items: center;
         justify-content: center;
         font-size: 28px;
+        color: var(--accent-error);
       }
 
       .error-title {
@@ -959,7 +967,12 @@
 
       /* Confirmation fade-in */
       #gate-confirmed:not(.state-hidden) {
-        animation: fadeInUp 0.4s ease-out;
+        animation: fadeInUp 0.45s ease-out;
+      }
+
+      #gate-confirmed:not(.state-hidden) .gate-success__title,
+      #gate-confirmed:not(.state-hidden) .gate-success__text {
+        animation: fadeInUp 0.4s ease-out 0.15s both;
       }
     </style>
   </head>
@@ -1080,7 +1093,7 @@
                 />
               </div>
               <p id="phone-error" class="phone-error state-hidden" role="alert" aria-live="polite"></p>
-              <p class="gate-privacy">Enter your number to join this quest when you sign up. Your phone number is only used to link this invite to your account. We won't call, text, or share your number. By submitting, you agree to our <a href="https://thequestsapp.com/privacy.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Privacy Policy</a> and <a href="https://thequestsapp.com/terms.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Terms of Service</a>.</p>
+              <p class="gate-privacy">Enter your number to join this quest when you sign up. Your phone number is encrypted and only used to link this invite to your account. We won't call, text, or share your number. By submitting, you agree to our <a href="https://thequestsapp.com/privacy.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Privacy Policy</a> and <a href="https://thequestsapp.com/terms.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Terms of Service</a>.</p>
               <div id="turnstile-container"></div>
             </div>
             <div id="gate-confirmed" class="state-hidden">
@@ -1116,7 +1129,7 @@
 
         <!-- ===== ERROR STATE ===== -->
         <div id="quest-error" class="state-hidden" role="alert">
-          <div class="error-icon" aria-hidden="true">&#128269;</div>
+          <div class="error-icon" aria-hidden="true"><i class="mdi mdi-map-search-outline"></i></div>
           <h1 class="error-title" id="error-title">Quest not found</h1>
           <p class="error-text" id="error-text">This quest may have been removed or the link is no longer valid.</p>
           <a
