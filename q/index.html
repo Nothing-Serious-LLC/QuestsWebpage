@@ -1100,7 +1100,7 @@
               <div class="gate-success">
                 <div class="gate-success__icon" aria-hidden="true">&#10003;</div>
                 <p class="gate-success__title">You're all set</p>
-                <p class="gate-success__text">Download Quests and sign up with this number to join automatically.</p>
+                <p class="gate-success__text">Opening Quests...</p>
               </div>
             </div>
           </div>
@@ -1111,10 +1111,10 @@
               class="cta-button cta-button--disabled"
               id="download-cta"
               type="button"
-              aria-label="Submit phone and download Quests"
+              aria-label="Submit phone and join on Quests"
             >
               <span class="cta-button__icon" aria-hidden="true">&#63743;</span>
-              <span id="cta-text">Download Quests and Join</span>
+              <span id="cta-text">Join on Quest!</span>
             </button>
             <button
               class="link-secondary"
@@ -1627,14 +1627,15 @@
           ctaBtn.disabled = false;
           ctaBtn.classList.remove('cta-button--loading');
           ctaBtn.setAttribute('aria-busy', 'false');
-          ctaText.textContent = 'Download Quests and Join';
+          ctaText.textContent = 'Join on Quest!';
           updateCtaState();
         }
 
         function setButtonSuccess() {
           ctaBtn.classList.remove('cta-button--loading');
-          ctaBtn.disabled = false;
-          ctaText.textContent = 'Download Quests and Join';
+          ctaBtn.disabled = true;
+          ctaBtn.setAttribute('aria-busy', 'true');
+          ctaText.textContent = 'Opening Quests...';
         }
 
         /* ============================================
@@ -1756,7 +1757,7 @@
           if (data && data.maskedPhone) {
             var successText = gateConfirmed.querySelector('.gate-success__text');
             if (successText) {
-              successText.textContent = 'Download Quests and sign in with ' + data.maskedPhone + ' to join automatically.';
+              successText.textContent = 'Opening Quests...';
             }
           }
 
@@ -1766,7 +1767,7 @@
 
           setTimeout(function () {
             window.location.href = APP_STORE_URL;
-          }, 1200);
+          }, 1600);
         }
 
         /* ============================================
