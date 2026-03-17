@@ -32,6 +32,7 @@
 html,
 body {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -762,7 +763,7 @@ main > section {
     max-height: 400px;
     width: 100%;
     max-width: none;
-    margin-bottom: 8px;
+    margin-bottom: 24px;
     margin-top: 0;
   }
   .hero__phone {
