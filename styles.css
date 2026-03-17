@@ -763,7 +763,7 @@ main > section {
     max-height: 370px;
     width: 100%;
     max-width: none;
-    margin-bottom: 40px;
+    margin-bottom: 80px;
     margin-top: 0;
   }
   .hero__phone {
@@ -791,6 +791,24 @@ main > section {
   }
   .iphone-hardware__screen img {
     border-radius: 20px !important;
+  }
+  .iphone-hardware__btn-mute,
+  .iphone-hardware__btn-vol,
+  .iphone-hardware__btn-power {
+    width: 2px;
+  }
+  .iphone-hardware__btn-mute {
+    height: 16px;
+    top: 65px;
+  }
+  .iphone-hardware__btn-vol {
+    height: 30px;
+  }
+  .iphone-hardware__btn-vol--up { top: 92px; }
+  .iphone-hardware__btn-vol--down { top: 130px; }
+  .iphone-hardware__btn-power {
+    height: 40px;
+    top: 105px;
   }
 }
 
@@ -1628,9 +1646,9 @@ main > section {
   
   /* Hero section mobile optimizations */
   .hero {
-    padding-top: 20px;
-    padding-bottom: 140px;
-    gap: 32px;
+    padding-top: 0;
+    padding-bottom: 40px;
+    gap: 0;
     min-height: auto;
     justify-content: flex-start;
   }
