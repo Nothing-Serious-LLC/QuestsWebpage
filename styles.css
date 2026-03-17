@@ -759,11 +759,11 @@ main > section {
   }
   .hero__phones {
     order: -1;
-    height: 50svh;
-    max-height: 400px;
+    height: 46svh;
+    max-height: 370px;
     width: 100%;
     max-width: none;
-    margin-bottom: 24px;
+    margin-bottom: 40px;
     margin-top: 0;
   }
   .hero__phone {
