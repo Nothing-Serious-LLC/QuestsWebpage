@@ -442,6 +442,7 @@ main > section {
 
 .hero__phone--front.is-loaded {
   opacity: 1 !important;
+  transform: rotate(0deg) scale(1) !important;
 }
 
 .hero__phone--back {
@@ -452,10 +453,7 @@ main > section {
 
 .hero__phone--back.is-loaded {
   opacity: 1 !important;
-}
-
-.hero__phone.is-scroll-active {
-  transition: opacity 1s ease-out, transform 0.18s linear;
+  transform: rotate(12deg) scale(0.85) !important;
 }
 
 .hero__phone--front.is-loaded .hero__phone-motion {
@@ -464,6 +462,8 @@ main > section {
 
 .hero__phone--back.is-loaded .hero__phone-motion {
   animation: floatBack 6s ease-in-out infinite alternate;
+  animation-delay: -3s;
+  animation-duration: 8.5s;
 }
 
 @keyframes floatFront {
