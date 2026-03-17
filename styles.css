@@ -32,7 +32,10 @@
 html,
 body {
   height: 100%;
-  overflow-x: hidden;
+}
+
+html {
+  overflow-x: clip;
 }
 
 body {
