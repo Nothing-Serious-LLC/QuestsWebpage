@@ -418,8 +418,8 @@
             });
           }
         });
-      }, { threshold: 0.5 });
-      
+      }, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+
       const introSection = document.querySelector('.intro');
       if (introSection) {
         observer.observe(introSection);
@@ -449,8 +449,8 @@
             }, 16);
           }
         });
-      }, { threshold: 0.5 });
-      
+      }, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+
       const whySection = document.querySelector('.why');
       if (whySection) {
         whyObserver.observe(whySection);
@@ -467,9 +467,7 @@
             const index = cards.indexOf(entry.target);
             entry.target.style.transitionDelay = `${index * 0.1}s`;
             entry.target.classList.add('feature-card--visible');
-          } else {
-            entry.target.style.transitionDelay = '0s';
-            entry.target.classList.remove('feature-card--visible');
+            featureObserver.unobserve(entry.target);
           }
         });
       }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
@@ -518,42 +516,38 @@
       let logoScrollProgress = 0;
       let hasCompleted = false;
       
+      let logoRafPending = false;
       window.addEventListener('scroll', () => {
-        if (!ctaSection || !clipRect || !ctaGlyph) return;
-        
-        const rect = ctaSection.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        
-        // Calculate scroll progress for CTA section
-        // Start revealing when section is well into viewport
-        // Finish when section is well centered
-        const scrollStart = windowHeight * 0.6;
-        const scrollEnd = windowHeight * 0.15;
-        
-        if (rect.top <= scrollStart && rect.top >= scrollEnd) {
-          // Scrolling down - reveal from bottom to top
-          logoScrollProgress = 1 - ((rect.top - scrollEnd) / (scrollStart - scrollEnd));
-        } else if (rect.top > scrollStart) {
-          // Section below viewport - not revealed
-          logoScrollProgress = 0;
-        } else if (rect.top < scrollEnd) {
-          // Section above center - fully revealed
-          logoScrollProgress = 1;
-        }
-        
-        // Update clip-path height (reveal from bottom)
-        const revealHeight = logoScrollProgress * 100;
-        clipRect.setAttribute('y', String(100 - revealHeight));
-        clipRect.setAttribute('height', String(revealHeight));
-      });
+        if (logoRafPending || !ctaSection || !clipRect || !ctaGlyph) return;
+        logoRafPending = true;
+        requestAnimationFrame(() => {
+          logoRafPending = false;
+          const rect = ctaSection.getBoundingClientRect();
+          const windowHeight = window.innerHeight;
 
-      // Generic Scroll Reveal (bidirectional)
+          const scrollStart = windowHeight * 0.6;
+          const scrollEnd = windowHeight * 0.15;
+
+          if (rect.top <= scrollStart && rect.top >= scrollEnd) {
+            logoScrollProgress = 1 - ((rect.top - scrollEnd) / (scrollStart - scrollEnd));
+          } else if (rect.top > scrollStart) {
+            logoScrollProgress = 0;
+          } else if (rect.top < scrollEnd) {
+            logoScrollProgress = 1;
+          }
+
+          const revealHeight = logoScrollProgress * 100;
+          clipRect.setAttribute('y', String(100 - revealHeight));
+          clipRect.setAttribute('height', String(revealHeight));
+        });
+      }, { passive: true });
+
+      // Generic Scroll Reveal (one-shot)
       const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-visible');
-          } else {
-            entry.target.classList.remove('is-visible');
+            revealObserver.unobserve(entry.target);
           }
         });
       }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });

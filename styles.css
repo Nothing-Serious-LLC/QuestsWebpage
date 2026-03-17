@@ -1161,7 +1161,7 @@ main > section {
   grid-template-columns: auto 1fr;
   gap: 28px;
   align-items: center;
-  transition: all 0.6s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.25s ease;
   opacity: 0;
 }
 
@@ -1178,8 +1178,8 @@ main > section {
   transform: translateX(0) !important;
 }
 
-.feature-card:hover {
-  transform: translateX(0) translateY(-4px);
+.feature-card--visible:hover {
+  transform: translateY(-4px) !important;
   box-shadow: var(--shadow-lg);
 }
 
