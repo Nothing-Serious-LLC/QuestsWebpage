@@ -173,33 +173,37 @@
 
               <!-- Back Phone -->
               <div class="hero__phone hero__phone--back" style="opacity: 0; transform: translate3d(0, 0, -100px) scale(0.85) rotate(0deg);">
-                <div class="iphone-hardware">
-                  <div class="iphone-hardware__bezel">
-                    <div class="iphone-hardware__screen">
-                      <img src="phone-screen-2.png" alt="Quests Leaderboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
+                <div class="hero__phone-motion">
+                  <div class="iphone-hardware">
+                    <div class="iphone-hardware__bezel">
+                      <div class="iphone-hardware__screen">
+                        <img src="phone-screen-2.png" alt="Quests Leaderboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
+                      </div>
                     </div>
+                    <!-- Buttons -->
+                    <div class="iphone-hardware__btn-mute"></div>
+                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
+                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
+                    <div class="iphone-hardware__btn-power"></div>
                   </div>
-                  <!-- Buttons -->
-                  <div class="iphone-hardware__btn-mute"></div>
-                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
-                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
-                  <div class="iphone-hardware__btn-power"></div>
                 </div>
               </div>
 
               <!-- Front Phone -->
               <div class="hero__phone hero__phone--front" style="transform: translateY(0); opacity: 1;">
-                <div class="iphone-hardware">
-                  <div class="iphone-hardware__bezel">
-                    <div class="iphone-hardware__screen">
-                      <img src="phone-screen-1.png" alt="Quests Dashboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
+                <div class="hero__phone-motion">
+                  <div class="iphone-hardware">
+                    <div class="iphone-hardware__bezel">
+                      <div class="iphone-hardware__screen">
+                        <img src="phone-screen-1.png" alt="Quests Dashboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
+                      </div>
                     </div>
+                    <!-- Buttons -->
+                    <div class="iphone-hardware__btn-mute"></div>
+                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
+                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
+                    <div class="iphone-hardware__btn-power"></div>
                   </div>
-                  <!-- Buttons -->
-                  <div class="iphone-hardware__btn-mute"></div>
-                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
-                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
-                  <div class="iphone-hardware__btn-power"></div>
                 </div>
               </div>
             </div>
@@ -558,8 +562,60 @@
         revealObserver.observe(el);
       });
 
-      // Hero initial load animation
+      let heroAnimationInitialized = false;
+      let heroScrollInitialized = false;
+
+      // Hero scroll + load animation
+      function initHeroScrollMotion() {
+        if (heroScrollInitialized) return;
+        heroScrollInitialized = true;
+
+        const heroSection = document.querySelector('.hero--minimal');
+        const phoneBack = document.querySelector('.hero__phone--back');
+        const phoneFront = document.querySelector('.hero__phone--front');
+
+        if (!heroSection || !phoneBack || !phoneFront) return;
+
+        let ticking = false;
+
+        function clamp(value, min, max) {
+          return Math.min(Math.max(value, min), max);
+        }
+
+        function updateHeroPhones() {
+          const rect = heroSection.getBoundingClientRect();
+          const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+          const progress = clamp((-rect.top) / Math.max(viewportHeight * 0.9, 1), 0, 1);
+
+          const frontShift = progress * -26;
+          const backShift = progress * 18;
+
+          phoneFront.style.transform = `translate3d(0, ${frontShift}px, 0) rotate(0deg) scale(1)`;
+          phoneBack.style.transform = `translate3d(0, ${backShift}px, -100px) rotate(12deg) scale(0.85)`;
+
+          ticking = false;
+        }
+
+        function requestUpdate() {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(updateHeroPhones);
+        }
+
+        requestUpdate();
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', requestUpdate);
+
+        setTimeout(() => {
+          phoneFront.classList.add('is-scroll-active');
+          phoneBack.classList.add('is-scroll-active');
+        }, 1100);
+      }
+
       function initHeroAnimation() {
+        if (heroAnimationInitialized) return;
+        heroAnimationInitialized = true;
+
         setTimeout(() => {
           const heroContent = document.querySelector('.hero__content');
           const phoneBack = document.querySelector('.hero__phone--back');
@@ -576,11 +632,14 @@
       }
       
       if (document.readyState === 'complete') {
+        initHeroScrollMotion();
         initHeroAnimation();
       } else {
         window.addEventListener('load', initHeroAnimation);
+        window.addEventListener('load', initHeroScrollMotion);
         // Fallback just in case
         document.addEventListener('DOMContentLoaded', initHeroAnimation);
+        document.addEventListener('DOMContentLoaded', initHeroScrollMotion);
       }
     </script>
   </body>
