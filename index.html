@@ -123,7 +123,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=18" />
   </head>
   <body>
     <div class="page__background"></div>
@@ -139,55 +139,75 @@
       </header>
 
       <main>
-        <section id="hero" class="hero">
-          <div class="hero__quest-cards">
-            <article class="quest-card" data-card="1" role="article" aria-label="75 Hard challenge quest">
-              <div class="quest-card__bg" style="background-image: url('bg-4.png');" role="img" aria-label="75 Hard quest background"></div>
-              <div class="quest-card__content">
-                <div class="quest-card__icon" role="img" aria-label="Skull icon for 75 Hard challenge">
-                  <i class="mdi mdi-skull-crossbones" aria-hidden="true"></i>
+        <section id="hero" class="hero hero--minimal">
+          <div class="hero__container">
+            <div class="hero__content" style="opacity: 0; transform: translateX(-30px);">
+              <h1 class="hero__title">Habits Made <span class="highlight-text">Social.</span></h1>
+              <p class="hero__subtitle">Create challenges, build streaks, and check in daily with friends. Quests makes staying consistent fun and rewarding through social accountability.</p>
+              <div id="download" class="hero__cta-group">
+                <a class="hero__app-store" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer" aria-label="Download on the App Store">
+                  <img src="download-on-the-app-store.svg" alt="Download on the App Store">
+                </a>
+                <div class="hero__app-store hero__app-store--disabled" aria-label="Android app coming soon" title="Coming Soon">
+                  <div class="store-btn">
+                    <i class="mdi mdi-google-play"></i>
+                    <div class="store-btn__text">
+                      <span class="store-btn__sub">Coming soon</span>
+                      <span class="store-btn__main">Google Play</span>
+                    </div>
+                  </div>
                 </div>
-                <h3 class="quest-card__title">75 Hard</h3>
               </div>
-            </article>
-            <article class="quest-card" data-card="2" role="article" aria-label="Daily Gratitude quest">
-              <div class="quest-card__bg" style="background-image: url('bg-3.png');" role="img" aria-label="Daily Gratitude quest background"></div>
-              <div class="quest-card__content">
-                <div class="quest-card__icon" role="img" aria-label="Heart icon for gratitude practice">
-                  <i class="mdi mdi-heart" aria-hidden="true"></i>
-                </div>
-                <h3 class="quest-card__title">Daily Gratitude</h3>
-              </div>
-            </article>
-            <article class="quest-card" data-card="3" role="article" aria-label="Dry January quest">
-              <div class="quest-card__bg" style="background-image: url('bg-2.png');" role="img" aria-label="Dry January quest background"></div>
-              <div class="quest-card__content">
-                <div class="quest-card__icon" role="img" aria-label="No alcohol icon for Dry January">
-                  <i class="mdi mdi-glass-cocktail-off" aria-hidden="true"></i>
-                </div>
-                <h3 class="quest-card__title">Dry January</h3>
-              </div>
-            </article>
-          </div>
+            </div>
 
-          <div class="hero__content">
-            <h1 class="hero__title">Turn your health goals into a shared Quest</h1>
-            <div id="download" class="hero__cta-group">
-              <a class="button button--primary" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer">
-                <span aria-hidden="true" class="button__icon"></span>
-                Download on the App Store
-              </a>
-              <!-- Google Play - Coming Soon -->
-              <!-- <a class="button button--ghost" href="https://play.google.com" target="_blank" rel="noreferrer">
-                <span aria-hidden="true" class="button__icon">▶</span>
-                Get it on Google Play
-              </a> -->
+            <div class="hero__phones">
+              <!-- Faint Floating Background Icons -->
+              <div class="hero__floating-icons">
+                <span class="mdi mdi-dumbbell floating-icon icon-1"></span>
+                <span class="mdi mdi-book-open-variant floating-icon icon-2"></span>
+                <span class="mdi mdi-water floating-icon icon-3"></span>
+                <span class="mdi mdi-run floating-icon icon-4"></span>
+                <span class="mdi mdi-meditation floating-icon icon-5"></span>
+                <span class="mdi mdi-bed-empty floating-icon icon-6"></span>
+              </div>
+
+              <!-- Back Phone -->
+              <div class="hero__phone hero__phone--back" style="opacity: 0; transform: translate3d(0, 0, -100px) scale(0.85) rotate(0deg);">
+                <div class="iphone-hardware">
+                  <div class="iphone-hardware__bezel">
+                    <div class="iphone-hardware__screen">
+                      <img src="phone-screen-2.png" alt="Quests Leaderboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
+                    </div>
+                  </div>
+                  <!-- Buttons -->
+                  <div class="iphone-hardware__btn-mute"></div>
+                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
+                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
+                  <div class="iphone-hardware__btn-power"></div>
+                </div>
+              </div>
+
+              <!-- Front Phone -->
+              <div class="hero__phone hero__phone--front" style="transform: translateY(0); opacity: 1;">
+                <div class="iphone-hardware">
+                  <div class="iphone-hardware__bezel">
+                    <div class="iphone-hardware__screen">
+                      <img src="phone-screen-1.png" alt="Quests Dashboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
+                    </div>
+                  </div>
+                  <!-- Buttons -->
+                  <div class="iphone-hardware__btn-mute"></div>
+                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
+                  <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
+                  <div class="iphone-hardware__btn-power"></div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         <section class="intro">
-          <div class="intro__grid">
+          <div class="intro__grid scroll-reveal">
             <div class="intro__text-block">
               <h2 class="intro__heading">Grow together</h2>
               <p class="intro__description">
@@ -219,7 +239,7 @@
         </section>
 
         <section id="why" class="why">
-          <div class="why__grid">
+          <div class="why__grid scroll-reveal">
             <div class="why__visual">
               <div class="why__stat-display">
                 <p class="why__stat-number"><span class="why__stat-counter">0</span><span class="why__stat-percent">%</span></p>
@@ -239,7 +259,7 @@
 
         <section id="features" class="features">
           <div class="features__container">
-            <h2 class="features__heading">Everything you need to build habits together</h2>
+            <h2 class="features__heading scroll-reveal">Everything you need to build habits together</h2>
             <div class="features__list">
               <article class="feature-card feature-card--slide" data-slide="left">
                 <div class="feature-card__icon" role="img" aria-label="Fire icon representing daily streak tracking">
@@ -290,7 +310,7 @@
         </section>
 
         <section id="cta" class="cta">
-          <div class="cta__container">
+          <div class="cta__container scroll-reveal">
             <div class="cta__logo">
               <svg class="cta__glyph-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Quests app logo">
                 <title>Quests Logo</title>
@@ -305,10 +325,20 @@
               </svg>
             </div>
             <h2 class="cta__title">Start your first Quest</h2>
-            <a class="button button--primary button--cta" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer">
-                <span aria-hidden="true" class="button__icon"></span>
-                Download on the App Store
+            <div class="hero__cta-group cta__group">
+              <a class="hero__app-store" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer" aria-label="Download on the App Store">
+                <img src="download-on-the-app-store.svg" alt="Download on the App Store">
               </a>
+              <div class="hero__app-store hero__app-store--disabled" aria-label="Android app coming soon" title="Coming Soon">
+                <div class="store-btn">
+                  <i class="mdi mdi-google-play"></i>
+                  <div class="store-btn__text">
+                    <span class="store-btn__sub">Coming soon</span>
+                    <span class="store-btn__main">Google Play</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -422,22 +452,23 @@
         whyObserver.observe(whySection);
       }
       
-      // Feature cards slide-in animation
+      // Feature cards slide-in animation (bidirectional)
       const featureCards = document.querySelectorAll('.feature-card--slide');
-      
-      // Adjust threshold based on screen size
-      const isMobile = window.innerWidth <= 640;
-      const observerOptions = isMobile 
-        ? { threshold: 0.3, rootMargin: '-40px' }
-        : { threshold: 0.8, rootMargin: '-120px' };
       
       const featureObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
+            // Stagger the animation based on card index
+            const cards = Array.from(featureCards);
+            const index = cards.indexOf(entry.target);
+            entry.target.style.transitionDelay = `${index * 0.1}s`;
             entry.target.classList.add('feature-card--visible');
+          } else {
+            entry.target.style.transitionDelay = '0s';
+            entry.target.classList.remove('feature-card--visible');
           }
         });
-      }, observerOptions);
+      }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
       
       featureCards.forEach(card => {
         featureObserver.observe(card);
@@ -511,6 +542,46 @@
         clipRect.setAttribute('y', String(100 - revealHeight));
         clipRect.setAttribute('height', String(revealHeight));
       });
+
+      // Generic Scroll Reveal (bidirectional)
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          } else {
+            entry.target.classList.remove('is-visible');
+          }
+        });
+      }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });
+
+      document.querySelectorAll('.scroll-reveal').forEach(el => {
+        revealObserver.observe(el);
+      });
+
+      // Hero initial load animation
+      function initHeroAnimation() {
+        setTimeout(() => {
+          const heroContent = document.querySelector('.hero__content');
+          const phoneBack = document.querySelector('.hero__phone--back');
+          const phoneFront = document.querySelector('.hero__phone--front');
+          
+          if (heroContent) heroContent.classList.add('is-loaded');
+          if (phoneFront) phoneFront.classList.add('is-loaded');
+          
+          // Delay back phone so front is fully solid first
+          setTimeout(() => {
+            if (phoneBack) phoneBack.classList.add('is-loaded');
+          }, 400);
+        }, 100);
+      }
+      
+      if (document.readyState === 'complete') {
+        initHeroAnimation();
+      } else {
+        window.addEventListener('load', initHeroAnimation);
+        // Fallback just in case
+        document.addEventListener('DOMContentLoaded', initHeroAnimation);
+      }
     </script>
   </body>
 </html>
