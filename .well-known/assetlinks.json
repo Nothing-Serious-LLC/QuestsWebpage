@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "info.nothingserious.quests",
+      "sha256_cert_fingerprints": [
+        "57:FE:AA:83:4B:37:E8:D4:29:31:D0:AB:E7:3E:FB:A4:A8:24:AE:CD:13:62:5B:08:64:48:24:87:EF:C7:0F:7C"
+      ]
+    }
+  }
+]
