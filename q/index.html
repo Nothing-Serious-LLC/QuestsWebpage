@@ -1113,7 +1113,7 @@
               type="button"
               aria-label="Submit phone and join on Quests"
             >
-              <span class="cta-button__icon" aria-hidden="true">&#63743;</span>
+              <span class="cta-button__icon" id="download-cta-icon" aria-hidden="true">&#63743;</span>
               <span id="cta-text">Join on Quests!</span>
             </button>
             <button
@@ -1199,6 +1199,18 @@
           var p = cta.getAttribute('data-platform-cta');
           if (platform !== 'desktop' && p !== platform) {
             cta.style.display = 'none';
+          }
+        }
+
+        // Swap the Apple glyph on the submit button to a Play Store icon for Android,
+        // since &#63743; only renders on Apple platforms (shows as a missing-glyph box on Android).
+        if (platform === 'android') {
+          var ctaIcon = document.getElementById('download-cta-icon');
+          if (ctaIcon) {
+            ctaIcon.textContent = '';
+            var playIcon = document.createElement('i');
+            playIcon.className = 'mdi mdi-google-play';
+            ctaIcon.appendChild(playIcon);
           }
         }
 
@@ -1810,12 +1822,13 @@
         function onSubmitSuccess(data) {
           setButtonSuccess();
 
-          // Update confirmation text with masked phone if available
-          if (data && data.maskedPhone) {
-            var successText = gateConfirmed.querySelector('.gate-success__text');
-            if (successText) {
-              successText.textContent = 'Opening Quests...';
-            }
+          // Set the confirmation subtitle to reflect the actual destination
+          // so the user isn't surprised when the store opens.
+          var successText = gateConfirmed.querySelector('.gate-success__text');
+          if (successText) {
+            successText.textContent = PLATFORM === 'android'
+              ? 'Heading to Google Play...'
+              : 'Heading to the App Store...';
           }
 
           // Show confirmation, then redirect to the appropriate store
