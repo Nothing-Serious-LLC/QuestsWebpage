@@ -1134,6 +1134,7 @@
           <p class="error-text" id="error-text">This quest may have been removed or the link is no longer valid.</p>
           <a
             class="cta-button"
+            data-platform-cta="ios"
             href="https://apps.apple.com/app/id6745767553"
             target="_blank"
             rel="noreferrer"
@@ -1141,6 +1142,18 @@
           >
             <span class="cta-button__icon" aria-hidden="true">&#63743;</span>
             Download Quests
+          </a>
+          <a
+            class="cta-button"
+            data-platform-cta="android"
+            href="https://play.google.com/store/apps/details?id=info.nothingserious.quests"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Get Quests on Google Play"
+            style="margin-top: 12px;"
+          >
+            <span class="cta-button__icon" aria-hidden="true"><i class="mdi mdi-google-play"></i></span>
+            Get Quests on Google Play
           </a>
         </div>
 
@@ -1163,8 +1176,33 @@
         var shareCodeMatch = window.location.pathname.match(/^\/q\/([A-HJ-NP-Za-hj-kmnp-z2-9]{8})$/);
         var shareCode = shareCodeMatch ? shareCodeMatch[1] : '';
         var APP_STORE_URL = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
+        var PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=info.nothingserious.quests';
 
-        // Update smart app banner meta tag with actual share code
+        function detectPlatform() {
+          var ua = (navigator.userAgent || '').toLowerCase();
+          if (/android/.test(ua)) return 'android';
+          // iPadOS 13+ reports as Mac with touch points
+          if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+          if (ua.indexOf('mac') >= 0 && navigator.maxTouchPoints > 1) return 'ios';
+          return 'desktop';
+        }
+        var platform = detectPlatform();
+        // Expose for other script blocks on this page
+        window.__questsPlatform = platform;
+        window.__questsPlayStoreUrl = PLAY_STORE_URL;
+        window.__questsAppStoreUrl = APP_STORE_URL;
+
+        // Hide off-platform CTAs on iOS/Android; show both on desktop.
+        var platformCtas = document.querySelectorAll('[data-platform-cta]');
+        for (var i = 0; i < platformCtas.length; i++) {
+          var cta = platformCtas[i];
+          var p = cta.getAttribute('data-platform-cta');
+          if (platform !== 'desktop' && p !== platform) {
+            cta.style.display = 'none';
+          }
+        }
+
+        // Update smart app banner meta tag with actual share code (iOS only — ignored elsewhere)
         if (shareCode) {
           var metaTag = document.querySelector('meta[name="apple-itunes-app"]');
           if (metaTag) {
@@ -1180,10 +1218,26 @@
           }
         }
 
-        // "I already have the app" — attempt universal link, fallback to App Store
+        // "I already have the app" — platform-specific handoff:
+        //   iOS: visiting the universal link redirects to App Store as fallback
+        //   Android: launch via intent:// (App Links open the app directly if installed),
+        //            fall back to Play Store if intent fails
+        //   Desktop: App Store
         var openAppBtn = document.getElementById('open-app-link');
         if (openAppBtn) {
           openAppBtn.addEventListener('click', function () {
+            if (platform === 'android' && shareCode) {
+              var intentUrl =
+                'intent://invite.thequestsapp.com/q/' + shareCode +
+                '#Intent;scheme=https;package=info.nothingserious.quests;' +
+                'S.browser_fallback_url=' + encodeURIComponent(PLAY_STORE_URL) + ';end';
+              window.location.href = intentUrl;
+              return;
+            }
+            if (platform === 'android') {
+              window.location.href = PLAY_STORE_URL;
+              return;
+            }
             window.location.href = APP_STORE_URL;
           });
         }
@@ -1493,6 +1547,9 @@
         var ctaBtn        = document.getElementById('download-cta');
         var ctaText       = document.getElementById('cta-text');
         var APP_STORE_URL = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
+        var PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=info.nothingserious.quests';
+        var PLATFORM = window.__questsPlatform || 'desktop';
+        var POST_SUBMIT_STORE_URL = PLATFORM === 'android' ? PLAY_STORE_URL : APP_STORE_URL;
 
         /* ============================================
            State
@@ -1761,12 +1818,12 @@
             }
           }
 
-          // Show confirmation, then redirect to App Store
+          // Show confirmation, then redirect to the appropriate store
           gateForm.classList.add('state-hidden');
           gateConfirmed.classList.remove('state-hidden');
 
           setTimeout(function () {
-            window.location.href = APP_STORE_URL;
+            window.location.href = POST_SUBMIT_STORE_URL;
           }, 1600);
         }
 

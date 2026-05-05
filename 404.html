@@ -229,8 +229,11 @@
       <p class="hero__note" style="font-size: 1rem; max-width: 280px;">
         You've been invited to a quest!<br>Download the app to join.
       </p>
-      <a class="button" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer">
+      <a class="button" data-platform-cta="ios" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer">
         Download Quests and Join
+      </a>
+      <a class="button" data-platform-cta="android" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" target="_blank" rel="noreferrer" style="margin-top: 12px;">
+        Get Quests on Google Play
       </a>
       <button class="link-btn" id="fallback-open-app" type="button">
         I already have the app
@@ -252,11 +255,31 @@
         var path = window.location.pathname || "/";
         var isInvite = path === "/q" || path === "/q/" || path.indexOf("/q/") === 0;
         var APP_STORE_URL = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
+        var PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=info.nothingserious.quests';
+
+        function detectPlatform() {
+          var ua = (navigator.userAgent || '').toLowerCase();
+          if (/android/.test(ua)) return 'android';
+          if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+          if (ua.indexOf('mac') >= 0 && navigator.maxTouchPoints > 1) return 'ios';
+          return 'desktop';
+        }
+        var platform = detectPlatform();
 
         if (isInvite) {
           document.title = "You're invited to a Quest!";
           document.getElementById("invite-card").classList.remove("hidden");
           document.getElementById("not-found-card").classList.add("hidden");
+
+          // Hide off-platform CTAs on iOS/Android; show both on desktop.
+          var platformCtas = document.querySelectorAll('[data-platform-cta]');
+          for (var i = 0; i < platformCtas.length; i++) {
+            var cta = platformCtas[i];
+            var p = cta.getAttribute('data-platform-cta');
+            if (platform !== 'desktop' && p !== platform) {
+              cta.style.display = 'none';
+            }
+          }
 
           // Extract share code for "I already have the app"
           var codeMatch = path.match(/^\/q\/([A-HJ-NP-Za-hj-kmnp-z2-9]{8})$/);
@@ -266,9 +289,18 @@
           if (openBtn) {
             openBtn.addEventListener('click', function () {
               if (!shareCode) {
-                window.location.href = APP_STORE_URL;
+                window.location.href = platform === 'android' ? PLAY_STORE_URL : APP_STORE_URL;
                 return;
               }
+              if (platform === 'android') {
+                // Try the App Link via intent://; falls back to Play Store if app not installed
+                window.location.href =
+                  'intent://invite.thequestsapp.com/q/' + shareCode +
+                  '#Intent;scheme=https;package=info.nothingserious.quests;' +
+                  'S.browser_fallback_url=' + encodeURIComponent(PLAY_STORE_URL) + ';end';
+                return;
+              }
+              // iOS / desktop: re-hit the universal-link URL; fall back to App Store
               window.location.href = 'https://invite.thequestsapp.com/q/' + shareCode;
               setTimeout(function () {
                 if (!document.hidden) {
