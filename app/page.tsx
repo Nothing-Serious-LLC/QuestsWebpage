@@ -122,7 +122,7 @@ export default function Home() {
                 <span>Download on the App Store</span>
               </a>
               <a
-                href="https://play.google.com"
+                href="https://play.google.com/store/apps/details?id=info.nothingserious.quests"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 rounded-xl border border-[rgba(255,255,255,0.24)] px-6 py-3 font-semibold text-[var(--txt)] transition-all duration-[var(--transition-base)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
@@ -260,7 +260,7 @@ export default function Home() {
               <span>App Store</span>
             </a>
             <a
-              href="https://play.google.com"
+              href="https://play.google.com/store/apps/details?id=info.nothingserious.quests"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-xl border border-white/60 px-6 py-3 font-semibold text-white transition-transform duration-[var(--transition-base)] hover:-translate-y-0.5 hover:bg-white/10"

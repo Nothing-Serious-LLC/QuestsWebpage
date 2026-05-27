@@ -178,7 +178,7 @@ export default function Home() {
                 App Store
               </a>
               <a
-                href="https://play.google.com"
+                href="https://play.google.com/store/apps/details?id=info.nothingserious.quests"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-3 rounded-2xl border border-white/30 bg-white/5 px-8 py-4 font-semibold text-lg text-white shadow-[0_18px_40px_-12px_rgba(5,10,35,0.6)] transition hover:-translate-y-1 hover:bg-white/15 hover:shadow-[0_22px_44px_-12px_rgba(5,10,35,0.7)]"
@@ -426,7 +426,7 @@ export default function Home() {
               Download for iOS
             </a>
             <a
-              href="https://play.google.com"
+              href="https://play.google.com/store/apps/details?id=info.nothingserious.quests"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 rounded-2xl border border-white/30 bg-white/5 px-10 py-4 text-lg font-semibold text-white shadow-[0_18px_40px_-12px_rgba(5,10,35,0.6)] transition hover:-translate-y-1 hover:bg-white/15 hover:shadow-[0_22px_44px_-12px_rgba(5,10,35,0.7)]"
