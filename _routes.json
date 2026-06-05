@@ -1,5 +1,5 @@
 {
   "version": 1,
-  "include": ["/q/*", "/api/*"],
+  "include": ["/q/*", "/api/*", "/upgrade"],
   "exclude": ["/q/index.html", "/.well-known/*"]
 }
