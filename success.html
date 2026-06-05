@@ -260,15 +260,17 @@
         // Fire the deep link on load to bounce back into the app.
         window.location.href = deepLink;
 
-        // After ~2.5s (the app didn't take over), reveal the manual fallback.
+        // Reveal the manual "Reopen Quests" button quickly. iOS Safari blocks the
+        // auto scheme-open above without a user gesture, so a tappable button is the
+        // reliable path back into the app.
         setTimeout(function () {
           var statusText = document.getElementById('status-text');
           if (statusText) {
-            statusText.textContent = 'You can head back to the Quests app to continue.';
+            statusText.textContent = 'Tap below to return to the Quests app.';
           }
           var fallback = document.getElementById('fallback');
           if (fallback) fallback.classList.add('is-visible');
-        }, 2500);
+        }, 500);
       })();
     </script>
   </body>

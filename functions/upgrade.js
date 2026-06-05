@@ -317,7 +317,7 @@ export async function onRequestGet(context) {
   const target =
     base +
     encodeURIComponent(uid) +
-    `?package_id=${encodeURIComponent(packageId)}&skip_purchase_success=true`;
+    `?package_id=${encodeURIComponent(packageId)}`;
 
   return new Response(null, {
     status: 302,
