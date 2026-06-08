@@ -105,14 +105,21 @@ const PLAY_STORE_URL =
 //   - connect-src: RevenueCat API + Stripe APIs (+ esm.sh for the module fetch).
 //   - frame-src: Stripe (card element + 3DS challenge frames).
 // MUST stay identical to the /subscribe block in _headers (the static "belt").
+// NOTE on Stripe wildcards: a CSP host wildcard matches exactly ONE label, so
+// https://*.stripe.com does NOT cover Stripe's TWO-label card/3DS iframe hosts
+// (m.js.stripe.com, b.js.stripe.com). Per Stripe's official CSP guide, BOTH
+// https://js.stripe.com AND https://*.js.stripe.com must be in script-src and
+// frame-src or the Elements card form renders blank. e.revenue.cat = RC events;
+// da08ctfrofx1b.cloudfront.net = RC checkout branding assets (fonts/wordmark);
+// *.stripecdn.com = Stripe card-brand icons.
 const SUBSCRIBE_CSP =
   "default-src 'self'; " +
-  "script-src 'self' https://esm.sh https://js.stripe.com; " +
+  "script-src 'self' https://esm.sh https://js.stripe.com https://*.js.stripe.com; " +
   "style-src 'self' 'unsafe-inline' https://esm.sh https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
-  "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://*.stripe.com data:; " +
-  "img-src 'self' data: https://*.stripe.com; " +
-  "connect-src 'self' https://esm.sh https://api.revenuecat.com https://*.stripe.com https://*.stripe.network; " +
-  "frame-src https://js.stripe.com https://hooks.stripe.com https://*.stripe.com https://*.stripe.network; " +
+  "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://da08ctfrofx1b.cloudfront.net https://*.stripe.com data:; " +
+  "img-src 'self' data: https://*.stripe.com https://*.stripecdn.com https://da08ctfrofx1b.cloudfront.net; " +
+  "connect-src 'self' https://esm.sh https://api.revenuecat.com https://e.revenue.cat https://*.stripe.com https://*.stripe.network; " +
+  "frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://*.stripe.com https://*.stripe.network; " +
   "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self' https://*.stripe.com";
 
 function pageHeaders(extra) {
