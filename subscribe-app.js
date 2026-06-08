@@ -5,11 +5,24 @@
 // VERIFIED config (uid + publishable rcb_ key + chosen product id + env +
 // return scheme) into a non-executable <script type="application/json"
 // id="rc-config"> block. This module reads that config and drives the
-// RevenueCat Web SDK purchase() flow, which renders the checkout as a
-// self-contained MODAL overlay — with NO RevenueCat package-selection/intro
-// page, because we hand the SDK the single package the user already chose in
-// the app. (No htmlTarget: rendering at the document root keeps this page's
-// CSS from cascading into and collapsing RC's form layout.)
+// RevenueCat Web SDK purchase() flow.
+//
+// FULL-SCREEN (htmlTarget) APPROACH — what's actually in use:
+//   We pass htmlTarget: #rc-checkout to purchase(), so RC mounts the Stripe
+//   checkout form INLINE into our own full-viewport container instead of its
+//   default centered modal window. Combined with a solid-WHITE body
+//   (.checkout-open) and hiding the navy .page, the result reads as one
+//   continuous full-screen checkout, not a card floating on a blue page. There
+//   is still NO RevenueCat package-selection/intro step, because we hand the
+//   SDK the single package the user already chose in the app.
+//
+//   The page's CSS deliberately does NOT zero margin/padding on * (only
+//   box-sizing), so it does not cascade into and collapse RC's mounted form.
+//
+// FALLBACK (RC default modal, NOT in use): if Stripe Elements ever collapse to
+//   0-height inside htmlTarget again, OMIT htmlTarget from purchase() and set
+//   the body white before calling it — RC then renders its own self-contained
+//   modal overlay at the document root, immune to our page's layout/CSS.
 //
 // Pinned SDK version (publishable key in the page is safe by design):
 //   @revenuecat/purchases-js@1.42.1
@@ -24,6 +37,9 @@ import { Purchases } from "https://esm.sh/@revenuecat/purchases-js@1.42.1";
 const cfgEl = document.getElementById("rc-config");
 const mount = document.getElementById("rc-checkout");
 const loadingEl = document.getElementById("loading");
+const loadingWhiteEl = document.getElementById("loading-white");
+const pageEl = document.querySelector(".page");
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 const statusEl = document.getElementById("status");
 const noticeEl = document.getElementById("notice");
 const noticeTitle = document.getElementById("notice-title");
@@ -31,6 +47,28 @@ const noticeText = document.getElementById("notice-text");
 const successMark = document.getElementById("success-mark");
 const primaryBtn = document.getElementById("primary-btn");
 const secondaryBtn = document.getElementById("secondary-btn");
+
+const NAVY = "#04102a";
+const WHITE = "#ffffff";
+
+// Switch the page to the full-screen WHITE checkout surface: solid-white body,
+// hide the navy .page, flip iOS browser-chrome theme-color to white. Called as
+// soon as the SDK is configured (before offerings load) so there's no navy
+// flash, and stays in effect through purchase().
+function enterCheckoutChrome() {
+  document.body.classList.add("checkout-open");
+  if (pageEl) pageEl.hidden = true;
+  if (themeColorMeta) themeColorMeta.setAttribute("content", WHITE);
+}
+
+// Restore the navy page chrome so the success/error notice renders on brand.
+function exitCheckoutChrome() {
+  document.body.classList.remove("checkout-open");
+  if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
+  if (mount) mount.classList.remove("is-open");
+  if (pageEl) pageEl.hidden = false;
+  if (themeColorMeta) themeColorMeta.setAttribute("content", NAVY);
+}
 
 function readConfig() {
   try {
@@ -83,7 +121,10 @@ function hideLoading() {
 // secondary that routes the app Home.
 function showError(title, text) {
   hideLoading();
-  if (mount) { mount.classList.remove("is-open"); mount.replaceChildren(); }
+  // Restore the navy page so the error notice renders on brand (also clears the
+  // white body + white loader + checkout surface and resets theme-color).
+  exitCheckoutChrome();
+  if (mount) mount.replaceChildren();
   if (successMark) successMark.hidden = true;
   if (noticeTitle) noticeTitle.textContent = title;
   if (noticeText) noticeText.textContent = text;
@@ -110,7 +151,10 @@ function showError(title, text) {
 // app's scheme is registered (a real dev-client / production build).
 function showSuccess() {
   hideLoading();
-  if (mount) { mount.classList.remove("is-open"); mount.replaceChildren(); }
+  // Restore the navy page so the success notice renders on brand (also clears
+  // the white body + white loader + checkout surface and resets theme-color).
+  exitCheckoutChrome();
+  if (mount) mount.replaceChildren();
   if (successMark) successMark.hidden = false;
   if (noticeTitle) noticeTitle.textContent = "You're Quests Pro!";
   if (noticeText) {
@@ -132,8 +176,9 @@ function showSuccess() {
 // All 9 fields are required and colors MUST be hex/rgb (Stripe rejects rgba).
 // NOTE: color_page_bg also drives Stripe's input background, so it stays light
 // for legible card fields (RC's appearance schema has no text-color control and
-// defaults to white). The brand expression is the blue buttons/accent + rounded
-// shapes; a fully dark form isn't safely supported by this schema.
+// defaults to white). The brand expression is the blue buttons/accent; we use
+// rectangle (squared) shapes to read as a flush full-page form rather than a
+// rounded modal card. A fully dark form isn't safely supported by this schema.
 const BRAND_APPEARANCE = {
   color_buttons_primary: "#3366cc", // Quests primary blue (Pay button)
   color_accent: "#3366cc", // links / focus / selected states
@@ -142,8 +187,8 @@ const BRAND_APPEARANCE = {
   color_page_bg: "#ffffff",
   color_product_info_bg: "#eef2fb", // light blue tint for the plan summary
   font: "",
-  shapes: "rounded",
-  show_product_description: true,
+  shapes: "rectangle", // squared corners -> flush full-page form, not a card
+  show_product_description: false, // plan already chosen in-app; tighter form
 };
 
 // Find the package whose Web Billing product matches the chosen product id.
@@ -198,6 +243,13 @@ async function run() {
     dbg("configuring SDK…");
     purchases = Purchases.configure({ apiKey: cfg.apiKey, appUserId: cfg.uid });
     dbg("configured OK");
+    // Whiten NOW (before the up-to-20s offerings fetch) so the user never sees a
+    // navy spinner flash right before the white checkout opens: hide the navy
+    // loader/.page and show the WHITE loader. enterCheckoutChrome() also flips
+    // the body white + theme-color white. showError/showSuccess undo all of it.
+    if (loadingEl) loadingEl.hidden = true;
+    enterCheckoutChrome();
+    if (loadingWhiteEl) loadingWhiteEl.classList.add("is-open");
   } catch (e) {
     dbg("FAIL configure: " + errStr(e));
     showError(
@@ -244,19 +296,19 @@ async function run() {
     return;
   }
 
-  // Hand the SINGLE chosen package to the SDK. With NO htmlTarget, purchase()
-  // renders the checkout as a self-contained MODAL overlay (its own DOM at the
-  // document root) — there is no package-selection/intro step, and it pops open
-  // directly over the loading screen without our page's layout/CSS interfering
-  // with the form. skipSuccessPage:true returns control to us on completion.
+  // Hand the SINGLE chosen package to the SDK. We pass htmlTarget so purchase()
+  // mounts the checkout INLINE into our full-viewport #rc-checkout container
+  // (not RC's default centered modal window) — there is no package-selection/
+  // intro step. skipSuccessPage:true returns control to us on completion.
   try {
     dbg("opening checkout (purchase)…");
-    // Go full-screen: hide the loading view and open the full-viewport checkout
+    // Go full-screen: swap the WHITE loader for the full-viewport checkout
     // surface, then mount the RC checkout into it (htmlTarget) so it fills the
-    // screen instead of rendering as a small centered modal window. The page's
-    // CSS reset no longer leaks into RC's DOM, and the fixed container is sized,
-    // so the inline form renders correctly.
-    if (loadingEl) loadingEl.hidden = true;
+    // screen instead of rendering as a small centered modal window. The body is
+    // already white (enterCheckoutChrome, above). The page's CSS does not zero
+    // margin/padding on *, so it doesn't leak into RC's DOM, and the fixed
+    // container is sized, so the inline form renders correctly.
+    if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
     if (mount) mount.classList.add("is-open");
     await purchases.purchase({
       rcPackage: pkg,

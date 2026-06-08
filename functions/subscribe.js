@@ -212,6 +212,14 @@ function headStyles() {
       background-attachment: fixed; min-height: 100vh; min-height: 100dvh; line-height: 1.5;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
+    /* While the checkout is open (and while offerings load just before it),
+       the body goes solid WHITE so RevenueCat's light checkout surface reads as
+       one continuous full-screen page — no navy gradient bleeding around it and
+       no blue loading flash. subscribe-app.js toggles .checkout-open on <body>
+       (and also flips the <meta name=theme-color> to white so iOS browser chrome
+       matches). On success/cancel/error it removes the class to reveal the navy
+       notice page again. */
+    body.checkout-open { background: #ffffff; }
     .page {
       position: relative; width: 100%; min-height: 100vh; min-height: 100dvh;
       display: flex; align-items: center; justify-content: center;
@@ -247,6 +255,20 @@ function headStyles() {
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    /* WHITE loading state shown once the SDK is configured and offerings are
+       being fetched (up to ~20s), so the user never sees the navy spinner flash
+       right before the white checkout opens. subscribe-app.js reveals this (and
+       hides the navy .page) as soon as Purchases.configure() succeeds. */
+    #loading-white { display: none; position: fixed; inset: 0; z-index: 900;
+      background: #ffffff; align-items: center; justify-content: center;
+      flex-direction: column; text-align: center;
+      padding: env(safe-area-inset-top, 0px) 20px env(safe-area-inset-bottom, 0px); }
+    #loading-white.is-open { display: flex; }
+    #loading-white .spinner {
+      border: 3px solid rgba(51,102,204,0.18); border-top-color: var(--accent);
+    }
+    #loading-white .subtext { color: #5a6480; }
+    #loading-white .brand span { color: var(--blue-900); }
     .notice { text-align: center; display: none; }
     .notice.is-visible { display: block; }
     .success-mark {
@@ -296,20 +318,19 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
 <body>
   <div class="page">
     <main class="loader" role="main">
-      <!-- Minimal interstitial: logo + spinner + one line, shown while the
-           full-screen checkout loads in. -->
+      <!-- Minimal NAVY interstitial: logo + spinner + one line, shown only for
+           the brief moment before the SDK configures. Once configured,
+           subscribe-app.js hides .page and shows the WHITE loader below. -->
       <div id="loading">
         <div class="brand"><span>Quests Pro</span></div>
         <div class="spinner" aria-hidden="true"></div>
         <p class="subtext" id="status">Taking you to secure checkout…</p>
       </div>
 
-      <!-- Full-screen surface the RC checkout mounts into (htmlTarget). -->
-      <div id="rc-checkout"></div>
-
       <!-- Success / canceled / error state (revealed + populated by
            /subscribe-app.js). Self-contained so we never depend on another
-           page's CSP for the return-to-app bounce. -->
+           page's CSP for the return-to-app bounce. Lives on the navy .page,
+           which subscribe-app.js re-reveals on completion. -->
       <div class="notice" id="notice">
         <div class="success-mark" id="success-mark" hidden aria-hidden="true">&#10003;</div>
         <h2 class="notice__title" id="notice-title"></h2>
@@ -320,8 +341,22 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
     </main>
   </div>
 
+  <!-- WHITE loading state, shown while offerings load (after SDK configure,
+       before the checkout opens) so there is no navy flash before the white
+       checkout. position:fixed; toggled by subscribe-app.js. -->
+  <div id="loading-white" aria-hidden="true">
+    <div class="brand"><span>Quests Pro</span></div>
+    <div class="spinner" aria-hidden="true"></div>
+    <p class="subtext">Taking you to secure checkout…</p>
+  </div>
+
+  <!-- Full-screen surface the RC checkout mounts into (htmlTarget). A DIRECT
+       child of <body> (not inside .page/.loader) for cleaner stacking on iOS
+       WebKit; it is position:fixed so it escapes normal flow regardless. -->
+  <div id="rc-checkout"></div>
+
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=6"></script>
+  <script type="module" src="/subscribe-app.js?v=7"></script>
 </body>
 </html>`;
 }
