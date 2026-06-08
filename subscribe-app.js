@@ -41,6 +41,30 @@ function readConfig() {
 
 const cfg = readConfig();
 
+// Diagnostic logger: writes to the on-page #debug box (via subscribe-boot.js)
+// AND the console, so the failing step is visible on-device during sandbox tests.
+function dbg(msg) {
+  try {
+    if (typeof window !== "undefined" && window.__rcDebug) window.__rcDebug(msg);
+  } catch (_e) {
+    /* no-op */
+  }
+  console.log("[subscribe] " + msg);
+}
+
+// Reject after `ms` so a hung network call (e.g. getOfferings) surfaces as a
+// visible error instead of an endless "Loading…" spinner.
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise(function (_resolve, reject) {
+      setTimeout(function () {
+        reject(new Error((label || "operation") + " timed out after " + ms + "ms"));
+      }, ms);
+    }),
+  ]);
+}
+
 // Resolve the app return deep links from the server-injected scheme. We handle
 // the return-to-app bounce IN THIS PAGE (not via success.html) so the flow never
 // depends on another page's CSP. deepLinkService handles both paths:
@@ -119,8 +143,26 @@ function findPackage(offerings, productId) {
   return null;
 }
 
+function errStr(e) {
+  if (!e) return "unknown";
+  return (
+    (e.name ? e.name + ": " : "") +
+    (e.message || String(e)) +
+    (e.code ? " (code " + e.code + ")" : "")
+  );
+}
+
 async function run() {
+  dbg(
+    "boot env=" +
+      (cfg && cfg.env) +
+      " product=" +
+      (cfg && cfg.productId) +
+      " key=" +
+      (cfg && cfg.apiKey ? cfg.apiKey.slice(0, 10) + "…" : "none")
+  );
   if (!cfg || !cfg.uid || !cfg.apiKey || !cfg.productId) {
+    dbg("FAIL: missing/invalid config");
     showError(
       "Something went wrong",
       "This checkout link is invalid or expired. Please reopen Quests and try again."
@@ -130,9 +172,11 @@ async function run() {
 
   let purchases;
   try {
+    dbg("configuring SDK…");
     purchases = Purchases.configure({ apiKey: cfg.apiKey, appUserId: cfg.uid });
+    dbg("configured OK");
   } catch (e) {
-    console.error("[subscribe] configure failed", e);
+    dbg("FAIL configure: " + errStr(e));
     showError(
       "Something went wrong",
       "We couldn't start checkout. Please reopen Quests and try again."
@@ -142,11 +186,26 @@ async function run() {
 
   let pkg;
   try {
-    // US-only launch; request USD explicitly.
-    const offerings = await purchases.getOfferings({ currency: "USD" });
+    // US-only launch; request USD explicitly. Timed so a hang surfaces as an error.
+    dbg("loading offerings (USD)…");
+    const offerings = await withTimeout(
+      purchases.getOfferings({ currency: "USD" }),
+      20000,
+      "getOfferings"
+    );
+    const offCount =
+      offerings && offerings.all ? Object.keys(offerings.all).length : 0;
+    const curCount =
+      offerings && offerings.current && offerings.current.availablePackages
+        ? offerings.current.availablePackages.length
+        : 0;
+    dbg(
+      "offerings loaded: " + offCount + " offering(s), current=" + curCount + " pkg"
+    );
     pkg = findPackage(offerings, cfg.productId);
+    dbg(pkg ? "matched package for " + cfg.productId : "NO match for " + cfg.productId);
   } catch (e) {
-    console.error("[subscribe] getOfferings failed", e);
+    dbg("FAIL getOfferings: " + errStr(e));
     showError(
       "Couldn't load plans",
       "Please check your connection and try again."
@@ -167,6 +226,7 @@ async function run() {
   // skipSuccessPage:true returns control to us immediately on completion.
   try {
     if (statusEl) statusEl.textContent = "";
+    dbg("opening checkout (purchase)…");
     await purchases.purchase({
       rcPackage: pkg,
       htmlTarget: mount,
@@ -175,11 +235,12 @@ async function run() {
     });
     // Success: bounce back into the app. Entitlement is already being granted
     // server-side via the RC webhook -> subscription_entitlements -> Realtime.
+    dbg("purchase resolved OK");
     showSuccess();
   } catch (e) {
     // purchase() rejects on user cancel as well as on real errors. Either way no
     // entitlement was granted; offer retry + a path back into the app.
-    console.warn("[subscribe] purchase did not complete", e);
+    dbg("purchase ended: " + errStr(e));
     showError(
       "Checkout closed",
       "No charge was made. You can try again or head back to the app."

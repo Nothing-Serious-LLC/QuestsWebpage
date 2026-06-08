@@ -248,6 +248,7 @@ function headStyles() {
     }
     .btn--ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--text-muted); }
     .footer__meta { margin-top: 22px; text-align: center; font-size: 11px; color: var(--text-soft); letter-spacing: 0.08em; }
+    #debug { display: none; margin-top: 18px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.35); border: 1px solid var(--border-strong); color: #9fb4e6; font-family: ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1.5; text-align: left; white-space: pre-wrap; word-break: break-word; }
     [hidden] { display: none !important; }
   `;
 }
@@ -302,11 +303,16 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
       </div>
 
       <p class="footer__meta">© 2026 Nothing Serious LLC</p>
+
+      <!-- Diagnostic output (hidden until something is logged). Surfaces the
+           exact failing step / error on-device for the sandbox test. -->
+      <pre id="debug"></pre>
     </main>
   </div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=1"></script>
+  <script src="/subscribe-boot.js?v=2"></script>
+  <script type="module" src="/subscribe-app.js?v=2"></script>
 </body>
 </html>`;
 }
