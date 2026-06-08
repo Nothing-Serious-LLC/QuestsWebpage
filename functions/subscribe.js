@@ -197,7 +197,13 @@ function headStyles() {
       --text-soft: rgba(167,177,208,0.6); --surface-strong: rgba(32,44,79,0.92);
       --border-strong: rgba(48,61,98,0.95); --shadow-md: 0 24px 60px -30px rgba(6,22,58,0.55);
     }
-    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* box-sizing only on the universal selector. We deliberately do NOT zero
+       margin/padding on * — RevenueCat mounts its checkout DOM inside this page,
+       and a universal margin/padding reset cascades into RC's form and collapses
+       its layout (the Stripe iframe ends up 0-height). Scope spacing to our own
+       elements instead. */
+    *,*::before,*::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; background: #04102a; }
     body {
       font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -283,13 +289,9 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
       <div class="brand"><img src="/icon.png" alt="" /><span>Quests Pro</span></div>
 
       <div id="loading">
-        <h1 class="title">Secure checkout</h1>
-        <p class="subtitle">Complete your purchase below to unlock Quests Pro.</p>
-        <div id="status"><div class="spinner" aria-hidden="true"></div>Loading secure checkout…</div>
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="subtitle" id="status">Opening secure checkout…</p>
       </div>
-
-      <!-- The RevenueCat Web SDK mounts the Stripe card form HERE. -->
-      <div id="rc-checkout"></div>
 
       <!-- Success / canceled / error state (revealed + populated by
            /subscribe-app.js). Self-contained so we never depend on another
@@ -311,8 +313,8 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
   </div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script src="/subscribe-boot.js?v=2"></script>
-  <script type="module" src="/subscribe-app.js?v=2"></script>
+  <script src="/subscribe-boot.js?v=3"></script>
+  <script type="module" src="/subscribe-app.js?v=3"></script>
 </body>
 </html>`;
 }

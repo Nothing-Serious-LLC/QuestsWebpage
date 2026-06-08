@@ -5,9 +5,11 @@
 // VERIFIED config (uid + publishable rcb_ key + chosen product id + env +
 // return scheme) into a non-executable <script type="application/json"
 // id="rc-config"> block. This module reads that config and drives the
-// RevenueCat Web SDK purchase() flow, which renders the Stripe card form
-// directly into #rc-checkout — with NO RevenueCat package-selection/intro page,
-// because we hand the SDK the single package the user already chose in the app.
+// RevenueCat Web SDK purchase() flow, which renders the checkout as a
+// self-contained MODAL overlay — with NO RevenueCat package-selection/intro
+// page, because we hand the SDK the single package the user already chose in
+// the app. (No htmlTarget: rendering at the document root keeps this page's
+// CSS from cascading into and collapsing RC's form layout.)
 //
 // Pinned SDK version (publishable key in the page is safe by design):
 //   @revenuecat/purchases-js@1.42.1
@@ -15,9 +17,8 @@
 // Entitlement is granted SERVER-SIDE: a Web SDK purchase fires the existing
 // RevenueCat webhook (INITIAL_PURCHASE, store=RC_BILLING, app_user_id = uid),
 // which writes subscription_entitlements -> Realtime -> isPro. This page only
-// drives the UI; on success it bounces to /success.html, which deep-links back
-// into the app. The app must NOT trust the redirect for entitlement — it waits
-// for the Realtime push.
+// drives the UI; on success it deep-links back into the app. The app must NOT
+// trust the redirect for entitlement — it waits for the Realtime push.
 import { Purchases } from "https://esm.sh/@revenuecat/purchases-js@1.42.1";
 
 const cfgEl = document.getElementById("rc-config");
@@ -221,15 +222,15 @@ async function run() {
     return;
   }
 
-  // Hand the SINGLE chosen package to the SDK. purchase() renders ONLY the
-  // Stripe card form into #rc-checkout — there is no selection/intro step.
-  // skipSuccessPage:true returns control to us immediately on completion.
+  // Hand the SINGLE chosen package to the SDK. With NO htmlTarget, purchase()
+  // renders the checkout as a self-contained MODAL overlay (its own DOM at the
+  // document root) — there is no package-selection/intro step, and it pops open
+  // directly over the loading screen without our page's layout/CSS interfering
+  // with the form. skipSuccessPage:true returns control to us on completion.
   try {
-    if (statusEl) statusEl.textContent = "";
     dbg("opening checkout (purchase)…");
     await purchases.purchase({
       rcPackage: pkg,
-      htmlTarget: mount,
       skipSuccessPage: true,
       metadata: { supabase_uid: cfg.uid, source: "web_subscribe" },
     });
