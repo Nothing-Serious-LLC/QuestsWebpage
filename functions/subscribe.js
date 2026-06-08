@@ -232,6 +232,16 @@ function headStyles() {
     .loader { max-width: 360px; width: 100%; text-align: center; }
     .subtext { font-size: 0.9rem; color: var(--text-muted); margin: 18px 0 0; }
     .textlink { display: inline-block; margin-top: 22px; background: none; border: none; padding: 6px; color: var(--text-soft); font-family: inherit; font-size: 0.85rem; text-decoration: underline; cursor: pointer; }
+    .textlink--fixed { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); z-index: 1100; margin: 0; }
+    /* The RC checkout mounts here. When open it is a full-viewport, branded
+       surface (gives RC a sized container so the form fills the screen instead
+       of rendering as a small centered modal window). */
+    #rc-checkout { display: none; }
+    #rc-checkout.is-open {
+      display: block; position: fixed; inset: 0; z-index: 1000;
+      overflow-y: auto; background: var(--blue-900);
+      padding: max(env(safe-area-inset-top, 0px), 12px) 0 calc(env(safe-area-inset-bottom, 0px) + 12px);
+    }
     .spinner {
       width: 30px; height: 30px; margin: 0 auto; border-radius: 50%;
       border: 3px solid rgba(167,177,208,0.25); border-top-color: var(--accent-light);
@@ -290,11 +300,13 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
       <!-- Minimal interstitial: the RevenueCat checkout opens as a modal over
            this. Just logo + spinner + one line, plus a manual fallback link. -->
       <div id="loading">
-        <div class="brand"><img src="/icon.png" alt="" /><span>Quests Pro</span></div>
+        <div class="brand"><span>Quests Pro</span></div>
         <div class="spinner" aria-hidden="true"></div>
         <p class="subtext" id="status">Taking you to secure checkout…</p>
-        <button class="textlink" id="manual-open" type="button" hidden>Not redirected? Tap here</button>
       </div>
+
+      <!-- Full-screen surface the RC checkout mounts into (htmlTarget). -->
+      <div id="rc-checkout"></div>
 
       <!-- Success / canceled / error state (revealed + populated by
            /subscribe-app.js). Self-contained so we never depend on another
@@ -309,8 +321,12 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
     </main>
   </div>
 
+  <!-- Always-available escape hatch (revealed after a few seconds), floats above
+       the checkout so it's reachable even if the form fails to render. -->
+  <button class="textlink textlink--fixed" id="manual-open" type="button" hidden>Not redirected? Tap here</button>
+
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=4"></script>
+  <script type="module" src="/subscribe-app.js?v=5"></script>
 </body>
 </html>`;
 }

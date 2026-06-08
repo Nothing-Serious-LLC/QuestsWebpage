@@ -92,7 +92,8 @@ function hideLoading() {
 // secondary that routes the app Home.
 function showError(title, text) {
   hideLoading();
-  if (mount) mount.replaceChildren();
+  if (mount) { mount.classList.remove("is-open"); mount.replaceChildren(); }
+  if (manualBtn) manualBtn.hidden = true;
   if (successMark) successMark.hidden = true;
   if (noticeTitle) noticeTitle.textContent = title;
   if (noticeText) noticeText.textContent = text;
@@ -115,7 +116,8 @@ function showError(title, text) {
 // scheme-open without a gesture, so the primary button re-fires it on tap.
 function showSuccess() {
   hideLoading();
-  if (mount) mount.replaceChildren();
+  if (mount) { mount.classList.remove("is-open"); mount.replaceChildren(); }
+  if (manualBtn) manualBtn.hidden = true;
   if (successMark) successMark.hidden = false;
   if (noticeTitle) noticeTitle.textContent = "You're Quests Pro";
   if (noticeText) {
@@ -132,6 +134,25 @@ function showSuccess() {
   // Best-effort auto-bounce; the button above is the reliable fallback.
   window.location.href = successDeepLink;
 }
+
+// Quests-branded checkout appearance (RevenueCat BrandingAppearance shape,
+// applied to the RC checkout + Stripe Elements via brandingAppearanceOverride).
+// All 9 fields are required and colors MUST be hex/rgb (Stripe rejects rgba).
+// NOTE: color_page_bg also drives Stripe's input background, so it stays light
+// for legible card fields (RC's appearance schema has no text-color control and
+// defaults to white). The brand expression is the blue buttons/accent + rounded
+// shapes; a fully dark form isn't safely supported by this schema.
+const BRAND_APPEARANCE = {
+  color_buttons_primary: "#3366cc", // Quests primary blue (Pay button)
+  color_accent: "#3366cc", // links / focus / selected states
+  color_error: "#e5484d",
+  color_form_bg: "#ffffff",
+  color_page_bg: "#ffffff",
+  color_product_info_bg: "#eef2fb", // light blue tint for the plan summary
+  font: "",
+  shapes: "rounded",
+  show_product_description: true,
+};
 
 // Find the package whose Web Billing product matches the chosen product id.
 // Scans the current offering first, then every other offering, so it does not
@@ -238,13 +259,22 @@ async function run() {
   // with the form. skipSuccessPage:true returns control to us on completion.
   try {
     dbg("opening checkout (purchase)…");
-    // Reveal the manual fallback link a few seconds in, in case the modal
-    // didn't auto-open. It sits under the spinner (behind the modal if it did).
+    // Go full-screen: hide the loading view and open the full-viewport checkout
+    // surface, then mount the RC checkout into it (htmlTarget) so it fills the
+    // screen instead of rendering as a small centered modal window. The page's
+    // CSS reset no longer leaks into RC's DOM, and the fixed container is sized,
+    // so the inline form renders correctly.
+    if (loadingEl) loadingEl.hidden = true;
+    if (mount) mount.classList.add("is-open");
+    // Reveal the manual fallback link a few seconds in, in case the form fails
+    // to draw — it floats above the checkout so it's always reachable.
     setTimeout(function () {
       if (manualBtn) manualBtn.hidden = false;
     }, 3500);
     await purchases.purchase({
       rcPackage: pkg,
+      htmlTarget: mount,
+      brandingAppearanceOverride: BRAND_APPEARANCE,
       skipSuccessPage: true,
       metadata: { supabase_uid: cfg.uid, source: "web_subscribe" },
     });
