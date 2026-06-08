@@ -232,15 +232,17 @@ function headStyles() {
     .loader { max-width: 360px; width: 100%; text-align: center; }
     .subtext { font-size: 0.9rem; color: var(--text-muted); margin: 18px 0 0; }
     .textlink { display: inline-block; margin-top: 22px; background: none; border: none; padding: 6px; color: var(--text-soft); font-family: inherit; font-size: 0.85rem; text-decoration: underline; cursor: pointer; }
-    .textlink--fixed { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); z-index: 1100; margin: 0; }
-    /* The RC checkout mounts here. When open it is a full-viewport, branded
-       surface (gives RC a sized container so the form fills the screen instead
-       of rendering as a small centered modal window). */
+    /* Readable on BOTH the navy loading screen and the white checkout surface. */
+    .textlink--fixed { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); z-index: 1100; margin: 0; background: #14213c; color: #fff; border: 1px solid rgba(255,255,255,0.22); padding: 9px 18px; border-radius: 999px; text-decoration: none; }
+    /* The RC checkout mounts here. When open it is a full-viewport surface. The
+       background is WHITE (not navy) so RevenueCat's light checkout card blends
+       into one continuous full-screen page instead of looking like a window
+       floating on the blue loading screen. */
     #rc-checkout { display: none; }
     #rc-checkout.is-open {
       display: block; position: fixed; inset: 0; z-index: 1000;
-      overflow-y: auto; background: var(--blue-900);
-      padding: max(env(safe-area-inset-top, 0px), 12px) 0 calc(env(safe-area-inset-bottom, 0px) + 12px);
+      overflow-y: auto; background: #ffffff;
+      padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
     }
     .spinner {
       width: 30px; height: 30px; margin: 0 auto; border-radius: 50%;
