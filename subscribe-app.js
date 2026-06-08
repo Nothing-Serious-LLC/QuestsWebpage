@@ -31,15 +31,6 @@ const noticeText = document.getElementById("notice-text");
 const successMark = document.getElementById("success-mark");
 const primaryBtn = document.getElementById("primary-btn");
 const secondaryBtn = document.getElementById("secondary-btn");
-const manualBtn = document.getElementById("manual-open");
-
-// Fallback: if the checkout modal somehow doesn't open, reloading re-runs the
-// whole flow (same signed link, valid for an hour) and re-opens it.
-if (manualBtn) {
-  manualBtn.addEventListener("click", function () {
-    window.location.reload();
-  });
-}
 
 function readConfig() {
   try {
@@ -93,7 +84,6 @@ function hideLoading() {
 function showError(title, text) {
   hideLoading();
   if (mount) { mount.classList.remove("is-open"); mount.replaceChildren(); }
-  if (manualBtn) manualBtn.hidden = true;
   if (successMark) successMark.hidden = true;
   if (noticeTitle) noticeTitle.textContent = title;
   if (noticeText) noticeText.textContent = text;
@@ -111,17 +101,21 @@ function showError(title, text) {
   if (noticeEl) noticeEl.classList.add("is-visible");
 }
 
-// Render the success state and bounce back into the app. Entitlement is granted
-// SERVER-SIDE by the RC webhook; this is UX only. iOS Safari may block the auto
-// scheme-open without a gesture, so the primary button re-fires it on tap.
+// Render the success state. Entitlement is already granted SERVER-SIDE by the RC
+// webhook; this screen is UX only. We do NOT auto-fire a custom scheme — iOS
+// Safari blocks programmatic scheme opens, and an unregistered scheme (Expo Go /
+// dev client) throws "Safari cannot open the page because the address is invalid".
+// Seamless auto-return is the PRODUCTION Universal Link (see PR5 build-out). The
+// "Return to Quests" button fires the scheme on a user tap, which works where the
+// app's scheme is registered (a real dev-client / production build).
 function showSuccess() {
   hideLoading();
   if (mount) { mount.classList.remove("is-open"); mount.replaceChildren(); }
-  if (manualBtn) manualBtn.hidden = true;
   if (successMark) successMark.hidden = false;
-  if (noticeTitle) noticeTitle.textContent = "You're Quests Pro";
+  if (noticeTitle) noticeTitle.textContent = "You're Quests Pro!";
   if (noticeText) {
-    noticeText.textContent = "Tap below to return to the Quests app.";
+    noticeText.textContent =
+      "Your Pro features are unlocked. Return to the Quests app to continue.";
   }
   if (primaryBtn) {
     primaryBtn.textContent = "Return to Quests";
@@ -131,8 +125,6 @@ function showSuccess() {
   }
   if (secondaryBtn) secondaryBtn.hidden = true;
   if (noticeEl) noticeEl.classList.add("is-visible");
-  // Best-effort auto-bounce; the button above is the reliable fallback.
-  window.location.href = successDeepLink;
 }
 
 // Quests-branded checkout appearance (RevenueCat BrandingAppearance shape,
@@ -266,11 +258,6 @@ async function run() {
     // so the inline form renders correctly.
     if (loadingEl) loadingEl.hidden = true;
     if (mount) mount.classList.add("is-open");
-    // Reveal the manual fallback link a few seconds in, in case the form fails
-    // to draw — it floats above the checkout so it's always reachable.
-    setTimeout(function () {
-      if (manualBtn) manualBtn.hidden = false;
-    }, 3500);
     await purchases.purchase({
       rcPackage: pkg,
       htmlTarget: mount,
