@@ -31,6 +31,15 @@ const noticeText = document.getElementById("notice-text");
 const successMark = document.getElementById("success-mark");
 const primaryBtn = document.getElementById("primary-btn");
 const secondaryBtn = document.getElementById("secondary-btn");
+const manualBtn = document.getElementById("manual-open");
+
+// Fallback: if the checkout modal somehow doesn't open, reloading re-runs the
+// whole flow (same signed link, valid for an hour) and re-opens it.
+if (manualBtn) {
+  manualBtn.addEventListener("click", function () {
+    window.location.reload();
+  });
+}
 
 function readConfig() {
   try {
@@ -229,6 +238,11 @@ async function run() {
   // with the form. skipSuccessPage:true returns control to us on completion.
   try {
     dbg("opening checkout (purchase)…");
+    // Reveal the manual fallback link a few seconds in, in case the modal
+    // didn't auto-open. It sits under the spinner (behind the modal if it did).
+    setTimeout(function () {
+      if (manualBtn) manualBtn.hidden = false;
+    }, 3500);
     await purchases.purchase({
       rcPackage: pkg,
       skipSuccessPage: true,

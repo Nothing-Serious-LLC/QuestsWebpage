@@ -214,7 +214,7 @@ function headStyles() {
     }
     .page {
       position: relative; width: 100%; min-height: 100vh; min-height: 100dvh;
-      display: flex; align-items: flex-start; justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       padding: 40px 20px calc(env(safe-area-inset-bottom, 0px) + 40px);
       padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
     }
@@ -228,14 +228,16 @@ function headStyles() {
     .brand span { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.01em; }
     .title { font-size: clamp(1.4rem, 5vw, 1.8rem); font-weight: 800; letter-spacing: -0.02em; text-align: center; margin: 0 0 6px; }
     .subtitle { font-size: 0.95rem; color: var(--text-muted); text-align: center; margin: 0 0 22px; }
-    #status { text-align: center; color: var(--text-muted); font-size: 0.95rem; padding: 18px 0; }
+    #status { text-align: center; }
+    .loader { max-width: 360px; width: 100%; text-align: center; }
+    .subtext { font-size: 0.9rem; color: var(--text-muted); margin: 18px 0 0; }
+    .textlink { display: inline-block; margin-top: 22px; background: none; border: none; padding: 6px; color: var(--text-soft); font-family: inherit; font-size: 0.85rem; text-decoration: underline; cursor: pointer; }
     .spinner {
-      width: 26px; height: 26px; margin: 0 auto 12px; border-radius: 50%;
+      width: 30px; height: 30px; margin: 0 auto; border-radius: 50%;
       border: 3px solid rgba(167,177,208,0.25); border-top-color: var(--accent-light);
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #rc-checkout { min-height: 10px; }
     .notice { text-align: center; display: none; }
     .notice.is-visible { display: block; }
     .success-mark {
@@ -254,7 +256,6 @@ function headStyles() {
     }
     .btn--ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--text-muted); }
     .footer__meta { margin-top: 22px; text-align: center; font-size: 11px; color: var(--text-soft); letter-spacing: 0.08em; }
-    #debug { display: none; margin-top: 18px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.35); border: 1px solid var(--border-strong); color: #9fb4e6; font-family: ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1.5; text-align: left; white-space: pre-wrap; word-break: break-word; }
     [hidden] { display: none !important; }
   `;
 }
@@ -285,12 +286,14 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
 </head>
 <body>
   <div class="page">
-    <main class="card" role="main">
-      <div class="brand"><img src="/icon.png" alt="" /><span>Quests Pro</span></div>
-
+    <main class="loader" role="main">
+      <!-- Minimal interstitial: the RevenueCat checkout opens as a modal over
+           this. Just logo + spinner + one line, plus a manual fallback link. -->
       <div id="loading">
+        <div class="brand"><img src="/icon.png" alt="" /><span>Quests Pro</span></div>
         <div class="spinner" aria-hidden="true"></div>
-        <p class="subtitle" id="status">Opening secure checkout…</p>
+        <p class="subtext" id="status">Taking you to secure checkout…</p>
+        <button class="textlink" id="manual-open" type="button" hidden>Not redirected? Tap here</button>
       </div>
 
       <!-- Success / canceled / error state (revealed + populated by
@@ -303,18 +306,11 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
         <button class="btn" type="button" id="primary-btn"></button>
         <a class="btn btn--ghost" id="secondary-btn" href="#" hidden></a>
       </div>
-
-      <p class="footer__meta">© 2026 Nothing Serious LLC</p>
-
-      <!-- Diagnostic output (hidden until something is logged). Surfaces the
-           exact failing step / error on-device for the sandbox test. -->
-      <pre id="debug"></pre>
     </main>
   </div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script src="/subscribe-boot.js?v=3"></script>
-  <script type="module" src="/subscribe-app.js?v=3"></script>
+  <script type="module" src="/subscribe-app.js?v=4"></script>
 </body>
 </html>`;
 }
