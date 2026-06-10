@@ -178,6 +178,20 @@ function showSuccess() {
   }
   if (secondaryBtn) secondaryBtn.hidden = true;
   if (noticeEl) noticeEl.classList.add("is-visible");
+
+  // AUTO-RETURN: fire the app's custom-scheme return link immediately. When
+  // this page runs inside the app's in-app browser auth session (the normal
+  // flow since build 2.6.5/3), the session intercepts this navigation and
+  // dismisses itself — the user is back in the app with ZERO taps. In plain
+  // Safari the programmatic scheme open is simply ignored/blocked, and the
+  // success notice above (button -> Universal Link) is the fallback.
+  setTimeout(function () {
+    try {
+      window.location.href = successDeepLink;
+    } catch (e) {
+      /* plain-Safari block — fallback button is already visible */
+    }
+  }, 150);
 }
 
 // Quests-branded checkout appearance (RevenueCat BrandingAppearance shape,

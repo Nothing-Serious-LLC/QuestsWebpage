@@ -356,7 +356,7 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
   <div id="rc-checkout"></div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=8"></script>
+  <script type="module" src="/subscribe-app.js?v=9"></script>
 </body>
 </html>`;
 }
@@ -405,6 +405,7 @@ export async function onRequestGet(context) {
   const sig = (url.searchParams.get("sig") || "").trim();
   const plan = (url.searchParams.get("plan") || "").trim().toLowerCase();
   const env = (url.searchParams.get("env") || "").trim().toLowerCase();
+  const appScheme = (url.searchParams.get("appscheme") || "").trim().toLowerCase();
 
   const signingSecret = context.env.RC_UPGRADE_SIGNING_SECRET;
 
@@ -423,13 +424,22 @@ export async function onRequestGet(context) {
   const signedOk = await verifySignedLink(uid, exp, sig, signingSecret);
   if (!signedOk) return fallbackResponse();
 
+  // The BUILD's registered scheme can differ from the env-derived guess (a
+  // prod-scheme TestFlight build checking out against the staging backend).
+  // The app passes its own scheme as `appscheme`; honor it when it is one of
+  // the two known schemes, else keep the env default. This is what makes the
+  // in-app auth session auto-dismiss: the success page must fire the EXACT
+  // scheme the session is watching for.
+  const KNOWN_SCHEMES = ["info.nothingserious.quests", "quests-staging"];
+  const scheme = KNOWN_SCHEMES.includes(appScheme) ? appScheme : envCfg.scheme;
+
   return new Response(
     checkoutHtml({
       uid,
       productId,
       apiKey: envCfg.apiKey,
       env,
-      scheme: envCfg.scheme,
+      scheme,
     }),
     {
       status: 200,
