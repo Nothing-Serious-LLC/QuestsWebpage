@@ -356,7 +356,7 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
   <div id="rc-checkout"></div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=7"></script>
+  <script type="module" src="/subscribe-app.js?v=8"></script>
 </body>
 </html>`;
 }

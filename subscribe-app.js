@@ -110,8 +110,13 @@ function withTimeout(promise, ms, label) {
 //   success -> pro-upgrade-success (routes back to the dev sandbox screen)
 //   cancel  -> home
 const scheme = (cfg && cfg.scheme) || "info.nothingserious.quests";
-const successDeepLink = scheme + "://pro-upgrade-success";
+const successDeepLink = scheme + "://pro-upgrade-success"; // legacy custom-scheme return (still used by /pro/success.html fallback)
 const homeDeepLink = scheme + "://home";
+// Universal-Link return target (see showSuccess). env is the server-validated
+// backend name; the landing page uses it only to surface a staging escape hatch.
+const successUniversalLink =
+  "https://thequestsapp.com/pro/success?env=" +
+  encodeURIComponent((cfg && cfg.env) || "production");
 
 function hideLoading() {
   if (loadingEl) loadingEl.hidden = true;
@@ -143,12 +148,16 @@ function showError(title, text) {
 }
 
 // Render the success state. Entitlement is already granted SERVER-SIDE by the RC
-// webhook; this screen is UX only. We do NOT auto-fire a custom scheme — iOS
-// Safari blocks programmatic scheme opens, and an unregistered scheme (Expo Go /
-// dev client) throws "Safari cannot open the page because the address is invalid".
-// Seamless auto-return is the PRODUCTION Universal Link (see PR5 build-out). The
-// "Return to Quests" button fires the scheme on a user tap, which works where the
-// app's scheme is registered (a real dev-client / production build).
+// webhook; this screen is UX only.
+//
+// RETURN-TO-APP = UNIVERSAL LINK. The "Return to Quests" button navigates (on a
+// user tap) to https://thequestsapp.com/pro/success?env=… — the APEX domain, not
+// invite.* — because iOS suppresses Universal Links that target the domain the
+// page is already on, and checkout runs on invite.thequestsapp.com. On a build
+// whose associated domains include applinks:thequestsapp.com (TestFlight 13+),
+// iOS opens the app directly and deepLinkService routes /pro/success. Anywhere
+// else (older build, dev-client, no app) Safari loads /pro/success.html, which
+// offers a tap-to-open custom-scheme button + store fallback.
 function showSuccess() {
   hideLoading();
   // Restore the navy page so the success notice renders on brand (also clears
@@ -164,7 +173,7 @@ function showSuccess() {
   if (primaryBtn) {
     primaryBtn.textContent = "Return to Quests";
     primaryBtn.onclick = function () {
-      window.location.href = successDeepLink;
+      window.location.href = successUniversalLink;
     };
   }
   if (secondaryBtn) secondaryBtn.hidden = true;
