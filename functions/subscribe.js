@@ -273,7 +273,7 @@ function headStyles() {
     .notice.is-visible { display: block; }
     .success-mark {
       width: 64px; height: 64px; margin: 4px auto 14px; border-radius: 50%;
-      background: rgba(52,199,89,0.14); color: #34c759; font-size: 34px;
+      background: rgba(92,133,214,0.16); color: #5c85d6; font-size: 34px;
       display: flex; align-items: center; justify-content: center;
     }
     .notice__title { font-size: 1.15rem; font-weight: 700; margin: 8px 0 8px; }
@@ -356,7 +356,7 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
   <div id="rc-checkout"></div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=9"></script>
+  <script type="module" src="/subscribe-app.js?v=10"></script>
 </body>
 </html>`;
 }

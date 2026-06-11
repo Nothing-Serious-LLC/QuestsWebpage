@@ -179,17 +179,21 @@ function showSuccess() {
   if (secondaryBtn) secondaryBtn.hidden = true;
   if (noticeEl) noticeEl.classList.add("is-visible");
 
-  // AUTO-RETURN: fire the app's custom-scheme return link immediately. When
-  // this page runs inside the app's in-app browser auth session (the normal
-  // flow since build 2.6.5/3), the session intercepts this navigation and
-  // dismisses itself — the user is back in the app with ZERO taps. In plain
-  // Safari the programmatic scheme open is simply ignored/blocked, and the
-  // success notice above (button -> Universal Link) is the fallback.
+  // ZERO-TAP AUTO-RETURN: hop to /subscribe/return (same-origin https — always
+  // allowed for JS), whose SERVER-side 302 to the app scheme iOS honors even
+  // inside SFSafariViewController (JS-initiated scheme/universal-link redirects
+  // are "untrusted" and blocked; server redirects are not). The app receives
+  // the scheme open, dismisses the in-app browser sheet, and shows the
+  // ProUpgradeSuccess screen. If the hop is ever blocked, the success notice
+  // above (button -> Universal Link) is already visible as the fallback.
   setTimeout(function () {
     try {
-      window.location.href = successDeepLink;
+      window.location.href =
+        "/subscribe/return?scheme=" +
+        encodeURIComponent(scheme) +
+        "&to=pro-upgrade-success";
     } catch (e) {
-      /* plain-Safari block — fallback button is already visible */
+      /* blocked — fallback button is already visible */
     }
   }, 150);
 }

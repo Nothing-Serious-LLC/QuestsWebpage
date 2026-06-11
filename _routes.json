@@ -1,5 +1,13 @@
 {
   "version": 1,
-  "include": ["/q/*", "/api/*", "/subscribe"],
-  "exclude": ["/q/index.html", "/.well-known/*"]
+  "include": [
+    "/q/*",
+    "/api/*",
+    "/subscribe",
+    "/subscribe/return"
+  ],
+  "exclude": [
+    "/q/index.html",
+    "/.well-known/*"
+  ]
 }
