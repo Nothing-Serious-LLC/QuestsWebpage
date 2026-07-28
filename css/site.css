@@ -1,0 +1,920 @@
+/* ==========================================================================
+   Quests V2 design system
+   One stylesheet for every page. No frameworks, no build step.
+   Order: tokens > reset > base type > utilities > layout > components > motion
+   Fonts come from the Google Fonts CDN, loaded in each page <head>:
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+:root {
+  /* Surfaces and text */
+  --cream: #FDFBF6;
+  --wash: #F3F1E7;
+  --card: #FEFEFD;
+  --card-border: #FFFFFF;
+  --ink: #191919;
+  --ink-pressed: #101010;
+  --ink-2: #696969;
+  --hairline: rgba(0, 0, 0, 0.04);
+
+  /* Signature purple */
+  --purple: #A961CC;
+  --purple-deep: #9354B3;
+  --purple-mid: #C796DF;
+  --purple-pale: #F1E2F8;
+
+  /* Category accents (accent + pale pair + text-safe ink tone) */
+  --c-mindfulness: #A961CC;
+  --c-mindfulness-pale: #F1E2F8;
+  --c-mindfulness-ink: #7E3D9E;
+  --c-recharge: #889FE9;
+  --c-recharge-pale: #ECF0FE;
+  --c-recharge-ink: #4A66C6;
+  --c-creativity: #F0925B;
+  --c-creativity-pale: #FFE4D6;
+  --c-creativity-ink: #B4551D;
+  --c-growth: #DBB66B;
+  --c-growth-pale: #F5E9CF;
+  --c-growth-ink: #8A6716;
+  --c-social: #A1B717;
+  --c-social-pale: #EEF2D5;
+  --c-social-ink: #5F6E0C;
+
+  /* Active category, remapped by the .cat-* context classes */
+  --cat: var(--purple);
+  --cat-pale: var(--purple-pale);
+  --cat-ink: var(--purple-deep);
+
+  /* Ambient blobs */
+  --blob-1: #FFF5F1;
+  --blob-2: #FFB18F;
+  --blob-3: #D5AFE8;
+  --blob-4: #889FE9;
+  --blob-5: #F1E2F8;
+
+  /* Deck accents, decoration only, never for text */
+  --accent-lime: #ECFA7A;
+  --accent-orange: #FF7F47;
+  --accent-blue: #4D73EF;
+  --accent-lavender: #EBD8F5;
+
+  /* Confetti */
+  --confetti-1: #FFD400;
+  --confetti-2: #FF3333;
+  --confetti-3: #48FF48;
+  --confetti-4: #3BCCFF;
+
+  /* Type */
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  /* Hero display size. Tuned so the mobile floor stays 56px (the clamp min
+     binds below 620px) and 1280px lands at 111px, inside the 96 to 112 band
+     the design lead asked for. 1440px and up caps at the 7.5rem token. */
+  --fs-hero: clamp(3.5rem, 0.25rem + 8.4vw, 7.5rem);
+  --fs-section: clamp(2rem, 4.5vw, 3.25rem);
+  --fs-sub: clamp(1.5rem, 3vw, 2.25rem);
+  --fs-title: clamp(1.25rem, 2vw, 1.5rem);
+  --fs-body: 1.0625rem;
+  --fs-lede: 1.1875rem;
+  --fs-small: 0.875rem;
+  --fs-eyebrow: 0.8125rem;
+
+  /* Radii */
+  --radius-pill: 999px;
+  --radius-card: 24px;
+  --radius-feature: 32px;
+  --radius-hero: 40px;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.05);
+  --shadow-lift: 0 8px 30px rgba(0, 0, 0, 0.08);
+  /* Hero object only: the quest card has to sit above cream and read as the
+     one solid thing on the page. Still soft, just deeper. */
+  --shadow-hero: 0 14px 44px rgba(25, 25, 25, 0.10), 0 2px 8px rgba(25, 25, 25, 0.05);
+  --shadow-hero-lift: 0 20px 56px rgba(25, 25, 25, 0.13), 0 2px 8px rgba(25, 25, 25, 0.05);
+
+  /* Spacing scale */
+  --s-4: 4px;
+  --s-8: 8px;
+  --s-12: 12px;
+  --s-16: 16px;
+  --s-20: 20px;
+  --s-24: 24px;
+  --s-32: 32px;
+  --s-40: 40px;
+  --s-64: 64px;
+  --s-96: 96px;
+  --s-128: 128px;
+
+  /* Layout */
+  --container: 1120px;
+  --gutter: 20px;
+  --measure: 65ch;
+  --nav-h: 68px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --reveal-dur: 400ms;
+
+  /* Pattern opacity, kept quiet per the brief */
+  --pattern-opacity: 0.08;
+  --pattern-band-opacity: 0.45;
+}
+
+/* Category context classes. Put one on any block that owns a category and
+   every child token (medallion, eyebrow, pattern, quest fill) follows. */
+.cat-mindfulness { --cat: var(--c-mindfulness); --cat-pale: var(--c-mindfulness-pale); --cat-ink: var(--c-mindfulness-ink); --pat: var(--pat-mindfulness); }
+.cat-recharge    { --cat: var(--c-recharge);    --cat-pale: var(--c-recharge-pale);    --cat-ink: var(--c-recharge-ink);    --pat: var(--pat-recharge); }
+.cat-creativity  { --cat: var(--c-creativity);  --cat-pale: var(--c-creativity-pale);  --cat-ink: var(--c-creativity-ink);  --pat: var(--pat-creativity); }
+.cat-growth      { --cat: var(--c-growth);      --cat-pale: var(--c-growth-pale);      --cat-ink: var(--c-growth-ink);      --pat: var(--pat-growth); }
+.cat-social      { --cat: var(--c-social);      --cat-pale: var(--c-social-pale);      --cat-ink: var(--c-social-ink);      --pat: var(--pat-social); }
+
+/* --------------------------------------------------------------------------
+   2. Reset
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+}
+
+body,
+h1, h2, h3, h4, h5, h6,
+p, figure, blockquote, dl, dd, ul, ol {
+  margin: 0;
+}
+
+ul[class], ol[class] { list-style: none; padding: 0; }
+
+body {
+  min-height: 100%;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg, video, canvas, picture { display: block; max-width: 100%; }
+img, video { height: auto; }
+
+input, button, textarea, select { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+
+a { color: inherit; }
+
+table { border-collapse: collapse; width: 100%; }
+
+hr { border: 0; border-top: 1px solid var(--hairline); margin: var(--s-40) 0; }
+
+::selection { background: var(--purple-pale); color: var(--ink); }
+
+/* --------------------------------------------------------------------------
+   3. Base type
+   -------------------------------------------------------------------------- */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+h1 { font-size: var(--fs-hero); line-height: 0.95; letter-spacing: -0.02em; }
+h2 { font-size: var(--fs-section); }
+h3 { font-size: var(--fs-sub); }
+h4 { font-size: var(--fs-title); }
+
+p { color: var(--ink-2); }
+p + p { margin-top: var(--s-20); }
+
+strong, b { font-weight: 700; color: var(--ink); }
+
+small { font-size: var(--fs-small); }
+
+/* The expressive accent word inside a headline. One per headline at most. */
+.accent {
+  font-style: italic;
+  color: var(--purple);
+}
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cat-ink);
+  margin-bottom: var(--s-16);
+}
+
+.lede {
+  font-size: var(--fs-lede);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 34ch;
+}
+
+.prose { max-width: var(--measure); }
+.prose h2 { margin-top: var(--s-64); margin-bottom: var(--s-20); }
+.prose h3 { margin-top: var(--s-40); margin-bottom: var(--s-16); }
+.prose p, .prose li { color: var(--ink-2); }
+.prose ul, .prose ol { margin: var(--s-20) 0; padding-left: 1.25em; }
+.prose li + li { margin-top: var(--s-8); }
+.prose a { color: var(--purple-deep); text-underline-offset: 3px; }
+
+/* --------------------------------------------------------------------------
+   4. Utilities
+   -------------------------------------------------------------------------- */
+.container {
+  width: min(var(--container), 100% - (var(--gutter) * 2));
+  margin-inline: auto;
+}
+.container--narrow { --container: 780px; }
+.container--wide { --container: 1280px; }
+
+.section { padding-block: clamp(var(--s-64), 10vw, var(--s-128)); position: relative; }
+.section--tight { padding-block: clamp(var(--s-40), 7vw, var(--s-96)); }
+.section--wash { background: var(--wash); }
+.section--cream { background: var(--cream); }
+.section--fade { background: linear-gradient(180deg, var(--wash) 0%, #FFFFFF 100%); }
+
+.split {
+  display: grid;
+  gap: var(--s-40);
+  align-items: center;
+}
+@media (min-width: 860px) {
+  .split { grid-template-columns: 1fr 1fr; gap: var(--s-64); }
+  .split--wide-left { grid-template-columns: 1.15fr 0.85fr; }
+}
+
+.grid-3 { display: grid; gap: var(--s-24); }
+@media (min-width: 720px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+
+.stack > * + * { margin-top: var(--s-20); }
+.stack-sm > * + * { margin-top: var(--s-12); }
+.stack-lg > * + * { margin-top: var(--s-32); }
+
+.center { text-align: center; }
+.center .lede { margin-inline: auto; }
+
+.text-ink { color: var(--ink); }
+.text-muted { color: var(--ink-2); }
+.text-cat { color: var(--cat-ink); }
+.serif { font-family: var(--font-display); }
+.italic { font-style: italic; }
+
+.u-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--s-16);
+  top: -100px;
+  z-index: 200;
+  padding: var(--s-12) var(--s-20);
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #FFFFFF;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 150ms var(--ease-out);
+}
+.skip-link:focus { top: var(--s-16); }
+
+/* --------------------------------------------------------------------------
+   5. Buttons and store badges
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-8);
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #FFFFFF;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1.5px solid transparent;
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), background-color 180ms var(--ease-out);
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+.btn:active { background: var(--ink-pressed); transform: translateY(0); box-shadow: var(--shadow-soft); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+.btn-ghost:hover { background: rgba(25, 25, 25, 0.04); }
+.btn-ghost:active { background: rgba(25, 25, 25, 0.08); }
+
+.btn-sm { padding: 10px 20px; font-size: 0.9375rem; }
+.btn-block { display: flex; width: 100%; }
+
+.store-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-12);
+}
+.store-badges--center { justify-content: center; }
+
+.store-badge {
+  display: inline-block;
+  border-radius: 9px;
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+.store-badge img { height: 48px; width: auto; }
+.store-badge:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+@media (max-width: 380px) {
+  .store-badge img { height: 42px; }
+}
+
+/* --------------------------------------------------------------------------
+   6. Cards
+   -------------------------------------------------------------------------- */
+.card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: var(--s-24);
+}
+.card--feature { border-radius: var(--radius-feature); padding: var(--s-32); overflow: hidden; }
+.card--hero { border-radius: var(--radius-hero); padding: var(--s-32); }
+.card--flat { box-shadow: none; border-color: var(--hairline); }
+.card--hover { transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out); }
+.card--hover:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+
+.card__title { font-family: var(--font-display); font-size: var(--fs-title); margin-bottom: var(--s-8); }
+.card__text { color: var(--ink-2); font-size: var(--fs-body); }
+
+/* Numbered step card, used by How it works */
+.step__num {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  color: var(--cat-ink);
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------------------------------
+   7. Category medallions
+   -------------------------------------------------------------------------- */
+.medallion {
+  --medallion-size: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--medallion-size);
+  height: var(--medallion-size);
+  border-radius: 50%;
+  background: var(--cat-pale);
+  border: 2px solid var(--cat);
+  overflow: hidden;
+}
+.medallion img, .medallion svg {
+  width: 54%;
+  height: 54%;
+  object-fit: contain;
+}
+.medallion--sm { --medallion-size: 40px; }
+.medallion--lg { --medallion-size: 72px; }
+.medallion--xl { --medallion-size: 96px; }
+.medallion--plain { background: var(--card); }
+
+/* Line glyphs drawn inline in the markup. currentColor strokes, so the ink
+   comes from the element. Fixed 24px inside a medallion, never a raster. */
+.glyph {
+  width: 24px;
+  height: 24px;
+  color: var(--cat-ink);
+  flex: 0 0 auto;
+}
+.medallion .glyph { width: 24px; height: 24px; }
+
+/* Floating decorative medallions scattered behind the hero. Ring plus glyph,
+   no pale fill, so they read as deliberate line marks on cream. */
+.medallion--float {
+  position: absolute;
+  opacity: 0.15;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1;
+  animation: float-soft 24s ease-in-out infinite alternate;
+}
+.medallion--float .glyph { width: 58%; height: 58%; color: var(--cat-ink); }
+
+/* --------------------------------------------------------------------------
+   8. Brand pattern fields
+   Recreated from design-refs/ as inline SVG. The reference PNGs are never
+   shipped. Fields stay quiet: 6 to 12 percent opacity, decoration only.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Mindfulness: lavender gradient dot grid */
+  --pat-mindfulness: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><defs><linearGradient id='a' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23FFFDF7'/><stop offset='1' stop-color='%23EBD8F5'/></linearGradient></defs><rect width='100' height='100' fill='%23C796DF'/><g fill='url(%23a)'><circle cx='25' cy='25' r='24'/><circle cx='75' cy='25' r='24'/><circle cx='25' cy='75' r='24'/><circle cx='75' cy='75' r='24'/></g></svg>");
+
+  /* Recharge: periwinkle diagonal capsule weave */
+  --pat-recharge: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><defs><linearGradient id='b' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23FFFFFF'/><stop offset='1' stop-color='%23DCE4FB'/></linearGradient></defs><rect width='48' height='48' fill='%23ECF0FE'/><g stroke='%23889FE9' stroke-width='15' stroke-linecap='round' fill='none'><path d='M-24 -24 L72 72'/><path d='M0 -48 L96 48'/><path d='M-48 0 L48 96'/><path d='M-12 -36 L84 60'/><path d='M-36 -12 L60 84'/></g><g stroke='url(%23b)' stroke-width='11' stroke-linecap='round' fill='none'><path d='M-8 -8 L8 8'/><path d='M40 -8 L56 8'/><path d='M-8 40 L8 56'/><path d='M40 40 L56 56'/><path d='M16 16 L32 32'/></g></svg>");
+
+  /* Social: acid lime quarter circle pinwheel */
+  --pat-social: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><defs><linearGradient id='c' x1='0' y1='0' x2='0.7' y2='1'><stop offset='0' stop-color='%23ECFA7A'/><stop offset='1' stop-color='%23A1B717'/></linearGradient></defs><rect width='60' height='60' fill='%23FBFDE8'/><g fill='url(%23c)'><path d='M0 0 L30 0 A30 30 0 0 1 0 30 Z'/><path d='M60 0 L60 30 A30 30 0 0 1 30 0 Z'/><path d='M0 60 L0 30 A30 30 0 0 1 30 60 Z'/><path d='M60 60 L30 60 A30 30 0 0 1 60 30 Z'/></g></svg>");
+
+  /* Creativity: peach rounded cluster */
+  --pat-creativity: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><defs><linearGradient id='d' x1='0' y1='0' x2='0.4' y2='1'><stop offset='0' stop-color='%23FFD5BC'/><stop offset='1' stop-color='%23F5A377'/></linearGradient><g id='e'><circle cx='-9' cy='-9' r='11'/><circle cx='9' cy='-9' r='11'/><circle cx='-9' cy='9' r='11'/><circle cx='9' cy='9' r='11'/></g></defs><rect width='60' height='60' fill='%23F0925B'/><g fill='url(%23d)'><use href='%23e' x='30' y='30'/><use href='%23e' x='0' y='0'/><use href='%23e' x='60' y='0'/><use href='%23e' x='0' y='60'/><use href='%23e' x='60' y='60'/></g><g fill='%23FFE4D6'><circle cx='30' cy='30' r='5'/><circle cx='0' cy='0' r='5'/><circle cx='60' cy='0' r='5'/><circle cx='0' cy='60' r='5'/><circle cx='60' cy='60' r='5'/></g></svg>");
+
+  /* Growth: gold pixel step */
+  --pat-growth: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><defs><linearGradient id='f' x1='0' y1='0' x2='0.2' y2='1'><stop offset='0' stop-color='%23E4C689'/><stop offset='1' stop-color='%23C9A24F'/></linearGradient><linearGradient id='g' x1='0' y1='0' x2='0.2' y2='1'><stop offset='0' stop-color='%23FBF3E2'/><stop offset='1' stop-color='%23EEDCB4'/></linearGradient></defs><rect width='60' height='60' fill='%23F5E9CF'/><g fill='url(%23f)'><rect x='0' y='0' width='30' height='15'/><rect x='15' y='15' width='30' height='15'/><rect x='30' y='30' width='30' height='15'/><rect x='45' y='45' width='30' height='15'/><rect x='-15' y='45' width='30' height='15'/></g><g fill='url(%23g)'><rect x='30' y='0' width='30' height='15'/><rect x='45' y='15' width='30' height='15'/><rect x='-15' y='15' width='30' height='15'/><rect x='0' y='30' width='30' height='15'/><rect x='15' y='45' width='30' height='15'/></g></svg>");
+}
+
+/* Full bleed field, absolutely positioned inside a positioned parent */
+.pattern-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--pattern-opacity);
+  background-image: var(--pat, var(--pat-mindfulness));
+  background-repeat: repeat;
+  background-size: 110px;
+}
+.pattern-field--soft { --pattern-opacity: 0.06; }
+.pattern-field--strong { --pattern-opacity: 0.12; }
+.pattern-field--fade {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+}
+
+/* Thin header band across the top of a feature card */
+.pattern-band {
+  display: block;
+  height: 12px;
+  width: 100%;
+  opacity: var(--pattern-band-opacity);
+  background-image: var(--pat, var(--pat-mindfulness));
+  background-repeat: repeat;
+  background-size: 72px;
+}
+.card--feature > .pattern-band:first-child {
+  margin: calc(var(--s-32) * -1) calc(var(--s-32) * -1) var(--s-24);
+  width: auto;
+}
+/* Phones get the same band at 60 percent of the tile size, so the geometry
+   reads as texture instead of a toy print. */
+@media (max-width: 640px) {
+  .pattern-band {
+    height: 10px;
+    background-size: 44px;
+    --pattern-band-opacity: 0.38;
+  }
+}
+
+/* Standalone swatch, used on the components page */
+.pattern-swatch {
+  height: 120px;
+  border-radius: var(--radius-card);
+  background-image: var(--pat, var(--pat-mindfulness));
+  background-size: 110px;
+  border: 1px solid var(--hairline);
+}
+
+/* Pattern class per category, for use without a .cat-* context */
+.pattern-mindfulness { --pat: var(--pat-mindfulness); }
+.pattern-recharge { --pat: var(--pat-recharge); }
+.pattern-social { --pat: var(--pat-social); }
+.pattern-creativity { --pat: var(--pat-creativity); }
+.pattern-growth { --pat: var(--pat-growth); }
+
+/* --------------------------------------------------------------------------
+   9. Blurred blob layer
+   Cream is the page. These are two or three discrete soft shapes that tint
+   it, sized and placed so the base colour stays dominant. The whole layer
+   fades out above the section's bottom edge, so a blur clipped by the
+   overflow can never leave a band where one section meets the next.
+   -------------------------------------------------------------------------- */
+.blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 56%, transparent 92%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 56%, transparent 92%);
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.28;
+  will-change: transform;
+  animation: blob-drift 72s ease-in-out infinite alternate;
+}
+/* 1 sits behind the headline, 2 behind the hero card, 3 is a quiet anchor
+   between them. Sizes are capped so wide screens get more cream, not more blob. */
+.blob--1 { width: clamp(260px, 26vw, 400px); height: clamp(260px, 26vw, 400px); background: var(--blob-2); top: 6%; left: -2%; opacity: 0.26; }
+.blob--2 { width: clamp(280px, 30vw, 440px); height: clamp(280px, 30vw, 440px); background: var(--blob-3); top: 13%; right: -1%; opacity: 0.3; animation-duration: 88s; animation-direction: alternate-reverse; }
+.blob--3 { width: clamp(200px, 21vw, 320px); height: clamp(200px, 21vw, 320px); background: var(--blob-4); top: 44%; left: 31%; opacity: 0.15; animation-duration: 96s; }
+.blob--4 { width: clamp(180px, 18vw, 280px); height: clamp(180px, 18vw, 280px); background: var(--blob-5); top: 34%; left: 8%; opacity: 0.24; animation-duration: 104s; animation-direction: alternate-reverse; }
+.blob--5 { width: clamp(200px, 20vw, 300px); height: clamp(200px, 20vw, 300px); background: var(--blob-1); top: 30%; right: 14%; opacity: 0.3; animation-duration: 80s; }
+
+/* Phones stack the hero, so the card moves down the page and blob 2 goes with
+   it. Two blobs only, smaller and softer: cream still owns the screen. */
+@media (max-width: 720px) {
+  .blob { filter: blur(64px); opacity: 0.2; }
+  .blob--1 { width: clamp(220px, 58vw, 300px); height: clamp(220px, 58vw, 300px); top: 3%; left: -12%; }
+  .blob--2 { width: clamp(260px, 74vw, 340px); height: clamp(260px, 74vw, 340px); top: 34%; right: auto; left: 6%; }
+  .blob--3, .blob--4, .blob--5 { display: none; }
+}
+
+@keyframes blob-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(3%, -4%, 0) scale(1.08); }
+  to   { transform: translate3d(-4%, 3%, 0) scale(0.96); }
+}
+
+@keyframes float-soft {
+  from { transform: translate3d(0, 0, 0) rotate(-4deg); }
+  to   { transform: translate3d(0, -14px, 0) rotate(4deg); }
+}
+
+/* Content sitting above blobs and pattern fields */
+.layer-up { position: relative; z-index: 1; }
+
+/* --------------------------------------------------------------------------
+   10. Sticky frosted nav
+   -------------------------------------------------------------------------- */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  border-bottom: 1px solid var(--hairline);
+  transition: background-color 250ms var(--ease-out), box-shadow 250ms var(--ease-out);
+}
+.site-nav.is-scrolled {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-soft);
+}
+.site-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-16);
+  height: var(--nav-h);
+}
+.site-nav__logo { display: inline-flex; align-items: center; }
+.site-nav__logo img { height: 22px; width: auto; }
+
+@media (max-width: 600px) {
+  :root { --nav-h: 60px; }
+  .site-nav__logo img { height: 20px; }
+  .site-nav .btn { padding: 10px 20px; font-size: 0.9375rem; }
+}
+
+/* --------------------------------------------------------------------------
+   11. Giant wordmark band
+   -------------------------------------------------------------------------- */
+.wordmark-band {
+  background: var(--cream);
+  padding-block: clamp(var(--s-40), 7vw, var(--s-96)) clamp(var(--s-24), 4vw, var(--s-40));
+  overflow: hidden;
+}
+.wordmark-band img {
+  width: 100%;
+  height: auto;
+}
+
+/* --------------------------------------------------------------------------
+   12. Footer
+   -------------------------------------------------------------------------- */
+.site-footer {
+  background: var(--wash);
+  padding-block: var(--s-64) var(--s-40);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+.site-footer__top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-32);
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.site-footer__brand img { height: 22px; width: auto; }
+.site-footer__brand p { margin-top: var(--s-12); max-width: 30ch; font-size: var(--fs-small); }
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-12) var(--s-24);
+}
+.site-footer a {
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: color 160ms var(--ease-out);
+}
+.site-footer a:hover { color: var(--ink); }
+.site-footer__legal {
+  margin-top: var(--s-40);
+  padding-top: var(--s-20);
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-8) var(--s-20);
+  justify-content: space-between;
+  font-size: 0.8125rem;
+}
+
+/* --------------------------------------------------------------------------
+   13. Quest card (signature element)
+   Behaviour lives in js/quest-card.js. Markup contract is documented there.
+   -------------------------------------------------------------------------- */
+.quest-card-stage {
+  display: flex;
+  justify-content: center;
+  perspective: 900px;
+}
+
+.quest-card {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 354px;
+  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-hero);
+  box-shadow: var(--shadow-hero);
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: box-shadow 220ms var(--ease-out);
+}
+.quest-card:hover { box-shadow: var(--shadow-hero-lift); }
+
+/* Rising fill */
+.quest-card__fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--cat-pale);
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+.quest-card[data-state="holding"] .quest-card__fill {
+  transform: scaleY(1);
+  transition: transform 1200ms linear;
+}
+.quest-card[data-state="draining"] .quest-card__fill {
+  transform: scaleY(0);
+  transition: transform 320ms var(--ease-out);
+}
+.quest-card[data-state="checked"] .quest-card__fill { transform: scaleY(1); }
+
+.quest-card__inner { position: relative; z-index: 2; }
+
+.quest-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-16);
+}
+
+.quest-card__medallion { backface-visibility: visible; }
+.quest-card__medallion .glyph {
+  width: 26px;
+  height: 26px;
+  color: var(--purple-deep);
+}
+.quest-card[data-state="checked"] .quest-card__medallion {
+  animation: qc-flip 700ms var(--ease-out) both;
+}
+
+.quest-card__name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.quest-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-12);
+  margin-top: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.quest-card__streak { display: inline-flex; align-items: center; gap: 5px; }
+.quest-card__streak svg { width: 14px; height: 14px; color: var(--c-creativity); }
+
+.avatar-stack { display: inline-flex; align-items: center; }
+.avatar-stack span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  background: var(--purple-mid);
+  margin-left: -7px;
+}
+.avatar-stack span:first-child { margin-left: 0; }
+.avatar-stack .avatar-stack__more {
+  width: auto;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(25, 25, 25, 0.06);
+  color: var(--ink-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* Hint pill */
+.quest-card__hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-8);
+  margin-top: var(--s-20);
+  padding: 13px 18px;
+  border-radius: var(--radius-pill);
+  background: rgba(25, 25, 25, 0.05);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink-2);
+  text-align: center;
+  transition: background-color 260ms var(--ease-out), color 260ms var(--ease-out);
+}
+.quest-card__hint svg { width: 16px; height: 16px; }
+.quest-card__hint-done { display: none; align-items: center; gap: 7px; }
+.quest-card[data-state="checked"] .quest-card__hint {
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--cat-ink);
+}
+.quest-card[data-state="checked"] .quest-card__hint-idle { display: none; }
+.quest-card[data-state="checked"] .quest-card__hint-done { display: inline-flex; }
+
+/* Full card press target, keeps the card semantic and keyboard reachable */
+.quest-card__press {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  background: transparent;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.quest-card__press:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: -4px;
+}
+
+/* Spring on completion */
+.quest-card.is-pop { animation: qc-pop 460ms var(--ease-spring); }
+
+/* Confetti */
+.quest-card__confetti {
+  position: absolute;
+  left: 50%;
+  bottom: 52px;
+  width: 0;
+  height: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.qc-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  will-change: transform, opacity;
+  animation: qc-burst 900ms var(--ease-out) forwards;
+}
+
+@keyframes qc-pop {
+  0%   { transform: scale(1); }
+  38%  { transform: scale(1.035); }
+  100% { transform: scale(1); }
+}
+@keyframes qc-flip {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+@keyframes qc-burst {
+  0%   { transform: translate3d(0, 0, 0) scale(0.4) rotate(0deg); opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translate3d(var(--dx), var(--dy), 0) scale(1) rotate(var(--rot)); opacity: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   14. Reveal on scroll and load sequence
+   -------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: opacity var(--reveal-dur) var(--ease-out), transform var(--reveal-dur) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Orchestrated homepage load: opacity and transform only.
+   Fill mode is both, so the element holds its start frame through its stagger
+   delay instead of flashing in at full opacity and then jumping back. */
+.load-in {
+  opacity: 0;
+  animation: load-rise 500ms var(--ease-out) both;
+  animation-delay: var(--load-delay, 0ms);
+}
+@keyframes load-rise {
+  from { opacity: 0; transform: translate3d(0, 20px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Hero card settles from -3deg */
+.load-settle {
+  animation: card-settle 700ms var(--ease-out) both;
+  animation-delay: var(--load-delay, 200ms);
+}
+@keyframes card-settle {
+  from { opacity: 0; transform: rotate(-3deg) translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: rotate(0deg) translate3d(0, 0, 0); }
+}
+
+/* --------------------------------------------------------------------------
+   15. Focus rings
+   -------------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* --------------------------------------------------------------------------
+   16. Reduced motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .load-in, .load-settle { opacity: 1; animation: none; }
+  .blob, .medallion--float { animation: none; }
+  .quest-card[data-state="holding"] .quest-card__fill,
+  .quest-card[data-state="draining"] .quest-card__fill { transition: none; }
+  .quest-card__fill { transform: scaleY(0); }
+  .quest-card[data-state="checked"] .quest-card__fill { transform: scaleY(1); }
+}
+
+@media (prefers-contrast: more) {
+  .site-nav { background: #FFFFFF; }
+  p, .text-muted { color: #4A4A4A; }
+}

@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Quests V2 — blog.html page-specific styles
+   Foundation tokens and components come from css/site.css. This file only
+   adds the things unique to the blog list: the post grid and its card meta
+   row and category chip.
+   ========================================================================== */
+
+.blog-hero h1 {
+  font-size: var(--fs-section);
+}
+
+.blog-grid {
+  display: grid;
+  gap: var(--s-24);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.blog-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-card__category {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--purple-pale);
+  color: var(--purple-deep);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--s-16);
+}
+
+.blog-card__title {
+  margin-top: 0;
+}
+
+.blog-card__excerpt {
+  flex: 1;
+}
+
+.blog-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-8);
+  margin-top: var(--s-20);
+  padding-top: var(--s-16);
+  border-top: 1px solid var(--hairline);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}

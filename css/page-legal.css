@@ -1,0 +1,120 @@
+/* ============================================================================
+   Quests V2 — page-specific styles for privacy.html and terms.html
+   Foundation tokens and .prose come from css/site.css. This file only adds
+   the small handful of rules specific to the long-form legal layout:
+   the header block, the table of contents card, and the CCPA data table.
+   ============================================================================ */
+
+.legal-updated {
+  margin-top: var(--s-12);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.legal-toc {
+  margin-bottom: var(--s-40);
+}
+
+.legal-toc__label {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--fs-small);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: var(--s-16);
+}
+
+.legal-toc__list {
+  display: grid;
+  gap: var(--s-8) var(--s-24);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+@media (min-width: 640px) {
+  .legal-toc__list { grid-template-columns: 1fr 1fr; }
+}
+
+.legal-toc__list a {
+  color: var(--ink-2);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+.legal-toc__list a:hover {
+  color: var(--purple-deep);
+  text-decoration: underline;
+}
+
+.legal-body h2 {
+  font-size: var(--fs-sub);
+  scroll-margin-top: calc(var(--nav-h) + var(--s-16));
+}
+
+.legal-body h3 {
+  font-size: 1.125rem;
+  scroll-margin-top: calc(var(--nav-h) + var(--s-16));
+}
+
+.legal-body ul,
+.legal-body ol {
+  list-style: disc;
+}
+
+/* A few clauses render raw, unbroken URLs as their own link text (Google
+   Analytics opt-out, the Termly policy-viewer link). Without a break
+   hint those push the whole page into horizontal scroll below ~400px. */
+.prose a {
+  overflow-wrap: anywhere;
+}
+
+.legal-body ol.legal-body__numbered {
+  list-style: none;
+  padding-left: 0;
+}
+
+.legal-table-scroll {
+  overflow-x: auto;
+  margin: var(--s-20) 0;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+}
+
+.legal-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.legal-table caption {
+  caption-side: top;
+  text-align: left;
+  padding: var(--s-12) var(--s-16);
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--wash);
+}
+
+.legal-table th,
+.legal-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: var(--s-12) var(--s-16);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink-2);
+}
+
+.legal-table thead th {
+  color: var(--ink);
+  font-weight: 700;
+  background: var(--wash);
+}
+
+.legal-table tbody tr:last-child th,
+.legal-table tbody tr:last-child td {
+  border-bottom: none;
+}

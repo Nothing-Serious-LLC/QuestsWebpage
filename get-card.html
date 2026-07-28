@@ -1,296 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Get Quest Card – Quests</title>
-    <meta name="description" content="Download your Quest Card to Apple Wallet. Scan the QR code to download the Quests app." />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="apple-itunes-app" content="app-id=6745767553">
-    <meta name="format-detection" content="telephone=no">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-      .card-page {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 120px 24px 80px;
-      }
-      
-      .card-container {
-        max-width: 600px;
-        margin: 0 auto;
-        width: 100%;
-      }
-      
-      .card-header {
-        text-align: center;
-        margin-bottom: 48px;
-      }
-      
-      .card-title {
-        font-size: clamp(2.5rem, 5vw, 3.5rem);
-        font-weight: 800;
-        color: var(--white);
-        margin: 0 0 16px;
-        letter-spacing: -0.02em;
-      }
-      
-      .card-subtitle {
-        font-size: 17px;
-        color: var(--text-muted);
-        line-height: 1.6;
-      }
-      
-      .card-download-box {
-        background: var(--surface-strong);
-        border: 1px solid var(--border-strong);
-        border-radius: 28px;
-        padding: 48px;
-        box-shadow: var(--shadow-md);
-        text-align: center;
-      }
-      
-      .card-preview {
-        background: linear-gradient(135deg, #0d1f3a 0%, #1a2f4a 100%);
-        border-radius: 20px;
-        padding: 32px;
-        margin-bottom: 32px;
-        border: 2px solid var(--border-soft);
-      }
-      
-      .card-preview-logo {
-        font-size: 24px;
-        font-weight: 800;
-        color: var(--white);
-        margin-bottom: 24px;
-        letter-spacing: 0.1em;
-      }
-      
-      .card-preview-qr {
-        width: 200px;
-        height: 200px;
-        margin: 0 auto;
-        background: white;
-        border-radius: 12px;
-        padding: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      .card-preview-qr-placeholder {
-        width: 100%;
-        height: 100%;
-        background: repeating-linear-gradient(
-          45deg,
-          #f0f0f0,
-          #f0f0f0 10px,
-          #ffffff 10px,
-          #ffffff 20px
-        );
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #999;
-        font-size: 14px;
-        text-align: center;
-      }
-      
-      .download-button {
-        width: 100%;
-        padding: 18px 32px;
-        background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-400) 100%);
-        color: var(--white);
-        border: none;
-        border-radius: 20px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow-lg);
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-      }
-      
-      .download-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      }
-      
-      .download-button:active {
-        transform: translateY(0);
-      }
-      
-      .download-button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-      
-      .instructions {
-        margin-top: 32px;
-        padding-top: 32px;
-        border-top: 1px solid var(--border-soft);
-      }
-      
-      .instructions-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--white);
-        margin-bottom: 16px;
-      }
-      
-      .instructions-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-      
-      .instructions-list li {
-        padding: 12px 0;
-        color: var(--text-muted);
-        font-size: 15px;
-        line-height: 1.6;
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      
-      .instructions-list li::before {
-        content: "✓";
-        color: var(--accent-light);
-        font-weight: 700;
-        font-size: 18px;
-        flex-shrink: 0;
-      }
-      
-      .airdrop-note {
-        background: var(--surface-medium);
-        border-left: 4px solid var(--accent-light);
-        padding: 16px 20px;
-        border-radius: 12px;
-        margin-top: 24px;
-      }
-      
-      .airdrop-note p {
-        margin: 0;
-        color: var(--text-muted);
-        font-size: 14px;
-        line-height: 1.6;
-      }
-      
-      .airdrop-note strong {
-        color: var(--white);
-      }
-      
-      @media (max-width: 768px) {
-        .card-download-box {
-          padding: 32px 24px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="page__background"></div>
-    <div class="page__wrapper">
-      <header class="site-header">
-        <div class="site-header__inner">
-          <a class="brand" href="/" aria-label="Quests home">
-            <span class="brand__glyph" aria-hidden="true"></span>
-            <span class="brand__name">Quests</span>
-          </a>
-          <a class="download-chip" href="/#cta">Download the app</a>
-        </div>
-      </header>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get your Quest Card | Quests</title>
+  <meta name="description" content="Add your Quest Card to Apple Wallet, then scan the code to download Quests and start a challenge with friends." />
+  <meta name="robots" content="noindex" />
+  <meta name="apple-itunes-app" content="app-id=6745767553" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="theme-color" content="#FDFBF6" />
+  <link rel="canonical" href="https://thequestsapp.com/get-card.html" />
 
-      <main class="card-page">
-        <div class="card-container">
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Get your Quest Card | Quests" />
+  <meta property="og:description" content="Add your Quest Card to Apple Wallet, then scan the code to download Quests and start a challenge with friends." />
+  <meta property="og:url" content="https://thequestsapp.com/get-card.html" />
+  <meta property="og:image" content="https://thequestsapp.com/og-image-v2.png" />
 
-          <div class="card-download-box">
-            <div class="card-preview">
-              <div class="card-preview-logo">QUESTS</div>
-              <div class="card-preview-qr">
-                <img id="qr-code-image" src="" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;" />
-              </div>
-            </div>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Get your Quest Card | Quests" />
+  <meta name="twitter:description" content="Add your Quest Card to Apple Wallet, then scan the code to download Quests and start a challenge with friends." />
+  <meta name="twitter:image" content="https://thequestsapp.com/og-image-v2.png" />
 
-            <a href="/QuestCard.pkpass" class="download-button" style="text-decoration: none; display: flex;">
-              <i class="mdi mdi-wallet" style="font-size: 20px;"></i>
-              <span>Add to Apple Wallet</span>
-            </a>
+  <link rel="icon" href="/assets/img/app-icon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/img/app-icon.png" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/site.css" />
+  <link rel="stylesheet" href="/css/page-get-card.css" />
+  <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Get your Quest Card",
+    "url": "https://thequestsapp.com/get-card.html",
+    "description": "Add your Quest Card to Apple Wallet, then scan the code to download Quests and start a challenge with friends.",
+    "isPartOf": { "@type": "WebSite", "name": "Quests", "url": "https://thequestsapp.com/" }
+  }
+  </script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-nav">
+  <div class="container site-nav__inner">
+    <a class="site-nav__logo" href="/" aria-label="Quests home">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+    </a>
+    <a class="btn btn-sm" href="/#download">Download</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section wallet-section">
+    <div class="container container--narrow reveal">
+      <div class="wallet-card">
+        <h1>Add your Quest Card to Apple Wallet</h1>
+
+        <div class="wallet-preview">
+          <p class="wallet-preview__wordmark">QUESTS</p>
+          <div class="wallet-preview__qr">
+            <img id="qr-code-image" src="" alt="QR code that links to the Quests download page">
           </div>
         </div>
-      </main>
 
-      <footer class="site-footer">
-        <div class="site-footer__content">
-          <div class="site-footer__links">
-            <a href="/contact.html">Contact</a>
-            <a href="/blog.html">Blog</a>
-            <a href="/privacy.html">Privacy</a>
-            <a href="/terms.html">Terms</a>
-          </div>
-          <div class="site-footer__social">
-            <a href="https://instagram.com/thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <i class="mdi mdi-instagram"></i>
-            </a>
-            <a href="https://tiktok.com/@thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.10-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-              </svg>
-            </a>
-            <a href="https://x.com/thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-          </div>
-          <p class="site-footer__meta">© <span id="year"></span> Quests</p>
-        </div>
-      </footer>
+        <p class="wallet-caption">Scan the code to download the app</p>
+
+        <a href="/QuestCard.pkpass" class="btn btn-block wallet-cta">Add to Apple Wallet</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="wordmark-band reveal">
+  <div class="container">
+    <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+        <p>The home of the healthy challenge. Grow better together.</p>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="Footer">
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
+      </nav>
     </div>
 
-    <script>
-      document.getElementById('year').textContent = new Date().getFullYear();
+    <div class="site-footer__legal">
+      <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
+      <p>Habits with friends.</p>
+    </div>
+  </div>
+</footer>
 
-      // Generate QR code for preview
-      (function() {
-        const appStoreUrl = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
-        // Use a QR code API service
-        const qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(appStoreUrl);
-        const qrImg = document.getElementById('qr-code-image');
-        if (qrImg) {
-          qrImg.src = qrCodeUrl;
-          qrImg.onerror = function() {
-            // Fallback: use QR code in a canvas if API fails
-            this.style.display = 'none';
-            this.parentElement.innerHTML = '<div class="card-preview-qr-placeholder">QR Code<br />Links to App Store</div>';
-          };
-        }
-      })();
+<script src="/js/site.js" defer></script>
+<script>
+  // Generate the Wallet card preview QR, pointed at the App Store listing.
+  (function () {
+    var appStoreUrl = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
+    var qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(appStoreUrl);
+    var qrImg = document.getElementById('qr-code-image');
+    if (qrImg) {
+      qrImg.src = qrCodeUrl;
+      qrImg.onerror = function () {
+        this.style.display = 'none';
+        this.parentElement.innerHTML = '<div class="wallet-preview__qr-placeholder">QR Code<br>Links to App Store</div>';
+      };
+    }
+  })();
 
-      // iOS Safari Wallet pass handling
-      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        // On iOS, Wallet passes should open automatically when tapped
-        // Make sure the link goes directly to the .pkpass file
-        const walletLink = document.querySelector('a[href*=".pkpass"]');
-        if (walletLink) {
-          walletLink.addEventListener('click', function(e) {
-            // Let iOS handle it natively
-            // Don't prevent default - iOS will open Wallet
-          });
-        }
-      }
-    </script>
-  </body>
+  // iOS Safari Wallet pass handling: let iOS open the .pkpass natively.
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    var walletLink = document.querySelector('a[href*=".pkpass"]');
+    if (walletLink) {
+      walletLink.addEventListener('click', function (e) {
+        // Don't prevent default, iOS handles the pass natively.
+      });
+    }
+  }
+</script>
+
+</body>
 </html>

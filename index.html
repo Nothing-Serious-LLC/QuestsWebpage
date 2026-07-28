@@ -1,589 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quests - Group Challenges | Build Habits with Friends</title>
-    <meta
-      name="description"
-      content="Build habits with friends. Quests makes self-improvement social, fun, and rewarding. Join friends for daily check-ins, earn badges, and build lasting habits together."
-    />
-    <meta name="keywords" content="habit tracker, social accountability, goal tracking app, 75 hard, dry january, build habits with friends, daily check-ins, streak tracking, habit building app, group challenges" />
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Quests - Group Challenges | Build Habits with Friends" />
-    <meta property="og:description" content="Build habits with friends. Make self-improvement social, fun, and rewarding through daily check-ins and friendly competition." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://thequestsapp.com/" />
-    <meta property="og:image" content="https://thequestsapp.com/og-image.png" />
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Quests - Group Challenges" />
-    <meta name="twitter:description" content="Build habits with friends. Join group challenges and build lasting habits together." />
-    <meta name="twitter:image" content="https://thequestsapp.com/og-image.png" />
-    
-    <!-- Canonical -->
-    <link rel="canonical" href="https://thequestsapp.com/" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="icon.png" />
-    <link rel="apple-touch-icon" href="icon.png" />
-    
-    <!-- Theme color for mobile browsers -->
-    <meta name="theme-color" content="#0d1f3a" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Quests: Habits with Friends</title>
+  <meta name="description" content="Quests turns healthy challenges into something you do with friends. Pick a quest, check in daily, build streaks together, and earn real rewards.">
+  <link rel="canonical" href="https://thequestsapp.com/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Quests">
+  <meta property="og:url" content="https://thequestsapp.com/">
+  <meta property="og:title" content="Quests: Habits with Friends">
+  <meta property="og:description" content="You're better at building habits when you do it with people you care about. 100+ challenges, daily check-ins, streaks, and rewards.">
+  <meta property="og:image" content="https://thequestsapp.com/og-image-v2.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Quests: habits with friends">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Quests: Habits with Friends">
+  <meta name="twitter:description" content="You're better at building habits when you do it with people you care about. 100+ challenges, daily check-ins, streaks, and rewards.">
+  <meta name="twitter:image" content="https://thequestsapp.com/og-image-v2.png">
+  <meta name="twitter:image:alt" content="Quests: habits with friends">
+
+  <!-- Icons and browser chrome -->
+  <link rel="icon" type="image/png" href="/assets/img/app-icon.png">
+  <link rel="apple-touch-icon" href="/assets/img/app-icon.png">
+  <meta name="theme-color" content="#FDFBF6">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/page-home.css">
+  <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
+
+  <!-- Behaviour -->
+  <script src="/js/site.js" defer></script>
+  <script src="/js/quest-card.js" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "Quests",
+    "alternateName": "Quests: Habits with Friends",
+    "url": "https://thequestsapp.com/",
+    "image": "https://thequestsapp.com/assets/img/app-icon.png",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "iOS, Android",
+    "description": "Quests turns healthy challenges into something you do with friends. Pick a quest, check in daily, build streaks together, and earn real rewards.",
+    "downloadUrl": "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553",
+    "installUrl": "https://play.google.com/store/apps/details?id=info.nothingserious.quests",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
       "@type": "Organization",
-      "name": "Quests",
-      "url": "https://thequestsapp.com",
-      "logo": "https://thequestsapp.com/icon.png",
-      "description": "Quests makes self-improvement social, fun, and rewarding. Join friends for daily check-ins, earn badges, and build lasting habits together.",
+      "name": "Nothing Serious LLC",
+      "url": "https://thequestsapp.com/",
+      "logo": "https://thequestsapp.com/assets/img/app-icon.png",
       "sameAs": [
-        "https://www.instagram.com/quests.app/",
-        "https://x.com/Quests_app_",
-        "https://www.tiktok.com/@quests.app"
+        "https://instagram.com/quests.app",
+        "https://tiktok.com/@quests.app",
+        "https://x.com/Quests_app_"
       ]
     }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "MobileApplication",
-      "name": "Quests",
-      "operatingSystem": "iOS, Android",
-      "applicationCategory": "HealthApplication",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "1200"
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "description": "Turn your health goals into a shared Quest. Build lasting habits with friends through daily check-ins, social accountability, and friendly competition. 65% more likely to succeed with a friend."
-    }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Quests",
-      "url": "https://thequestsapp.com",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://thequestsapp.com/?s={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "How does social accountability help build habits?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Studies show that teaming up with others dramatically boosts your chances of forming lasting habits by 65%. Quests is built on this principle of social accountability, allowing you to join friends for daily check-ins and track progress together."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is a Quest?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A Quest is a shared habit-building challenge you can join with friends. Popular quests include 75 Hard, Dry January, reading challenges, and custom habits. Each quest includes daily check-ins, progress tracking, and social features to keep you accountable."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is Quests free to use?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, Quests is free to download and use. Join friends, track habits, and build streaks together at no cost."
-          }
-        }
-      ]
-    }
-    </script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
-    <link rel="stylesheet" href="styles.css?v=37" />
-  </head>
-  <body>
-    <div class="page__background"></div>
-    <div class="page__wrapper">
-      <header class="site-header">
-        <div class="site-header__inner">
-          <a class="brand" href="/" aria-label="Quests home">
-            <span class="brand__glyph" aria-hidden="true"></span>
-            <span class="brand__name">Quests</span>
-          </a>
-          <a class="download-chip" href="/#cta">Download the app</a>
-        </div>
-      </header>
+  }
+  </script>
+</head>
+<body>
 
-      <main>
-        <section id="hero" class="hero hero--minimal">
-          <div class="hero__container">
-            <div class="hero__content" style="opacity: 0; transform: translateX(-30px);">
-              <h1 class="hero__title">Habits Made <span class="highlight-text">Social.</span></h1>
-              <p class="hero__subtitle">Build better habits with the people who matter most. Create challenges, track streaks, and earn rewards together.</p>
-              <div id="download" class="hero__cta-group">
-                <a class="hero__app-store" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer" aria-label="Download on the App Store">
-                  <img src="download-on-the-app-store.svg" alt="Download on the App Store">
-                </a>
-                <a class="hero__app-store" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" target="_blank" rel="noreferrer" aria-label="Get Quests on Google Play">
-                  <div class="store-btn">
-                    <i class="mdi mdi-google-play"></i>
-                    <div class="store-btn__text">
-                      <span class="store-btn__sub">Get it on</span>
-                      <span class="store-btn__main">Google Play</span>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
+<a class="skip-link" href="#main">Skip to content</a>
 
-            <div class="hero__phones">
-              <!-- Faint Floating Background Icons -->
-              <div class="hero__floating-icons">
-                <span class="mdi mdi-dumbbell floating-icon icon-1"></span>
-                <span class="mdi mdi-book-open-variant floating-icon icon-2"></span>
-                <span class="mdi mdi-water floating-icon icon-3"></span>
-                <span class="mdi mdi-run floating-icon icon-4"></span>
-                <span class="mdi mdi-meditation floating-icon icon-5"></span>
-                <span class="mdi mdi-bed-empty floating-icon icon-6"></span>
-              </div>
+<!-- Category line glyphs. Defined once, drawn wherever a medallion needs one.
+     currentColor strokes, so the ink comes from the element that uses them. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="g-lotus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22.5085 15.4326C22.8337 15.8578 23.0089 16.3101 23.0089 16.7791C23.0089 19.2665 18.0799 21.2829 11.9996 21.2829C5.91928 21.2829 0.990234 19.2665 0.990234 16.7791C0.990234 16.3101 1.16548 15.8578 1.49063 15.4326"/>
+    <path d="M17.5045 10.9528C17.5045 7.45365 14.6834 4.5133 13.0804 3.12495C12.452 2.58075 11.5476 2.58075 10.9193 3.12495C9.31622 4.5133 6.49512 7.45365 6.49512 10.9528C6.49512 14.1922 8.95967 16.2793 11.9998 16.2793C15.04 16.2793 17.5045 14.1922 17.5045 10.9528Z"/>
+    <path d="M8.40171 5.82592C6.62991 5.26442 4.77841 5.22817 3.55566 5.29327C2.71101 5.33827 2.05991 5.98937 2.01496 6.83402C1.90886 8.82642 2.07181 12.4882 4.33811 14.7545C5.93751 16.3539 8.00091 16.641 9.76426 15.8668C7.83806 15.1074 6.49501 13.3439 6.49501 10.9526C6.49501 9.01662 7.35861 7.25167 8.40171 5.82592Z"/>
+    <path d="M15.5969 5.82592C16.64 7.25167 17.5036 9.01662 17.5036 10.9526C17.5036 13.3439 16.1606 15.1074 14.2344 15.8668C15.9977 16.641 18.0611 16.3539 19.6605 14.7545C21.9268 12.4882 22.0898 8.82642 21.9837 6.83407C21.9387 5.98937 21.2876 5.33827 20.443 5.29327C19.2202 5.22817 17.3687 5.26442 15.5969 5.82592Z"/>
+  </symbol>
+  <symbol id="g-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.8 13.1A8.6 8.6 0 0 1 10.9 3.2 8.9 8.9 0 1 0 20.8 13.1Z"/>
+  </symbol>
+  <symbol id="g-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 21V11"/>
+    <path d="M12 12.5C8.4 12.5 5.5 9.6 5.5 6 9.1 6 12 8.9 12 12.5Z"/>
+    <path d="M12 15.5C12 11.9 14.9 9 18.5 9 18.5 12.6 15.6 15.5 12 15.5Z"/>
+  </symbol>
+  <symbol id="g-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3.5C12.6 8.6 15.4 11.4 20.5 12 15.4 12.6 12.6 15.4 12 20.5 11.4 15.4 8.6 12.6 3.5 12 8.6 11.4 11.4 8.6 12 3.5Z"/>
+  </symbol>
+</svg>
 
-              <!-- Back Phone -->
-              <div class="hero__phone hero__phone--back" style="opacity: 0; transform: translate3d(0, 0, -100px) scale(0.85) rotate(0deg);">
-                <div class="hero__phone-motion">
-                  <div class="iphone-hardware">
-                    <div class="iphone-hardware__bezel">
-                      <div class="iphone-hardware__screen">
-                        <img src="phone-screen-2.png" alt="Quests Leaderboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
-                      </div>
-                    </div>
-                    <!-- Buttons -->
-                    <div class="iphone-hardware__btn-mute"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
-                    <div class="iphone-hardware__btn-power"></div>
-                  </div>
-                </div>
-              </div>
+<header class="site-nav">
+  <div class="container site-nav__inner">
+    <a class="site-nav__logo" href="/" aria-label="Quests home">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+    </a>
+    <a class="btn btn-sm" href="/#download" aria-label="Download Quests">Download</a>
+  </div>
+</header>
 
-              <!-- Front Phone -->
-              <div class="hero__phone hero__phone--front" style="transform: translateY(0); opacity: 1;">
-                <div class="hero__phone-motion">
-                  <div class="iphone-hardware">
-                    <div class="iphone-hardware__bezel">
-                      <div class="iphone-hardware__screen">
-                        <img src="phone-screen-1.png" alt="Quests Dashboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
-                      </div>
-                    </div>
-                    <!-- Buttons -->
-                    <div class="iphone-hardware__btn-mute"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
-                    <div class="iphone-hardware__btn-power"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+<main id="main">
 
-        <section class="intro">
-          <div class="intro__grid scroll-reveal">
-            <div class="intro__text-block">
-              <h2 class="intro__heading">Grow together</h2>
-              <p class="intro__description">
-                Quests makes habit-building <strong>social</strong> and <strong>rewarding</strong>. Create a Quest, invite your friends in seconds, and stay accountable with daily check-ins that keep everyone engaged.
-              </p>
-            </div>
-            <div class="intro__visual">
-              <div class="intro__day-count" role="status" aria-label="Progress tracker">Day 10 of 30</div>
-              <div class="intro__avatar-group" role="group" aria-label="Friend avatars showing daily check-in status">
-                <div class="intro__avatar intro__avatar--1" role="img" aria-label="Friend 1 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--2" role="img" aria-label="Friend 2 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--3" role="img" aria-label="Friend 3 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--4" role="img" aria-label="Friend 4 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--5" role="img" aria-label="Friend 5 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-              </div>
-              <div class="intro__check-in-count" role="status" aria-live="polite"><span class="check-in-number">0</span>/5 checked in today</div>
-            </div>
-          </div>
-        </section>
-
-        <section id="why" class="why">
-          <div class="why__grid scroll-reveal">
-            <div class="why__visual">
-              <div class="why__stat-display">
-                <p class="why__stat-number"><span class="why__stat-counter">0</span><span class="why__stat-percent">%</span></p>
-                <p class="why__stat-caption">more likely to build a lasting habit with a friend<sup>1</sup></p>
-                <p class="why__mobile-text">Studies show that teaming up with a <strong>friend</strong> increases your chance of forming <strong>lasting habits</strong> by 65%. Quests is built on this principle of <strong>social accountability</strong>.<sup>1</sup></p>
-              </div>
-            </div>
-            <div class="why__text-block">
-              <h2 class="why__heading">Backed&nbsp;by&nbsp;science</h2>
-              <p class="why__description">
-                Studies show that <strong>teaming up with others</strong> dramatically boosts your chances of forming <strong>lasting habits</strong>. Quests is built on this principle of social accountability.
-              </p>
-              <p class="why__footnote"><sup>1</sup> American Society of Training and Development, 2014</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="features" class="features">
-          <div class="features__container">
-            <h2 class="features__heading scroll-reveal">Everything you need to build habits together</h2>
-            <div class="features__list">
-              <article class="feature-card feature-card--slide" data-slide="left">
-                <div class="feature-card__icon" role="img" aria-label="Fire icon representing daily streak tracking">
-                  <i class="mdi mdi-fire" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Daily Check-Ins</h3>
-                  <p class="feature-card__text">
-                    Keep your momentum with gentle reminders and progress updates.
-                  </p>
-                </div>
-              </article>
-              <article class="feature-card feature-card--slide" data-slide="right">
-                <div class="feature-card__icon" role="img" aria-label="Message icon representing instant friend invitations">
-                  <i class="mdi mdi-message-fast" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Instant Invites</h3>
-                  <p class="feature-card__text">
-                    Start a Quest and invite friends in seconds via text.
-                  </p>
-                </div>
-              </article>
-              <article class="feature-card feature-card--slide" data-slide="left">
-                <div class="feature-card__icon" role="img" aria-label="Medal icon representing achievement rewards">
-                  <i class="mdi mdi-medal" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Earn Points & Badges</h3>
-                  <p class="feature-card__text">
-                    Complete Quests to earn points, collect badges, and unlock rewards.
-                  </p>
-                </div>
-              </article>
-              <article class="feature-card feature-card--slide" data-slide="right">
-                <div class="feature-card__icon" role="img" aria-label="Podium icon representing competitive leaderboards">
-                  <i class="mdi mdi-podium" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Climb the Leaderboards</h3>
-                  <p class="feature-card__text">
-                    Compete with friends to see who stays most consistent.
-                  </p>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section id="cta" class="cta">
-          <div class="cta__container scroll-reveal">
-            <div class="cta__logo">
-              <svg class="cta__glyph-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Quests app logo">
-                <title>Quests Logo</title>
-                <defs>
-                  <clipPath id="revealClip">
-                    <rect x="0" y="0" width="100" height="0" id="clipRect" />
-                  </clipPath>
-                </defs>
-                <g clip-path="url(#revealClip)">
-                  <image href="Quests%20Logo.svg" width="100" height="100" alt="Quests logo icon" />
-                </g>
-              </svg>
-            </div>
-            <h2 class="cta__title">Start your first Quest</h2>
-            <div class="hero__cta-group cta__group">
-              <a class="hero__app-store" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer" aria-label="Download on the App Store">
-                <img src="download-on-the-app-store.svg" alt="Download on the App Store">
-              </a>
-              <a class="hero__app-store" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" target="_blank" rel="noreferrer" aria-label="Get Quests on Google Play">
-                <div class="store-btn">
-                  <i class="mdi mdi-google-play"></i>
-                  <div class="store-btn__text">
-                    <span class="store-btn__sub">Get it on</span>
-                    <span class="store-btn__main">Google Play</span>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer class="site-footer">
-        <div class="site-footer__content">
-          <div class="site-footer__links">
-            <a href="/contact.html">Contact</a>
-            <a href="/blog.html">Blog</a>
-            <a href="/privacy.html">Privacy</a>
-            <a href="/terms.html">Terms</a>
-          </div>
-          <div class="site-footer__social">
-            <a href="https://www.instagram.com/quests.app/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <i class="mdi mdi-instagram"></i>
-            </a>
-            <a href="https://www.tiktok.com/@quests.app" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-              </svg>
-            </a>
-            <a href="https://x.com/Quests_app_" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-          </div>
-          <p class="site-footer__meta">© 2025 Nothing Serious LLC</p>
-        </div>
-      </footer>
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <!-- Cream base. Three discrete blurred blobs tint it: one behind the
+         headline, one behind the card, one quiet anchor between them. -->
+    <div class="blobs" aria-hidden="true">
+      <span class="blob blob--1"></span>
+      <span class="blob blob--2"></span>
+      <span class="blob blob--3"></span>
+      <span class="hero__pattern"></span>
     </div>
 
-    <script>
-      // Check-in animation
-      const avatars = document.querySelectorAll('.intro__avatar');
-      const counter = document.querySelector('.check-in-number');
-      let count = 0;
-      let hasAnimated = false;
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !hasAnimated) {
-            hasAnimated = true;
-            avatars.forEach((avatar, index) => {
-              setTimeout(() => {
-                // Turn blue first
-                avatar.classList.add('intro__avatar--checked');
-                
-                // Add pop animation
-                avatar.classList.add('intro__avatar--pop');
-                setTimeout(() => {
-                  avatar.classList.remove('intro__avatar--pop');
-                }, 300);
-                
-                // Update counter
-                count++;
-                counter.textContent = count;
-                
-                // If last avatar, trigger single dramatic wave
-                if (index === 4) {
-                  setTimeout(() => {
-                    avatars.forEach((av, i) => {
-                      setTimeout(() => {
-                        av.classList.add('intro__avatar--wave-jump');
-                        setTimeout(() => {
-                          av.classList.remove('intro__avatar--wave-jump');
-                        }, 400);
-                      }, i * 120);
-                    });
-                  }, 400);
-                }
-              }, (index + 1) * 600);
-            });
-          }
-        });
-      }, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+    <div class="hero__decor" aria-hidden="true">
+      <span class="medallion medallion--float hero__m1 cat-mindfulness">
+        <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
+      </span>
+      <span class="medallion medallion--float hero__m2 cat-recharge">
+        <svg class="glyph" aria-hidden="true"><use href="#g-moon"/></svg>
+      </span>
+      <span class="medallion medallion--float hero__m3 cat-growth">
+        <svg class="glyph" aria-hidden="true"><use href="#g-sprout"/></svg>
+      </span>
+      <span class="medallion medallion--float hero__m4 cat-social">
+        <svg class="glyph" aria-hidden="true"><use href="#g-spark"/></svg>
+      </span>
+    </div>
 
-      const introSection = document.querySelector('.intro');
-      if (introSection) {
-        observer.observe(introSection);
-      }
-      
-      // Counter animation for why section
-      const whyCounter = document.querySelector('.why__stat-counter');
-      let hasCountedWhy = false;
-      
-      const whyObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !hasCountedWhy) {
-            hasCountedWhy = true;
-            let currentCount = 0;
-            const targetCount = 65;
-            const duration = 1500; // 1.5 seconds
-            const increment = targetCount / (duration / 16); // 60fps
-            
-            const counterInterval = setInterval(() => {
-              currentCount += increment;
-              if (currentCount >= targetCount) {
-                whyCounter.textContent = targetCount;
-                clearInterval(counterInterval);
-              } else {
-                whyCounter.textContent = Math.floor(currentCount);
-              }
-            }, 16);
-          }
-        });
-      }, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+    <div class="container hero__inner split split--wide-left">
+      <div>
+        <h1 class="hero__title load-in" style="--load-delay:0ms">Better, <em class="accent">together.</em></h1>
 
-      const whySection = document.querySelector('.why');
-      if (whySection) {
-        whyObserver.observe(whySection);
-      }
-      
-      // Feature cards slide-in animation (bidirectional)
-      const featureCards = document.querySelectorAll('.feature-card--slide');
-      
-      const featureObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            // Stagger the animation based on card index
-            const cards = Array.from(featureCards);
-            const index = cards.indexOf(entry.target);
-            entry.target.style.transitionDelay = `${index * 0.1}s`;
-            entry.target.classList.add('feature-card--visible');
-            featureObserver.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
-      
-      featureCards.forEach(card => {
-        featureObserver.observe(card);
-      });
-      
-      // Smooth scroll for download button
-      document.querySelector('.download-chip')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.target.blur(); // Remove focus immediately after click
-        const ctaElement = document.getElementById('cta');
-        if (!ctaElement) return;
-        
-        const targetPosition = ctaElement.offsetTop - (window.innerHeight * 0.1);
-        const startPosition = window.pageYOffset;
-        const distance = targetPosition - startPosition;
-        const duration = 2000; // 2 seconds for slow, dramatic scroll
-        let start = null;
-        
-        function easeOutCubic(t) {
-          return 1 - Math.pow(1 - t, 3);
-        }
-        
-        function animation(currentTime) {
-          if (start === null) start = currentTime;
-          const timeElapsed = currentTime - start;
-          const progress = Math.min(timeElapsed / duration, 1);
-          const ease = easeOutCubic(progress);
-          
-          window.scrollTo(0, startPosition + (distance * ease));
-          
-          if (timeElapsed < duration) {
-            requestAnimationFrame(animation);
-          }
-        }
-        
-        requestAnimationFrame(animation);
-      });
-      
-      // Logo reveal animation on scroll
-      const ctaSection = document.querySelector('.cta');
-      const clipRect = document.getElementById('clipRect');
-      const ctaGlyph = document.querySelector('.cta__glyph-svg');
-      let logoScrollProgress = 0;
-      let hasCompleted = false;
-      
-      let logoRafPending = false;
-      window.addEventListener('scroll', () => {
-        if (logoRafPending || !ctaSection || !clipRect || !ctaGlyph) return;
-        logoRafPending = true;
-        requestAnimationFrame(() => {
-          logoRafPending = false;
-          const rect = ctaSection.getBoundingClientRect();
-          const windowHeight = window.innerHeight;
+        <p class="lede hero__sub load-in" style="--load-delay:100ms">
+          You're better at building habits when you do it with people you care about.
+        </p>
 
-          const scrollStart = windowHeight * 0.6;
-          const scrollEnd = windowHeight * 0.15;
+        <div class="store-badges hero__cta load-in" style="--load-delay:200ms">
+          <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
+            <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+          </a>
+          <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
+            <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+          </a>
+        </div>
 
-          if (rect.top <= scrollStart && rect.top >= scrollEnd) {
-            logoScrollProgress = 1 - ((rect.top - scrollEnd) / (scrollStart - scrollEnd));
-          } else if (rect.top > scrollStart) {
-            logoScrollProgress = 0;
-          } else if (rect.top < scrollEnd) {
-            logoScrollProgress = 1;
-          }
+        <p class="note load-in" style="--load-delay:300ms">Free to download. iOS and Android.</p>
+      </div>
 
-          const revealHeight = logoScrollProgress * 100;
-          clipRect.setAttribute('y', String(100 - revealHeight));
-          clipRect.setAttribute('height', String(revealHeight));
-        });
-      }, { passive: true });
+      <div class="quest-card-stage load-settle" style="--load-delay:400ms">
+        <!-- Live quest card. Behaviour and markup contract: js/quest-card.js -->
+        <article class="quest-card cat-mindfulness" data-quest-card aria-label="Demo quest card. Hold to check in.">
+          <span class="quest-card__fill" aria-hidden="true"></span>
 
-      // Generic Scroll Reveal (one-shot)
-      const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });
+          <div class="quest-card__inner">
+            <p class="eyebrow">Mindfulness</p>
 
-      document.querySelectorAll('.scroll-reveal').forEach(el => {
-        revealObserver.observe(el);
-      });
+            <div class="quest-card__head">
+              <span class="medallion quest-card__medallion" data-quest-medallion>
+                <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
+              </span>
+              <div>
+                <p class="quest-card__name">Morning Run</p>
+                <p class="quest-card__meta">
+                  <span class="quest-card__streak">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+                    Day 12
+                  </span>
+                  <span class="avatar-stack" aria-hidden="true">
+                    <span></span><span style="background:var(--c-recharge)"></span><span style="background:var(--c-creativity)"></span>
+                    <span class="avatar-stack__more">+3</span>
+                  </span>
+                </p>
+              </div>
+            </div>
 
-      let heroAnimationInitialized = false;
-      function initHeroAnimation() {
-        if (heroAnimationInitialized) return;
-        heroAnimationInitialized = true;
+            <p class="quest-card__hint" aria-hidden="true">
+              <span class="quest-card__hint-idle">Hold to check in</span>
+              <span class="quest-card__hint-done">
+                Checked in today
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg>
+              </span>
+            </p>
+          </div>
 
-        setTimeout(() => {
-          const heroContent = document.querySelector('.hero__content');
-          const phoneBack = document.querySelector('.hero__phone--back');
-          const phoneFront = document.querySelector('.hero__phone--front');
-          
-          if (heroContent) heroContent.classList.add('is-loaded');
-          if (phoneFront) phoneFront.classList.add('is-loaded');
-          
-          // Delay back phone so front is fully solid first
-          setTimeout(() => {
-            if (phoneBack) phoneBack.classList.add('is-loaded');
-          }, 400);
-        }, 100);
-      }
-      
-      if (document.readyState === 'complete') {
-        initHeroAnimation();
-      } else {
-        window.addEventListener('load', initHeroAnimation);
-        // Fallback just in case
-        document.addEventListener('DOMContentLoaded', initHeroAnimation);
-      }
-    </script>
-  </body>
+          <button class="quest-card__press" type="button" aria-pressed="false" data-quest-press>
+            <span class="u-sr-only" data-quest-a11y>Hold to check in to Morning Run</span>
+          </button>
+
+          <span class="quest-card__confetti" aria-hidden="true" data-quest-confetti></span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== HOW IT WORKS ===================== -->
+  <section class="section" aria-labelledby="how-title">
+    <div class="container">
+      <div class="section__head center reveal">
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-title">Habits are hard to build. Friends make them stick.</h2>
+        <p class="lede" style="margin-top:var(--s-20)">Strava made running social. We're doing it for the rest of habits.</p>
+      </div>
+
+      <ol class="grid-3 steps">
+        <li class="card card--feature cat-mindfulness reveal" data-reveal-delay="0">
+          <span class="pattern-band" aria-hidden="true"></span>
+          <div class="step__head">
+            <span class="medallion">
+              <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
+            </span>
+            <span class="step__num">01</span>
+          </div>
+          <h3 class="card__title">Pick a quest with friends</h3>
+          <p class="card__text">Choose from 100+ curated challenges like 75 Hard, Dry January, and C25K, then invite the people you want beside you.</p>
+        </li>
+
+        <li class="card card--feature cat-recharge reveal" data-reveal-delay="100">
+          <span class="pattern-band" aria-hidden="true"></span>
+          <div class="step__head">
+            <span class="medallion">
+              <svg class="glyph" aria-hidden="true"><use href="#g-moon"/></svg>
+            </span>
+            <span class="step__num">02</span>
+          </div>
+          <h3 class="card__title">Check in every day</h3>
+          <p class="card__text">One tap logs your day, and everyone in your quest sees it land on the leaderboard.</p>
+        </li>
+
+        <li class="card card--feature cat-growth reveal" data-reveal-delay="200">
+          <span class="pattern-band" aria-hidden="true"></span>
+          <div class="step__head">
+            <span class="medallion">
+              <svg class="glyph" aria-hidden="true"><use href="#g-sprout"/></svg>
+            </span>
+            <span class="step__num">03</span>
+          </div>
+          <h3 class="card__title">Earn streaks, Cards, and real rewards</h3>
+          <p class="card__text">Your streak grows, your Points add up, and you trade them for collectible Quest Cards and rewards in the marketplace.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+
+  <!-- ===================== SCIENCE STRIP ===================== -->
+  <section class="section section--wash science cat-mindfulness" aria-labelledby="science-title">
+    <span class="pattern-field pattern-field--fade" aria-hidden="true"></span>
+
+    <div class="container container--narrow layer-up center reveal">
+      <p class="eyebrow">Backed by science</p>
+      <h2 id="science-title" class="science__headline">
+        <span class="science__stat">76%</span>
+        <span class="science__line">of people reach their goal when a friend checks in on their progress every week.</span>
+      </h2>
+      <p class="science__support">That's more than double the odds of going it alone.</p>
+      <p class="science__cite">Source: Dominican University of California study on goal achievement and accountability.</p>
+    </div>
+  </section>
+
+
+  <!-- ===================== PROOF ROW ===================== -->
+  <section class="section section--tight section--fade" aria-labelledby="proof-title">
+    <div class="container container--narrow center reveal">
+      <span class="proof__stars" role="img" aria-label="Rated 4.9 out of 5 on the App Store">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
+      </span>
+      <h2 id="proof-title" class="proof__title">4.9 stars on the App Store</h2>
+      <p class="proof__line">Questers show up for each other every day, and they keep telling us it works.</p>
+    </div>
+  </section>
+
+
+  <!-- ===================== FINAL CTA ===================== -->
+  <section class="section final-cta" id="download" aria-labelledby="cta-title">
+    <div class="container container--narrow center reveal">
+      <h2 id="cta-title" class="final-cta__title">Your friends are waiting.</h2>
+      <p class="lede final-cta__sub">Pick a challenge, invite your people, and start your streak today.</p>
+
+      <div class="store-badges store-badges--center">
+        <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
+          <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40" loading="lazy" decoding="async">
+        </a>
+        <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
+          <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40" loading="lazy" decoding="async">
+        </a>
+      </div>
+
+      <p class="note">Free to download. iOS and Android.</p>
+    </div>
+  </section>
+
+</main>
+
+
+<!-- ===================== GIANT WORDMARK BAND ===================== -->
+<div class="wordmark-band reveal">
+  <div class="container">
+    <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
+  </div>
+</div>
+
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+        <p>The home of the healthy challenge. Grow better together.</p>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="Footer">
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
+      </nav>
+    </div>
+
+    <div class="site-footer__legal">
+      <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
+      <p>Habits with friends.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
 </html>
-

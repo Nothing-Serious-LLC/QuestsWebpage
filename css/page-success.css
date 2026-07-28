@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Quests V2 - success.html page-specific styles
+   Foundation tokens and components come from css/site.css. This file only
+   adds the things unique to the Pro upgrade redirect card: the check
+   medallion and the fallback reveal.
+   ========================================================================== */
+
+.success-section {
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100dvh - var(--nav-h));
+  display: flex;
+  align-items: center;
+}
+
+.success-card {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.success-card h1 {
+  font-size: var(--fs-section);
+  margin-top: var(--s-24);
+}
+
+.success-check {
+  width: 64px;
+  height: 64px;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: var(--purple-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-check svg {
+  width: 30px;
+  height: 30px;
+  color: var(--purple-deep);
+}
+
+.success-status {
+  margin-top: var(--s-12);
+}
+
+.success-fallback {
+  margin-top: var(--s-32);
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+}
+
+.success-fallback.is-visible { opacity: 1; }
+
+.success-fallback__hint {
+  font-size: var(--fs-small);
+  margin-bottom: var(--s-16);
+}
+
+.success-fallback .btn,
+.success-fallback .btn-ghost {
+  width: 100%;
+}
+
+.success-fallback a.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--s-12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success-fallback { transition: none; }
+}

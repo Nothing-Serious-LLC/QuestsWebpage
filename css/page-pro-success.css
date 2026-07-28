@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Quests V2 - pro/success.html page-specific styles
+   Foundation tokens and components come from css/site.css. This file only
+   adds the things unique to the Quests Pro checkout-return card.
+   ========================================================================== */
+
+.success-section {
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100dvh - var(--nav-h));
+  display: flex;
+  align-items: center;
+}
+
+.success-card {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.success-card h1 {
+  font-size: var(--fs-section);
+  margin-top: var(--s-24);
+}
+
+.success-check {
+  width: 64px;
+  height: 64px;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: var(--purple-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-check svg {
+  width: 30px;
+  height: 30px;
+  color: var(--purple-deep);
+}
+
+.success-status {
+  margin-top: var(--s-12);
+}
+
+.success-actions {
+  margin-top: var(--s-32);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-12);
+}
+
+.success-actions .btn,
+.success-actions .btn-ghost {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The checkout-return script toggles the staging escape hatch with the
+   native `hidden` attribute. `.btn` sets its own `display`, which would
+   otherwise win over the UA default and leave it visible. */
+#staging-link[hidden] {
+  display: none !important;
+}

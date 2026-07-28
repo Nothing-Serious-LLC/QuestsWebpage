@@ -1,0 +1,51 @@
+/* ==========================================================================
+   Quests V2: contact page only
+   Foundation lives in css/site.css. This file holds the contact-form field
+   styling and the post-submit success state.
+   ========================================================================== */
+
+.contact-grid {
+  display: grid;
+  gap: var(--s-24);
+  align-items: start;
+}
+@media (min-width: 720px) {
+  .contact-grid { grid-template-columns: 0.85fr 1.15fr; gap: var(--s-32); }
+}
+
+.field { display: flex; flex-direction: column; gap: var(--s-8); }
+
+.field label {
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.field input,
+.field textarea {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--wash);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 12px 16px;
+  transition: background-color 180ms var(--ease-out), border-color 180ms var(--ease-out);
+}
+.field input:hover,
+.field textarea:hover { border-color: rgba(0, 0, 0, 0.1); }
+.field textarea { resize: vertical; min-height: 128px; line-height: 1.5; }
+
+.contact-success { text-align: center; padding-block: var(--s-16); }
+.contact-success__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--s-16);
+  border-radius: 50%;
+  background: var(--c-social-pale);
+  color: var(--c-social-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

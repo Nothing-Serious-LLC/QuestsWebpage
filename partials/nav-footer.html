@@ -1,0 +1,89 @@
+<!-- =========================================================================
+     Quests V2 canonical shell snippets.
+     This file is a reference fragment. It is never deployed and never linked.
+     Copy these blocks verbatim into every page so the shell stays identical.
+
+     Paths are root relative on purpose: they resolve the same from /index.html,
+     /q/index.html and /dev/components.html when served from the repo root.
+
+     Contract: every page needs id="download" on its final store CTA section,
+     because the nav pill points at /#download.
+     ========================================================================= -->
+
+
+<!-- ===================== 1. HEAD (inside <head>) ===================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
+<script src="/js/site.js" defer></script>
+<!-- quest-card.js only on pages that carry a quest card -->
+<script src="/js/quest-card.js" defer></script>
+
+
+<!-- ===================== 2. NAV (first thing in <body>) ===================== -->
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-nav">
+  <div class="container site-nav__inner">
+    <a class="site-nav__logo" href="/" aria-label="Quests home">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+    </a>
+    <a class="btn btn-sm" href="/#download">Download</a>
+  </div>
+</header>
+
+
+<!-- ===================== 3. STORE BADGE ROW ===================== -->
+<!-- Drop into any CTA. Add store-badges&#45;&#45;center to centre the row. -->
+
+<div class="store-badges">
+  <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
+    <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+  </a>
+  <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
+    <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+  </a>
+</div>
+
+
+<!-- ===================== 4. GIANT WORDMARK BAND ===================== -->
+<!-- Sits directly above the footer on every page. -->
+
+<div class="wordmark-band reveal">
+  <div class="container">
+    <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
+  </div>
+</div>
+
+
+<!-- ===================== 5. FOOTER (last thing in <body>) ===================== -->
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+        <p>The home of the healthy challenge. Grow better together.</p>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="Footer">
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
+      </nav>
+    </div>
+
+    <div class="site-footer__legal">
+      <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
+      <p>Habits with friends.</p>
+    </div>
+  </div>
+</footer>

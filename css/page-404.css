@@ -1,0 +1,30 @@
+/* ==========================================================================
+   Quests V2: 404 page only
+   Foundation lives in css/site.css. This file holds the handful of rules
+   specific to the not-found / broken-invite states.
+   ========================================================================== */
+
+.is-hidden { display: none; }
+
+.not-found__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-12);
+  margin-top: var(--s-8);
+}
+
+/* Quiet text button for the invite fallback's secondary action */
+.link-btn {
+  background: none;
+  border: 0;
+  padding: var(--s-8) var(--s-16);
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--ink); }

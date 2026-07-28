@@ -1,0 +1,359 @@
+/* ==========================================================================
+   Quests V2 - invite page (/q) only. Loads after css/site.css.
+
+   Contract with the page scripts, which stay untouched:
+   - the render script writes colours as var(--accent-light), var(--accent-warning)
+     and var(--text-soft), so those three names live on here as V2 tokens
+   - .state-hidden, .sr-only, .phone-input--error, .phone-input-group--shake,
+     .cta-button--disabled and .cta-button--loading are toggled from JS
+   - #quest-icon gets an inline gradient built from the quest colour, so its ring
+     stays neutral and lets that colour read
+   ========================================================================== */
+
+:root {
+  /* Names the surviving markup and scripts still reference */
+  --accent: var(--purple);
+  --accent-light: var(--purple-deep);
+  --accent-warning: var(--c-growth-ink);
+  --accent-error: #C0392B;
+  --text-soft: #767676;
+
+  /* Page local */
+  --q-line: rgba(25, 25, 25, 0.07);
+  --q-skeleton: rgba(25, 25, 25, 0.05);
+  --q-skeleton-hi: rgba(25, 25, 25, 0.1);
+}
+
+/* ---- Shell --------------------------------------------------------------- */
+.invite {
+  position: relative;
+  padding-top: clamp(var(--s-32), 6vw, var(--s-64));
+  padding-bottom: calc(clamp(var(--s-40), 8vw, var(--s-96)) + env(safe-area-inset-bottom, 0px));
+}
+.invite__wrap { --container: 560px; position: relative; z-index: 1; }
+
+/* State machine: the scripts flip this on every panel */
+.state-hidden { display: none !important; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Loading skeleton ---------------------------------------------------- */
+#quest-loading { display: flex; flex-direction: column; gap: var(--s-20); padding-top: var(--s-8); }
+
+.skeleton {
+  border-radius: var(--radius-card);
+  background: linear-gradient(90deg, var(--q-skeleton) 25%, var(--q-skeleton-hi) 50%, var(--q-skeleton) 75%);
+  background-size: 200% 100%;
+  animation: q-shimmer 1.8s ease-in-out infinite;
+}
+@keyframes q-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton--icon { width: 88px; height: 88px; border-radius: 50%; margin: 0 auto var(--s-8); }
+.skeleton--title { width: 62%; height: 30px; margin: 0 auto; border-radius: 10px; }
+.skeleton--text { width: 84%; height: 16px; margin: 0 auto; border-radius: 8px; }
+.skeleton--text-short { width: 52%; height: 14px; margin: 0 auto; border-radius: 8px; }
+.skeleton--card { width: 100%; height: 132px; border-radius: var(--radius-hero); }
+.skeleton--row { display: flex; align-items: center; gap: var(--s-12); padding: 0 var(--s-4); }
+.skeleton--circle { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+.skeleton--line { height: 14px; border-radius: 8px; flex: 1; }
+.skeleton--button { width: 100%; height: 54px; border-radius: var(--radius-pill); margin-top: var(--s-8); }
+.skeleton-group { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---- Loaded content ------------------------------------------------------ */
+#quest-content { animation: q-fade-up 500ms var(--ease-out) both; }
+@keyframes q-fade-up {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* The quest preview card, hero radius */
+.invite-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-hero);
+  box-shadow: var(--shadow-soft);
+  padding: clamp(var(--s-24), 6vw, var(--s-32));
+  text-align: center;
+}
+
+#quest-hero { text-align: center; }
+#quest-hero .eyebrow { margin-bottom: var(--s-8); }
+
+.quest-icon {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto var(--s-20);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--purple-pale);
+  border: 2px solid rgba(25, 25, 25, 0.06);
+  box-shadow: var(--shadow-soft);
+}
+
+.quest-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 var(--s-12);
+}
+
+.quest-description {
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 40ch;
+  margin: 0 auto;
+}
+
+/* ---- Meta rows ----------------------------------------------------------- */
+#quest-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  margin-top: var(--s-24);
+  background: var(--q-line);
+  border: 1px solid var(--q-line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  text-align: left;
+}
+@media (min-width: 420px) { #quest-meta { grid-template-columns: 1fr 1fr; } }
+
+.meta-row { display: flex; align-items: center; gap: var(--s-12); padding: 14px 16px; background: var(--card); }
+.meta-row--full { grid-column: 1 / -1; }
+
+.meta-row__icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--purple-pale);
+  color: var(--purple-deep);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.meta-row__icon--avatar {
+  border-radius: 50%;
+  background: var(--wash);
+  border: 2px solid var(--card-border);
+  box-shadow: 0 0 0 1px var(--q-line);
+  overflow: hidden;
+  font-size: 16px;
+  color: var(--ink-2);
+}
+.meta-row__icon--avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.meta-row__text { flex: 1; min-width: 0; }
+.meta-row__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  color: var(--text-soft);
+  margin-bottom: 2px;
+}
+.meta-row__value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.creator-avatar__fallback { font-size: 15px; font-weight: 700; color: #FFFFFF; line-height: 1; }
+
+/* ---- Quest ended notice -------------------------------------------------- */
+#quest-ended {
+  margin-top: var(--s-24);
+  padding: var(--s-32) var(--s-24);
+  border-radius: var(--radius-feature);
+  background: var(--wash);
+  border: 1px solid var(--card-border);
+  text-align: center;
+}
+.ended-icon { font-size: 30px; line-height: 1; margin-bottom: var(--s-12); }
+.ended-title { font-family: var(--font-display); font-size: 1.375rem; line-height: 1.15; color: var(--ink); margin: 0 0 var(--s-8); }
+.ended-text { font-size: var(--fs-small); line-height: 1.55; color: var(--ink-2); margin: 0 auto; max-width: 34ch; }
+#quest-ended .store-badges { margin-top: var(--s-24); justify-content: center; }
+
+/* ---- Phone gate ---------------------------------------------------------- */
+#phone-gate { margin-top: var(--s-24); }
+.phone-input-group { display: flex; gap: 10px; margin-bottom: var(--s-12); }
+
+.phone-input {
+  flex: 1;
+  min-width: 0;
+  padding: 15px 20px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--q-line);
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  outline: none;
+  box-shadow: var(--shadow-soft);
+  transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+  scroll-margin-top: 120px;
+}
+.phone-input::placeholder { color: var(--text-soft); font-weight: 400; }
+.phone-input:focus,
+.phone-input:focus-visible { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-pale); outline: none; }
+
+.phone-error { font-size: var(--fs-small); font-weight: 600; color: var(--accent-error); margin: 0 0 var(--s-8); line-height: 1.4; }
+.phone-input--error { border-color: var(--accent-error) !important; box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12) !important; }
+.phone-input-group--shake { animation: q-shake 400ms var(--ease-out); }
+@keyframes q-shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-6px, 0, 0); }
+  40% { transform: translate3d(6px, 0, 0); }
+  60% { transform: translate3d(-4px, 0, 0); }
+  80% { transform: translate3d(4px, 0, 0); }
+}
+
+.gate-privacy { font-size: 0.8125rem; line-height: 1.55; color: var(--ink-2); margin: 0; }
+.gate-privacy a { text-underline-offset: 2px; }
+
+.gate-success { text-align: center; padding: var(--s-8) 0; }
+.gate-success__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--s-16);
+  border-radius: 50%;
+  background: var(--purple-pale);
+  color: var(--purple-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  line-height: 1;
+  animation: q-check-pop 500ms var(--ease-spring) both;
+}
+@keyframes q-check-pop {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.gate-success__title { font-family: var(--font-display); font-size: 1.375rem; line-height: 1.15; color: var(--ink); margin: 0 0 var(--s-8); }
+.gate-success__text { font-size: var(--fs-small); line-height: 1.55; color: var(--ink-2); margin: 0; }
+#gate-confirmed:not(.state-hidden) { animation: q-fade-up 450ms var(--ease-out) both; }
+
+/* Invisible Turnstile widget */
+#turnstile-container { position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none; }
+
+/* ---- Calls to action ----------------------------------------------------- */
+#install-handoff { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-20); }
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-8);
+  width: 100%;
+  padding: 16px 28px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #FFFFFF;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), background-color 180ms var(--ease-out), opacity 180ms var(--ease-out);
+}
+.cta-button:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+.cta-button:active { background: var(--ink-pressed); transform: translateY(0); box-shadow: var(--shadow-soft); }
+.cta-button--disabled { opacity: 0.3; pointer-events: none; box-shadow: none; }
+.cta-button--loading { opacity: 0.7; pointer-events: none; }
+.cta-button__icon { font-size: 18px; line-height: 1; }
+
+/* Open in app, ghost pill */
+.link-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 13px 24px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-out);
+}
+.link-secondary:hover { background: rgba(25, 25, 25, 0.04); }
+.link-secondary:active { background: rgba(25, 25, 25, 0.08); }
+
+/* ---- Error state --------------------------------------------------------- */
+#quest-error {
+  text-align: center;
+  padding: clamp(var(--s-32), 9vh, var(--s-96)) 0 var(--s-40);
+  animation: q-fade-up 450ms var(--ease-out) both;
+}
+.error-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--s-20);
+  border-radius: 50%;
+  background: var(--purple-pale);
+  color: var(--purple-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  line-height: 1;
+}
+.error-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 var(--s-12);
+}
+.error-text { font-size: var(--fs-body); line-height: 1.6; color: var(--ink-2); margin: 0 auto var(--s-32); max-width: 34ch; }
+.invite__actions { display: flex; flex-direction: column; gap: var(--s-12); max-width: 340px; margin-inline: auto; }
+
+/* ---- Small screens ------------------------------------------------------- */
+@media (max-width: 380px) {
+  .quest-icon { width: 76px; height: 76px; font-size: 34px; }
+  .skeleton--icon { width: 76px; height: 76px; }
+  .cta-button { padding: 15px 20px; }
+}

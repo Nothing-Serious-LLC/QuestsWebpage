@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Quests V2 - share.html page-specific styles
+   Foundation tokens and components come from css/site.css. This file only
+   adds the things unique to the scan-to-download card: the white QR frame.
+   ========================================================================== */
+
+.share-section {
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100dvh - var(--nav-h));
+  display: flex;
+  align-items: center;
+}
+
+.share-card {
+  max-width: 360px;
+  margin-inline: auto;
+}
+
+.share-card h1 {
+  font-size: var(--fs-section);
+}
+
+.share-qr {
+  margin-top: var(--s-32);
+  margin-inline: auto;
+  width: fit-content;
+  background: #FFFFFF;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  padding: var(--s-20);
+  box-shadow: var(--shadow-soft);
+}
+
+.share-qr img {
+  width: 220px;
+  height: 220px;
+  display: block;
+}
+
+@media (max-width: 400px) {
+  .share-qr img { width: 180px; height: 180px; }
+}

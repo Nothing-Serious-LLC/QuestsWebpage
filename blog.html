@@ -3,320 +3,219 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blog – Quests | Habit Building Tips & Community Stories</title>
-    <meta name="description" content="Discover proven strategies for building lasting habits, read inspiring community stories, and learn how social accountability transforms goal achievement with Quests." />
-    <meta name="keywords" content="habit tracking, social accountability, goal setting, 75 hard challenge, habit building, friendship goals, dry january, habit app" />
-    
+
+    <title>Blog | Quests</title>
+    <meta name="description" content="Challenge guides, community stories, and what we learn about building habits with the people you care about." />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://thequestsapp.com/blog.html" />
+
     <!-- Open Graph -->
-    <meta property="og:title" content="Quests Blog – Habit Building Tips & Community Stories" />
-    <meta property="og:description" content="Proven strategies for building lasting habits through social accountability" />
+    <meta property="og:title" content="Blog | Quests" />
+    <meta property="og:description" content="Challenge guides, community stories, and what we learn about building habits with the people you care about." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://thequestsapp.com/blog.html" />
-    
+    <meta property="og:image" content="https://thequestsapp.com/og-image-v2.png" />
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Quests Blog – Habit Building Tips" />
-    <meta name="twitter:description" content="Discover proven strategies for building lasting habits with friends" />
-    
-    <link rel="canonical" href="https://thequestsapp.com/blog.html" />
+    <meta name="twitter:title" content="Blog | Quests" />
+    <meta name="twitter:description" content="Challenge guides, community stories, and what we learn about building habits with the people you care about." />
+    <meta name="twitter:image" content="https://thequestsapp.com/og-image-v2.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/img/app-icon.png" />
+    <link rel="apple-touch-icon" href="/assets/img/app-icon.png" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-      .blog-page {
-        min-height: 100vh;
-        padding: 120px 0 80px;
-      }
-      
-      .blog-container {
-        max-width: var(--max-width);
-        margin: 0 auto;
-        padding: 0 24px;
-      }
-      
-      .blog-header {
-        text-align: center;
-        margin-bottom: 80px;
-      }
-      
-      .blog-title {
-        font-size: clamp(3rem, 5vw, 4rem);
-        font-weight: 800;
-        color: var(--white);
-        margin: 0 0 20px;
-        letter-spacing: -0.02em;
-      }
-      
-      .blog-subtitle {
-        font-size: clamp(1.1rem, 2vw, 1.35rem);
-        color: var(--text-muted);
-        max-width: 680px;
-        margin: 0 auto;
-        line-height: 1.7;
-      }
-      
-      .blog-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-        gap: 32px;
-      }
-      
-      .blog-card {
-        background: var(--surface-strong);
-        border: 1px solid var(--border-strong);
-        border-radius: 24px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow-md);
-        display: flex;
-        flex-direction: column;
-      }
-      
-      .blog-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-      }
-      
-      .blog-card__content {
-        padding: 32px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      
-      .blog-card__category {
-        display: inline-block;
-        padding: 6px 14px;
-        background: var(--surface-medium);
-        border: 1px solid var(--border-soft);
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--accent-light);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 16px;
-        align-self: flex-start;
-      }
-      
-      .blog-card__title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--white);
-        margin: 0 0 12px;
-        line-height: 1.3;
-      }
-      
-      .blog-card__excerpt {
-        color: var(--text-muted);
-        font-size: 15px;
-        line-height: 1.7;
-        margin: 0 0 20px;
-        flex: 1;
-      }
-      
-      .blog-card__meta {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        font-size: 13px;
-        color: var(--text-soft);
-        padding-top: 20px;
-        border-top: 1px solid var(--border-soft);
-      }
-      
-      .blog-card__date {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      
-      .blog-card__read-time {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="stylesheet" href="/css/page-blog.css" />
+    <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
+    <script src="/js/site.js" defer></script>
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "Quests Blog",
+      "url": "https://thequestsapp.com/blog.html",
+      "description": "Challenge guides, community stories, and what we learn about building habits with the people you care about.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Nothing Serious LLC"
+      },
+      "blogPost": [
+        {
+          "@type": "BlogPosting",
+          "headline": "Why Social Accountability Is the Secret to Building Lasting Habits",
+          "datePublished": "2024-11-01",
+          "description": "Committing to a goal with a friend changes everything. Discover the psychology behind social accountability and how Quests leverages this principle to help you reach your goals."
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "How a Group of Friends Crushed the 75 Hard Challenge Together",
+          "datePublished": "2024-10-01",
+          "description": "Meet the crew who turned the notoriously difficult 75 Hard challenge into a shared adventure with daily check-ins and group chat support."
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "5 Strategies to Maintain Your Streak When Life Gets Busy",
+          "datePublished": "2024-10-01",
+          "description": "Five proven strategies Quests users rely on to protect their streaks during busy weeks, travel, and life's curveballs."
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "The Complete Guide to Dry January: Tips from Thousands of Successful Questers",
+          "datePublished": "2024-12-01",
+          "description": "Everything you need to succeed in your alcohol-free month, drawn from the Quests community's collective wisdom."
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "Unlock More Rewards: Your Guide to Points, Badges, and Leaderboards",
+          "datePublished": "2024-11-01",
+          "description": "How the points system works, which badges you can unlock, and strategies to climb the leaderboard with your crew."
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "From Solo Goals to Team Wins: Why Habit Building Works Better Together",
+          "datePublished": "2024-09-01",
+          "description": "Real stories from Quests users who discovered that accountability, encouragement, and shared celebration make all the difference."
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
-    <div class="page__background"></div>
-    <div class="page__wrapper">
-      <header class="site-header">
-        <div class="site-header__inner">
-          <a class="brand" href="/" aria-label="Quests home">
-            <span class="brand__glyph" aria-hidden="true"></span>
-            <span class="brand__name">Quests</span>
-          </a>
-          <a class="download-chip" href="/#cta">Download the app</a>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-nav">
+      <div class="container site-nav__inner">
+        <a class="site-nav__logo" href="/" aria-label="Quests home">
+          <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+        </a>
+        <a class="btn btn-sm" href="/#download" aria-label="Download Quests">Download</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="section section--tight blog-hero">
+        <div class="container container--narrow center reveal">
+          <span class="eyebrow">From the team</span>
+          <h1 class="serif">Blog</h1>
+          <p class="lede" style="margin-inline:auto">Challenge guides, community stories, and what we learn about building habits with the people you care about.</p>
         </div>
-      </header>
+      </section>
 
-      <main class="blog-page">
-        <div class="blog-container">
-          <div class="blog-header">
-            <h1 class="blog-title">Quests Blog</h1>
-            <p class="blog-subtitle">
-              Proven strategies, inspiring stories, and science-backed insights to help you build lasting habits with friends
-            </p>
-          </div>
-
+      <section class="section section--tight section--wash">
+        <div class="container">
           <div class="blog-grid">
-            <article class="blog-card">
-              <div class="blog-card__content">
-                <span class="blog-card__category">Science</span>
-                <h2 class="blog-card__title">Why Social Accountability Is the Secret to Building Lasting Habits</h2>
-                <p class="blog-card__excerpt">
-                  Research shows that committing to a goal with a friend makes you 65% more likely to succeed. Discover the psychology behind social accountability and how Quests leverages this principle to help you reach your goals.
-                </p>
-                <div class="blog-card__meta">
-                  <span class="blog-card__date">
-                    <i class="mdi mdi-calendar"></i>
-                    Nov 2024
-                  </span>
-                  <span class="blog-card__read-time">
-                    <i class="mdi mdi-clock-outline"></i>
-                    5 min read
-                  </span>
-                </div>
+
+            <article class="card card--feature card--hover blog-card reveal" data-reveal-delay="0">
+              <span class="blog-card__category">Science</span>
+              <h2 class="card__title blog-card__title">Why Social Accountability Is the Secret to Building Lasting Habits</h2>
+              <p class="card__text blog-card__excerpt">Committing to a goal with a friend changes everything. Discover the psychology behind social accountability and how Quests leverages this principle to help you reach your goals.</p>
+              <div class="blog-card__meta">
+                <span>Nov 2024</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>5 min read</span>
               </div>
             </article>
 
-            <article class="blog-card">
-              <div class="blog-card__content">
-                <span class="blog-card__category">Community</span>
-                <h2 class="blog-card__title">How a Group of Friends Crushed the 75 Hard Challenge Together</h2>
-                <p class="blog-card__excerpt">
-                  Meet the crew who turned the notoriously difficult 75 Hard challenge into a shared adventure. Learn how daily check-ins, friendly competition, and group chat support kept them accountable through 75 days of transformation.
-                </p>
-                <div class="blog-card__meta">
-                  <span class="blog-card__date">
-                    <i class="mdi mdi-calendar"></i>
-                    Oct 2024
-                  </span>
-                  <span class="blog-card__read-time">
-                    <i class="mdi mdi-clock-outline"></i>
-                    6 min read
-                  </span>
-                </div>
+            <article class="card card--feature card--hover blog-card reveal" data-reveal-delay="80">
+              <span class="blog-card__category">Community</span>
+              <h2 class="card__title blog-card__title">How a Group of Friends Crushed the 75 Hard Challenge Together</h2>
+              <p class="card__text blog-card__excerpt">Meet the crew who turned the notoriously difficult 75 Hard challenge into a shared adventure. Learn how daily check-ins, friendly competition, and group chat support kept them accountable through 75 days of transformation.</p>
+              <div class="blog-card__meta">
+                <span>Oct 2024</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>6 min read</span>
               </div>
             </article>
 
-            <article class="blog-card">
-              <div class="blog-card__content">
-                <span class="blog-card__category">Tips</span>
-                <h2 class="blog-card__title">5 Strategies to Maintain Your Streak When Life Gets Busy</h2>
-                <p class="blog-card__excerpt">
-                  Streaks are powerful motivators, but what happens when unexpected challenges arise? Discover five proven strategies Quests users employ to protect their streaks during busy weeks, travel, and life's curveballs.
-                </p>
-                <div class="blog-card__meta">
-                  <span class="blog-card__date">
-                    <i class="mdi mdi-calendar"></i>
-                    Oct 2024
-                  </span>
-                  <span class="blog-card__read-time">
-                    <i class="mdi mdi-clock-outline"></i>
-                    4 min read
-                  </span>
-                </div>
+            <article class="card card--feature card--hover blog-card reveal" data-reveal-delay="160">
+              <span class="blog-card__category">Tips</span>
+              <h2 class="card__title blog-card__title">5 Strategies to Maintain Your Streak When Life Gets Busy</h2>
+              <p class="card__text blog-card__excerpt">Streaks are powerful motivators, but what happens when unexpected challenges arise? Discover five proven strategies Quests users employ to protect their streaks during busy weeks, travel, and life's curveballs.</p>
+              <div class="blog-card__meta">
+                <span>Oct 2024</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>4 min read</span>
               </div>
             </article>
 
-            <article class="blog-card">
-              <div class="blog-card__content">
-                <span class="blog-card__category">Challenges</span>
-                <h2 class="blog-card__title">The Complete Guide to Dry January: Tips from Thousands of Successful Questers</h2>
-                <p class="blog-card__excerpt">
-                  Thinking about taking on Dry January? Learn from the Quests community's collective wisdom. From handling social pressure to celebrating milestones, here's everything you need to succeed in your alcohol-free month.
-                </p>
-                <div class="blog-card__meta">
-                  <span class="blog-card__date">
-                    <i class="mdi mdi-calendar"></i>
-                    Dec 2024
-                  </span>
-                  <span class="blog-card__read-time">
-                    <i class="mdi mdi-clock-outline"></i>
-                    7 min read
-                  </span>
-                </div>
+            <article class="card card--feature card--hover blog-card reveal" data-reveal-delay="0">
+              <span class="blog-card__category">Challenges</span>
+              <h2 class="card__title blog-card__title">The Complete Guide to Dry January: Tips from Thousands of Successful Questers</h2>
+              <p class="card__text blog-card__excerpt">Thinking about taking on Dry January? Learn from the Quests community's collective wisdom. From handling social pressure to celebrating milestones, here's everything you need to succeed in your alcohol-free month.</p>
+              <div class="blog-card__meta">
+                <span>Dec 2024</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>7 min read</span>
               </div>
             </article>
 
-            <article class="blog-card">
-              <div class="blog-card__content">
-                <span class="blog-card__category">Features</span>
-                <h2 class="blog-card__title">Unlock More Rewards: Your Guide to Points, Badges, and Leaderboards</h2>
-                <p class="blog-card__excerpt">
-                  Quests isn't just about completing goals—it's about earning rewards along the way. Explore how our points system works, discover exclusive badges you can unlock, and learn strategies to climb the leaderboard with your crew.
-                </p>
-                <div class="blog-card__meta">
-                  <span class="blog-card__date">
-                    <i class="mdi mdi-calendar"></i>
-                    Nov 2024
-                  </span>
-                  <span class="blog-card__read-time">
-                    <i class="mdi mdi-clock-outline"></i>
-                    5 min read
-                  </span>
-                </div>
+            <article class="card card--feature card--hover blog-card reveal" data-reveal-delay="80">
+              <span class="blog-card__category">Features</span>
+              <h2 class="card__title blog-card__title">Unlock More Rewards: Your Guide to Points, Badges, and Leaderboards</h2>
+              <p class="card__text blog-card__excerpt">Completing a quest earns you rewards every step of the way. Explore how our points system works, discover exclusive badges you can unlock, and learn strategies to climb the leaderboard with your crew.</p>
+              <div class="blog-card__meta">
+                <span>Nov 2024</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>5 min read</span>
               </div>
             </article>
 
-            <article class="blog-card">
-              <div class="blog-card__content">
-                <span class="blog-card__category">Inspiration</span>
-                <h2 class="blog-card__title">From Solo Goals to Team Wins: Why Habit Building Works Better Together</h2>
-                <p class="blog-card__excerpt">
-                  Explore the transformation that happens when you shift from individual goal-setting to team-based challenges. Real stories from Quests users who discovered that accountability, encouragement, and shared celebration make all the difference.
-                </p>
-                <div class="blog-card__meta">
-                  <span class="blog-card__date">
-                    <i class="mdi mdi-calendar"></i>
-                    Sep 2024
-                  </span>
-                  <span class="blog-card__read-time">
-                    <i class="mdi mdi-clock-outline"></i>
-                    6 min read
-                  </span>
-                </div>
+            <article class="card card--feature card--hover blog-card reveal" data-reveal-delay="160">
+              <span class="blog-card__category">Inspiration</span>
+              <h2 class="card__title blog-card__title">From Solo Goals to Team Wins: Why Habit Building Works Better Together</h2>
+              <p class="card__text blog-card__excerpt">Explore the transformation that happens when you shift from individual goal-setting to team-based challenges. Real stories from Quests users who discovered that accountability, encouragement, and shared celebration make all the difference.</p>
+              <div class="blog-card__meta">
+                <span>Sep 2024</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>6 min read</span>
               </div>
             </article>
+
           </div>
         </div>
-      </main>
+      </section>
+    </main>
 
-      <footer class="site-footer">
-        <div class="site-footer__content">
-          <div class="site-footer__links">
-            <a href="/contact.html">Contact</a>
-            <a href="/blog.html">Blog</a>
-            <a href="/privacy.html">Privacy</a>
-            <a href="/terms.html">Terms</a>
-          </div>
-          <div class="site-footer__social">
-            <a href="https://instagram.com/thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <i class="mdi mdi-instagram"></i>
-            </a>
-            <a href="https://tiktok.com/@thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.10-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-              </svg>
-            </a>
-            <a href="https://x.com/thequestsapp" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-          </div>
-          <p class="site-footer__meta">© <span id="year"></span> Quests</p>
-        </div>
-      </footer>
+    <div class="wordmark-band reveal">
+      <div class="container">
+        <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
+      </div>
     </div>
 
-    <script>
-      document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+    <footer class="site-footer">
+      <div class="container">
+        <div class="site-footer__top">
+          <div class="site-footer__brand">
+            <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+            <p>The home of the healthy challenge. Grow better together.</p>
+          </div>
+
+          <nav class="site-footer__nav" aria-label="Footer">
+            <a href="/blog.html">Blog</a>
+            <a href="/contact.html">Contact</a>
+            <a href="/privacy.html">Privacy</a>
+            <a href="/terms.html">Terms</a>
+            <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
+            <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
+          </nav>
+        </div>
+
+        <div class="site-footer__legal">
+          <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
+          <p>Habits with friends.</p>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>
-
