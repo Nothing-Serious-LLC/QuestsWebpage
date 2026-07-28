@@ -21,6 +21,8 @@
 
 <link rel="icon" type="image/png" href="/assets/img/app-icon.png">
 <link rel="apple-touch-icon" href="/assets/img/app-icon.png">
+<meta name="theme-color" content="#F3F1E7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E0E12" media="(prefers-color-scheme: dark)">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,62 +56,78 @@
     <a class="site-nav__logo" href="/" aria-label="Quests home">
       <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
     </a>
-    <a class="btn btn-sm" href="/#download">Download</a>
+    <a class="btn btn-outline-white" href="/#download" aria-label="Download Quests">Download</a>
   </div>
 </header>
 
 <main id="main">
-  <section class="section center">
-    <div class="container container--narrow">
+  <section class="notfound cat-mindfulness">
+
+    <div class="container notfound__body">
+
+      <!-- Default not-found state -->
+      <div class="notfound__state load-settle" id="not-found-card" style="--load-delay:80ms">
+        <span class="notfound__stub" aria-hidden="true">
+          <svg viewBox="0 0 60 130" fill="none" focusable="false">
+            <path d="M30 -30 C30 20 8 52 30 84 C40 100 32 108 30 116"></path>
+          </svg>
+        </span>
+
+        <article class="quest-card quest-card--roadmap cat-mindfulness">
+          <div class="quest-card__inner">
+            <span class="quest-card__medallion" aria-hidden="true">
+              <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path d="M22.5085 15.4326C22.8337 15.8578 23.0089 16.3101 23.0089 16.7791C23.0089 19.2665 18.0799 21.2829 11.9996 21.2829C5.91928 21.2829 0.990234 19.2665 0.990234 16.7791C0.990234 16.3101 1.16548 15.8578 1.49063 15.4326"/>
+                <path d="M17.5045 10.9528C17.5045 7.45365 14.6834 4.5133 13.0804 3.12495C12.452 2.58075 11.5476 2.58075 10.9193 3.12495C9.31622 4.5133 6.49512 7.45365 6.49512 10.9528C6.49512 14.1922 8.95967 16.2793 11.9998 16.2793C15.04 16.2793 17.5045 14.1922 17.5045 10.9528Z"/>
+                <path d="M8.40171 5.82592C6.62991 5.26442 4.77841 5.22817 3.55566 5.29327C2.71101 5.33827 2.05991 5.98937 2.01496 6.83402C1.90886 8.82642 2.07181 12.4882 4.33811 14.7545C5.93751 16.3539 8.00091 16.641 9.76426 15.8668C7.83806 15.1074 6.49501 13.3439 6.49501 10.9526C6.49501 9.01662 7.35861 7.25167 8.40171 5.82592Z"/>
+                <path d="M15.5969 5.82592C16.64 7.25167 17.5036 9.01662 17.5036 10.9526C17.5036 13.3439 16.1606 15.1074 14.2344 15.8668C15.9977 16.641 18.0611 16.3539 19.6605 14.7545C21.9268 12.4882 22.0898 8.82642 21.9837 6.83407C21.9387 5.98937 21.2876 5.33827 20.443 5.29327C19.2202 5.22817 17.3687 5.26442 15.5969 5.82592Z"/>
+              </svg>
+            </span>
+            <div class="quest-card__names">
+              <h1 class="quest-card__name notfound__title">This quest doesn&rsquo;t exist yet.</h1>
+              <p class="quest-card__duration notfound__line">The page you were looking for wandered off the map. Let&rsquo;s get you back to the good stuff.</p>
+            </div>
+          </div>
+        </article>
+
+        <div class="notfound__actions">
+          <a class="btn" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noopener">Download Quests</a>
+          <a class="btn notfound__ghost" href="/">Back to home</a>
+        </div>
+      </div>
 
       <!-- Invite fallback: shown only when the path is a broken /q/CODE deep link
            that reached the apex domain's 404 instead of the Cloudflare invite
-           renderer. Logic preserved from the previous 404.html. -->
-      <div class="stack center is-hidden" id="invite-card">
-        <span class="medallion medallion--xl cat-mindfulness" aria-hidden="true">
-          <img src="/assets/img/quest-category-lotus.svg" alt="" width="44" height="44">
+           renderer. Deliberately plain: the "invited to a quest" persona and
+           its copy belong to q/index.html only, so this is just a download
+           prompt, not a copy of that card. -->
+      <div class="notfound__state is-hidden" id="invite-card">
+        <span class="notfound__mark cat-mindfulness" aria-hidden="true">
+          <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28" decoding="async">
         </span>
-        <p class="lede" style="margin-inline:auto">You've been invited to a quest! Download the app to join.</p>
-        <div class="store-badges store-badges--center">
-          <a class="store-badge" data-platform-cta="ios" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store" target="_blank" rel="noopener">
-            <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
-          </a>
-          <a class="store-badge" data-platform-cta="android" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play" target="_blank" rel="noopener">
-            <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
-          </a>
-        </div>
-        <button class="link-btn" id="fallback-open-app" type="button">I already have the app</button>
-      </div>
 
-      <!-- Default not-found state -->
-      <div class="stack center reveal" id="not-found-card">
-        <h1 class="serif" style="font-size:var(--fs-section)">This quest doesn't exist yet.</h1>
-        <p class="lede" style="margin-inline:auto">The page you were after wandered off. Head home, or grab the app and start a real one.</p>
-        <div class="not-found__actions">
-          <a class="btn" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noopener">Download Quests</a>
-          <a class="btn btn-ghost" href="/">Back to home</a>
+        <div class="quest-card__names">
+          <p class="quest-card__name notfound__title">Get Quests to continue.</p>
+          <p class="quest-card__duration notfound__line">That link opens inside the app. Download Quests, or open the app if you already have it.</p>
+        </div>
+
+        <div class="notfound__actions">
+          <div class="store-badges store-badges--center">
+            <a class="store-badge" data-platform-cta="ios" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store" target="_blank" rel="noopener">
+              <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+            </a>
+            <a class="store-badge" data-platform-cta="android" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play" target="_blank" rel="noopener">
+              <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+            </a>
+          </div>
+          <button class="link-btn" id="fallback-open-app" type="button">I already have the app</button>
         </div>
       </div>
 
     </div>
-  </section>
-</main>
 
-<div class="wordmark-band reveal">
-  <div class="container">
-    <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="container">
-    <div class="site-footer__top">
-      <div class="site-footer__brand">
-        <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
-        <p>The home of the healthy challenge. Grow better together.</p>
-      </div>
-
-      <nav class="site-footer__nav" aria-label="Footer">
+    <footer class="notfound__footer">
+      <nav class="notfound__footer-links" aria-label="Footer">
         <a href="/blog.html">Blog</a>
         <a href="/contact.html">Contact</a>
         <a href="/privacy.html">Privacy</a>
@@ -118,20 +136,16 @@
         <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
         <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
       </nav>
-    </div>
-
-    <div class="site-footer__legal">
-      <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
-      <p>Habits with friends.</p>
-    </div>
-  </div>
-</footer>
+      <p class="notfound__copyright">&copy; <span data-year>2026</span> Nothing Serious LLC</p>
+    </footer>
+  </section>
+</main>
 
 <script>
-  // Preserved byte-for-byte in behavior from the previous 404.html: this page
-  // is the GitHub Pages catch-all for the apex domain, so a broken /q/CODE
-  // universal link that misses the Cloudflare invite renderer still lands
-  // here and needs to offer the same invite-and-deep-link fallback.
+  // This page is the GitHub Pages catch-all for the apex domain, so a broken
+  // /q/CODE universal link that misses the Cloudflare invite renderer still
+  // lands here. It still needs a deep-link fallback in that case, just with
+  // its own plain copy, not q/index.html's "invited to a quest" persona.
   (function () {
     var path = window.location.pathname || "/";
     var isInvite = path === "/q" || path === "/q/" || path.indexOf("/q/") === 0;
@@ -148,7 +162,7 @@
     var platform = detectPlatform();
 
     if (isInvite) {
-      document.title = "You're invited to a Quest!";
+      document.title = "Get Quests | Quests";
       document.getElementById("invite-card").classList.remove("is-hidden");
       document.getElementById("not-found-card").classList.add("is-hidden");
 

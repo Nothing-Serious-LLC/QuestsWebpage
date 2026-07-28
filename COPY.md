@@ -61,16 +61,15 @@ Links, verbatim:
 
 | Slot | Copy |
 | --- | --- |
-| Category eyebrow (mindfulness) | `Mindfulness` |
 | Quest name (Instrument Serif) | `Morning Run` |
 | Streak meta | `Day 12` |
 | Avatar cluster label | `+3` |
-| Hint pill, idle | `Hold to check in` |
+| Hint pill, idle | `Tap & Hold to check in` |
 | Hint pill, complete | `Checked in today ✓` |
 | Card aria-label | `Demo quest card. Hold to check in.` |
 | Screen-reader status on complete | `Checked in for today.` |
 
-Medallion icon alt is empty (`alt=""`, decorative) since the category eyebrow carries the word.
+No category eyebrow inside the card, as built. The medallion is an inline SVG icon, `aria-hidden="true"`, decorative; the quest name carries the meaning.
 
 ### 1.3 How it works
 
@@ -94,7 +93,28 @@ Three numbered steps, a real sequence. Card order and colors: 1 mindfulness purp
 - Title: `Earn streaks, Cards, and real rewards`
 - Sentence: `Your streak grows, your Points add up, and you trade them for collectible Quest Cards and rewards in the marketplace.`
 
-### 1.4 Science strip (the one stat)
+### 1.4 Inside the app
+
+Two device rows, alternating left/right on desktop, stacked on mobile. Real screenshots, lazy loaded.
+
+| Slot | Copy |
+| --- | --- |
+| Section eyebrow | `Inside the app` |
+| Section headline | `Beautiful, humanist, and effective.` |
+
+**Row 1** (mindfulness purple, roadmap screen, art on the left)
+- Title: `Follow the path together`
+- Bullet 1: `Every quest is a roadmap, and each check-in moves you one milestone further along it.`
+- Bullet 2: `Your friends walk the same path, so you always see where everyone is.`
+- Screenshot alt: `The Quests app showing a quest roadmap with a daily check-in card`
+
+**Row 2** (growth gold, marketplace screen, art on the right)
+- Title: `Turn streaks into rewards`
+- Bullet 1: `Daily check-ins build your streak and stack up Points.`
+- Bullet 2: `Spend Points in the marketplace on collectible Quest Cards and real rewards.`
+- Screenshot alt: `The Quests app marketplace showing points, rewards, and the Quest Pass`
+
+### 1.5 Science strip (the one stat)
 
 On `--wash`, low-opacity pattern field behind it. Giant serif `76%`.
 
@@ -103,12 +123,12 @@ On `--wash`, low-opacity pattern field behind it. Giant serif `76%`.
 | Eyebrow | `Backed by science` |
 | Stat (Instrument Serif, giant) | `76%` |
 | Stat line | `of people reach their goal when a friend checks in on their progress every week.` |
-| Supporting sentence | `Sharing your progress with people you care about more than doubles your odds.` |
+| Supporting sentence | `That's more than double the odds of going it alone.` |
 | Citation line (small Manrope, `--ink-2`) | `Source: Dominican University of California study on goal achievement and accountability.` |
 
 Accessibility: wrap as one readable sentence for screen readers, `76% of people reach their goal when a friend checks in on their progress every week.` Keep the `%` inside the visual stat element.
 
-### 1.5 Proof row (4.9 rating)
+### 1.6 Proof row (4.9 rating)
 
 Five stars rendered as inline SVG, `aria-hidden="true"`, with the text below carrying the meaning.
 
@@ -121,7 +141,7 @@ Five stars rendered as inline SVG, `aria-hidden="true"`, with the text below car
 
 If no V2 screenshots pass curation, omit the device frames and keep the rating headline plus trust line. Old dark V1 screenshots stay out.
 
-### 1.6 Wordmark band (above footer)
+### 1.7 Wordmark band (above footer)
 
 Full-width `assets/img/wordmark-caps-ink.png`, container edge to edge, standard fade-up. No text beyond the alt.
 
@@ -132,7 +152,7 @@ Full-width `assets/img/wordmark-caps-ink.png`, container edge to edge, standard 
 
 Ship the decorative version when the footer brand mark sits within the same landmark. Otherwise use `alt="Quests"`.
 
-### 1.7 Final CTA (on cream)
+### 1.8 Final CTA (on cream)
 
 | Slot | Copy |
 | --- | --- |
@@ -141,7 +161,7 @@ Ship the decorative version when the footer brand mark sits within the same land
 | Primary button, if a button is used alongside the badges | `Start your first Quest` |
 | Store badges | Same alt and aria-label strings as 1.2 |
 
-### 1.8 Footer
+### 1.9 Footer
 
 | Slot | Copy |
 | --- | --- |

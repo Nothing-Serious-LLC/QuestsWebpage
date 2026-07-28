@@ -1,36 +1,104 @@
 /* ==========================================================================
-   Quests V2 - invite page (/q) only. Loads after css/site.css.
+   Quests V4 - the invite page (/q). Loads after css/site.css.
 
-   Contract with the page scripts, which stay untouched:
-   - the render script writes colours as var(--accent-light), var(--accent-warning)
-     and var(--text-soft), so those three names live on here as V2 tokens
+   The invite runs the V4 base: cream in light, #0E0E12 in dark, grain over
+   both, no purple field anywhere. The journey arrives as a POSTCARD: the
+   app's own roadmap art in a rounded framed panel with the exact CARD-SPEC
+   quest-detail card mounted on it, so the winding path runs behind the card
+   the way it does on the app's quest detail screen. Everything else (the
+   ended notice, the phone gate, the calls to action, the error road that
+   stops) sits directly on the base.
+
+   Contract with the page scripts, which stay byte-for-byte untouched:
+   - the render script writes colours as var(--accent-light),
+     var(--accent-warning) and var(--text-soft), and writes them onto text
+     INSIDE the cream card, which never darkens. All three are therefore
+     fixed values here rather than mode tokens, or the "Ended" label would
+     drop to 2.2:1 the moment the page went dark.
    - .state-hidden, .sr-only, .phone-input--error, .phone-input-group--shake,
      .cta-button--disabled and .cta-button--loading are toggled from JS
-   - #quest-icon gets an inline gradient built from the quest colour, so its ring
-     stays neutral and lets that colour read
+   - #meta-status-row must contain a .meta-row__icon and #creator-avatar must
+     contain a .creator-avatar__fallback, both are queried and recoloured
+   - #quest-icon gets an inline gradient built from the quest colour, so the
+     medallion face stays neutral underneath and lets that colour read
+
+   Contrast: card ink is the app's own #292929 / #696969 on the cream face in
+   both modes. Off-card text is --text (9.8:1 light, 15.9:1 dark on the base)
+   and --text-2 (5.3:1 light, 6.6:1 dark).
    ========================================================================== */
 
 :root {
-  /* Names the surviving markup and scripts still reference */
-  --accent: var(--purple);
-  --accent-light: var(--purple-deep);
-  --accent-warning: var(--c-growth-ink);
-  --accent-error: #C0392B;
-  --text-soft: #767676;
+  /* Names the surviving markup and scripts still reference. Fixed, not mode
+     tokens: every one of them lands on the cream card face. */
+  --accent-light: #9354B3;    /* purple-deep, 4.85:1 on the cream card face */
+  --accent-warning: #8A6716;  /* growth ink, 5.0:1 on the cream card face */
+  --text-soft: #696969;       /* the app's own card secondary, 5.6:1 on cream */
 
   /* Page local */
-  --q-line: rgba(25, 25, 25, 0.07);
-  --q-skeleton: rgba(25, 25, 25, 0.05);
-  --q-skeleton-hi: rgba(25, 25, 25, 0.1);
+  --q-col: 402px;             /* the postcard: the app card plus its frame */
+  --q-card: 354px;            /* the app card itself */
+  --q-frame: clamp(12px, 4vw, 24px);
+  --q-field: #FDFBF6;         /* phone field fill, light */
+  --q-panel-bg: var(--surface);
+  --q-panel-line: transparent;
+  /* The error red is the one accent that DOES follow the mode, because it is
+     the only one that lands on the panel rather than on the card face. The
+     light value is 5.4:1 on white; the raw red falls to 2.5:1 on the #212121
+     dark panel, so dark gets it lifted to 6.2:1. Nothing in the page scripts
+     reads this name, so it is safe to flip. */
+  --accent-error: #C0392B;
+  --q-error-ring: rgba(192, 57, 43, 0.18);
 }
 
-/* ---- Shell --------------------------------------------------------------- */
-.invite {
-  position: relative;
-  padding-top: clamp(var(--s-32), 6vw, var(--s-64));
-  padding-bottom: calc(clamp(var(--s-40), 8vw, var(--s-96)) + env(safe-area-inset-bottom, 0px));
+/* Dark mode. Same two entry points and the same deliberate duplication as
+   site.css block 1d: CSS cannot share a declaration block across a media
+   query boundary, so keep the two copies in step. */
+html[data-theme="dark"] {
+  --q-field: #17171A;
+  --q-panel-bg: var(--surface-2);
+  --q-panel-line: #191919;
+  --accent-error: #F0857A;
+  --q-error-ring: rgba(240, 133, 122, 0.22);
 }
-.invite__wrap { --container: 560px; position: relative; z-index: 1; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --q-field: #17171A;
+    --q-panel-bg: var(--surface-2);
+    --q-panel-line: #191919;
+    --accent-error: #F0857A;
+    --q-error-ring: rgba(240, 133, 122, 0.22);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1. The page
+   One centred column on the base. The nav is frosted from the first pixel
+   here (site.css), so the column simply clears it.
+   -------------------------------------------------------------------------- */
+.invite {
+  display: flow-root;
+  padding-top: calc(var(--nav-h) + clamp(28px, 7vw, 56px));
+  padding-bottom: calc(clamp(72px, 11vw, 120px) + env(safe-area-inset-bottom, 0px));
+}
+
+/* One width for everything: the postcard's width, so the panels and the
+   buttons share a single edge with the frame around the card. */
+.invite__wrap { --container: var(--q-col); position: relative; }
+
+#quest-loading,
+#quest-content {
+  display: grid;
+  gap: var(--s-20);
+  justify-items: center;
+}
+#quest-loading > *,
+#quest-content > * { width: 100%; }
+
+#quest-content { animation: q-fade-up 500ms var(--ease) both; }
+@keyframes q-fade-up {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: none; }
+}
 
 /* State machine: the scripts flip this on every panel */
 .state-hidden { display: none !important; }
@@ -43,16 +111,104 @@
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
 
-/* ---- Loading skeleton ---------------------------------------------------- */
-#quest-loading { display: flex; flex-direction: column; gap: var(--s-20); padding-top: var(--s-8); }
+/* Framing line. The h1 on this page is the quest name inside the card, so
+   these two are a category eyebrow and a serif line, both on the base. */
+.invite__eyebrow {
+  display: flex;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--cat-text);
+  margin-bottom: calc(var(--s-12) * -1);
+}
+.invite__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.75rem, 9vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: calc(var(--s-4) * -1);
+}
 
+/* --------------------------------------------------------------------------
+   2. The postcard
+   A rounded frame holding the app's real roadmap art, with the quest card
+   mounted on the path. The art is an <img> under object-fit: cover rather
+   than a background, so the browser can pick the mode variant through
+   <picture> (one fetch, and js/site.js retunes the media query when a theme
+   is pinned for QA).
+
+   The art is the full colour mindfulness block, the same tile the homepage
+   gallery uses, because a contained panel is the category highlight moment
+   rather than a full bleed field: cream page, one purple postcard, the app's
+   own card mounted on it. Top padding is what makes it read as the app
+   screen: enough art above the card for the path to arrive, a thin margin
+   below for it to leave.
+   -------------------------------------------------------------------------- */
+.q-postcard {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: center;
+  border-radius: var(--r-panel);
+  overflow: hidden;
+  padding: clamp(84px, 22vw, 112px) var(--q-frame) var(--q-frame);
+  background: var(--purple-pale);
+  box-shadow: var(--sh-card);
+}
+/* A rim over the art rather than a border, so the frame never adds a pixel to
+   the layout box and the art still reaches the rounded edge. */
+.q-postcard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(253, 251, 246, 0.22);
+  pointer-events: none;
+}
+.q-postcard__art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.q-postcard__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+.q-postcard > .quest-card,
+.q-postcard > .q-skel-card {
+  position: relative;
+  z-index: 2;
+  width: var(--q-card);
+  max-width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   3. Loading state
+   Same silhouette as the loaded state, postcard and all, so the art is
+   already on screen when the data lands and nothing jumps. Bars are ink
+   tinted on the base and inside the card stand-in alike, since every surface
+   under them is now a light one in light mode and a dark one in dark mode.
+   -------------------------------------------------------------------------- */
 .skeleton {
-  border-radius: var(--radius-card);
-  background: linear-gradient(90deg, var(--q-skeleton) 25%, var(--q-skeleton-hi) 50%, var(--q-skeleton) 75%);
+  border-radius: 10px;
+  background: linear-gradient(90deg,
+    var(--veil) 25%,
+    var(--veil-2) 50%,
+    var(--veil) 75%);
   background-size: 200% 100%;
   animation: q-shimmer 1.8s ease-in-out infinite;
 }
@@ -61,174 +217,211 @@
   100% { background-position: -200% 0; }
 }
 
-.skeleton--icon { width: 88px; height: 88px; border-radius: 50%; margin: 0 auto var(--s-8); }
-.skeleton--title { width: 62%; height: 30px; margin: 0 auto; border-radius: 10px; }
-.skeleton--text { width: 84%; height: 16px; margin: 0 auto; border-radius: 8px; }
-.skeleton--text-short { width: 52%; height: 14px; margin: 0 auto; border-radius: 8px; }
-.skeleton--card { width: 100%; height: 132px; border-radius: var(--radius-hero); }
-.skeleton--row { display: flex; align-items: center; gap: var(--s-12); padding: 0 var(--s-4); }
-.skeleton--circle { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
-.skeleton--line { height: 14px; border-radius: 8px; flex: 1; }
-.skeleton--button { width: 100%; height: 54px; border-radius: var(--radius-pill); margin-top: var(--s-8); }
-.skeleton-group { display: flex; flex-direction: column; gap: 10px; }
+#quest-loading > .skeleton--head { height: 46px; width: 74%; max-width: 264px; margin-inline: auto; border-radius: 14px; }
+.skeleton--panel { height: 132px; border-radius: var(--r-white); }
+.skeleton--button { height: 54px; border-radius: var(--r-pill); }
 
-/* ---- Loaded content ------------------------------------------------------ */
-#quest-content { animation: q-fade-up 500ms var(--ease-out) both; }
-@keyframes q-fade-up {
-  from { opacity: 0; transform: translate3d(0, 16px, 0); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
-/* The quest preview card, hero radius */
-.invite-card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-hero);
-  box-shadow: var(--shadow-soft);
-  padding: clamp(var(--s-24), 6vw, var(--s-32));
-  text-align: center;
-}
-
-#quest-hero { text-align: center; }
-#quest-hero .eyebrow { margin-bottom: var(--s-8); }
-
-.quest-icon {
-  width: 88px;
-  height: 88px;
-  margin: 0 auto var(--s-20);
-  border-radius: 50%;
+/* Stand-in for the quest card: same 354 / radius 24 / 32-40-32 / gap 20 */
+.q-skel-card {
+  border-radius: var(--r-card);
+  background: var(--cream);
+  border: 1px solid var(--white);
+  box-shadow: var(--sh-quest);
+  padding: 32px 40px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: 40px;
+  gap: 20px;
+}
+/* The card face is cream in both modes, so its bars are always ink tinted. */
+.q-skel-card .skeleton {
+  background: linear-gradient(90deg,
+    rgba(25, 25, 25, 0.06) 25%,
+    rgba(25, 25, 25, 0.14) 50%,
+    rgba(25, 25, 25, 0.06) 75%);
+  background-size: 200% 100%;
+}
+.skeleton--icon { width: 54px; height: 54px; border-radius: 50%; }
+.skeleton--title { height: 28px; width: 62%; }
+.skeleton--text-short { height: 14px; width: 44%; }
+.skeleton--text { height: 14px; width: 88%; }
+.skeleton--pill { height: 40px; width: 185px; max-width: 100%; border-radius: var(--r-pill); }
+.skeleton--row { display: flex; align-items: center; gap: var(--s-8); width: 100%; justify-content: center; }
+.skeleton--circle { width: 24px; height: 24px; border-radius: 50%; flex: none; }
+.skeleton--line { height: 12px; width: 130px; max-width: 100%; }
+
+/* --------------------------------------------------------------------------
+   4. The quest preview card
+   Geometry comes wholesale from .quest-card / .quest-card--roadmap in
+   site.css (CARD-SPEC quest-detail values). Only the invite specific slots
+   are described here. The face stays the app's cream in both modes, exactly
+   as site.css decided for every replicated card on the site.
+   -------------------------------------------------------------------------- */
+.quest-card__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Medallion. The render script may paint an inline gradient of the quest
+   colour over the neutral face, the 2px pale ring stays either way. */
+.quest-icon { overflow: hidden; }
+.quest-icon .mdi { font-size: 24px; line-height: 1; }
+
+.quest-card__duration { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
+
+/* Hairline dot separator, so no dash characters are needed anywhere */
+.q-dot {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin: 0 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+  flex: none;
+}
+
+#quest-description {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-card-2);
+  text-align: center;
+  max-width: 30ch;
+  margin-inline: auto;
+}
+#quest-description:empty { display: none; }
+
+/* Creator avatar, 24px, inside the app's avatar stack */
+.avatar-stack > .q-avatar { overflow: hidden; background: var(--purple-mid); }
+.q-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.creator-avatar__fallback {
+  font-family: var(--font-ui);
+  font-size: 11px;
   line-height: 1;
-  color: var(--ink);
-  background: var(--purple-pale);
-  border: 2px solid rgba(25, 25, 25, 0.06);
-  box-shadow: var(--shadow-soft);
+  font-weight: 700;
+  color: #FFFFFF;
 }
 
-.quest-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 6vw, 2.5rem);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin: 0 0 var(--s-12);
-}
+.quest-card__caption { text-align: left; min-width: 0; }
 
-.quest-description {
-  font-size: var(--fs-body);
-  line-height: 1.6;
-  color: var(--ink-2);
-  max-width: 40ch;
-  margin: 0 auto;
+/* Status pill. Same 40px / 185 / r999 slot the check-in button occupies in
+   the app, carrying the quest state instead of an action. The render script
+   recolours both the dot and the label. */
+.quest-card__pill--status {
+  gap: var(--s-8);
+  cursor: default;
+  touch-action: auto;
+  -webkit-user-select: auto;
+          user-select: auto;
+  box-shadow: inset 0 0 0 1px rgba(41, 41, 41, 0.1);
 }
-
-/* ---- Meta rows ----------------------------------------------------------- */
-#quest-meta {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1px;
-  margin-top: var(--s-24);
-  background: var(--q-line);
-  border: 1px solid var(--q-line);
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  text-align: left;
-}
-@media (min-width: 420px) { #quest-meta { grid-template-columns: 1fr 1fr; } }
-
-.meta-row { display: flex; align-items: center; gap: var(--s-12); padding: 14px 16px; background: var(--card); }
-.meta-row--full { grid-column: 1 / -1; }
-
-.meta-row__icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: var(--purple-pale);
-  color: var(--purple-deep);
-  font-size: 20px;
-  flex-shrink: 0;
-}
-.meta-row__icon--avatar {
+.quest-card__pill--status:hover { background: transparent; }
+.quest-card__pill--status .meta-row__icon {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--wash);
-  border: 2px solid var(--card-border);
-  box-shadow: 0 0 0 1px var(--q-line);
-  overflow: hidden;
-  font-size: 16px;
-  color: var(--ink-2);
+  background: currentColor;
+  color: var(--accent-light);
+  flex: none;
 }
-.meta-row__icon--avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-.meta-row__text { flex: 1; min-width: 0; }
-.meta-row__label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  line-height: 1.3;
-  color: var(--text-soft);
-  margin-bottom: 2px;
-}
-.meta-row__value {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.creator-avatar__fallback { font-size: 15px; font-weight: 700; color: #FFFFFF; line-height: 1; }
-
-/* ---- Quest ended notice -------------------------------------------------- */
-#quest-ended {
-  margin-top: var(--s-24);
-  padding: var(--s-32) var(--s-24);
-  border-radius: var(--radius-feature);
-  background: var(--wash);
-  border: 1px solid var(--card-border);
+/* --------------------------------------------------------------------------
+   5. Utility panels on the base
+   The site's card recipe: white in light, #212121 with a #191919 border in
+   dark, same as .card in site.css.
+   -------------------------------------------------------------------------- */
+.q-panel {
+  background: var(--q-panel-bg);
+  border: 1px solid var(--q-panel-line);
+  border-radius: var(--r-white);
+  box-shadow: var(--sh-card);
+  padding: var(--s-24);
   text-align: center;
+  color: var(--text);
 }
-.ended-icon { font-size: 30px; line-height: 1; margin-bottom: var(--s-12); }
-.ended-title { font-family: var(--font-display); font-size: 1.375rem; line-height: 1.15; color: var(--ink); margin: 0 0 var(--s-8); }
-.ended-text { font-size: var(--fs-small); line-height: 1.55; color: var(--ink-2); margin: 0 auto; max-width: 34ch; }
-#quest-ended .store-badges { margin-top: var(--s-24); justify-content: center; }
 
-/* ---- Phone gate ---------------------------------------------------------- */
-#phone-gate { margin-top: var(--s-24); }
+/* Quest ended. The gold quest-complete milestone from the journey system:
+   this quest reached its end, so it gets the end-of-road medallion. */
+.ended-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto var(--s-16);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, var(--gold-lit) 0%, var(--gold) 62%, #C79526 100%);
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 3px var(--q-panel-bg), var(--sh-stop);
+  color: var(--gold-ink);
+  font-size: 30px;
+  line-height: 1;
+}
+.ended-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.625rem;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: var(--s-8);
+}
+.ended-text { font-size: var(--fs-small); line-height: 1.55; color: var(--text-2); max-width: 34ch; margin-inline: auto; }
+#quest-ended .store-badges { margin-top: var(--s-24); }
+
+/* --------------------------------------------------------------------------
+   6. Phone gate
+   -------------------------------------------------------------------------- */
+.q-panel--gate { text-align: left; }
+.gate-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: var(--s-12);
+}
 .phone-input-group { display: flex; gap: 10px; margin-bottom: var(--s-12); }
 
 .phone-input {
   flex: 1;
   min-width: 0;
-  padding: 15px 20px;
-  border-radius: var(--radius-pill);
-  border: 1.5px solid var(--q-line);
-  background: var(--card);
-  color: var(--ink);
+  height: 52px;
+  padding: 0 20px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--edge);
+  background: var(--q-field);
+  color: var(--text);
   font-family: var(--font-ui);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1rem;          /* 16px keeps iOS from zooming on focus */
+  font-weight: 700;
   line-height: 1.2;
   outline: none;
-  box-shadow: var(--shadow-soft);
-  transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
   scroll-margin-top: 120px;
 }
-.phone-input::placeholder { color: var(--text-soft); font-weight: 400; }
+.phone-input::placeholder { color: var(--text-2); font-weight: 400; }
+/* The ring carries the focus indicator, so it is the category colour, which
+   is a constant and clears 3:1 against both panel fills. */
 .phone-input:focus,
-.phone-input:focus-visible { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-pale); outline: none; }
+.phone-input:focus-visible {
+  border-color: var(--cat);
+  box-shadow: 0 0 0 3px rgb(var(--cat-rgb) / 0.32);
+  outline: none;
+}
 
-.phone-error { font-size: var(--fs-small); font-weight: 600; color: var(--accent-error); margin: 0 0 var(--s-8); line-height: 1.4; }
-.phone-input--error { border-color: var(--accent-error) !important; box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12) !important; }
-.phone-input-group--shake { animation: q-shake 400ms var(--ease-out); }
+.phone-error {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--accent-error);
+  margin-bottom: var(--s-8);
+  line-height: 1.4;
+}
+.phone-input--error { border-color: var(--accent-error) !important; box-shadow: 0 0 0 3px var(--q-error-ring) !important; }
+.phone-input-group--shake { animation: q-shake 400ms var(--ease); }
 @keyframes q-shake {
   0%, 100% { transform: translate3d(0, 0, 0); }
   20% { transform: translate3d(-6px, 0, 0); }
@@ -237,8 +430,14 @@
   80% { transform: translate3d(4px, 0, 0); }
 }
 
-.gate-privacy { font-size: 0.8125rem; line-height: 1.55; color: var(--ink-2); margin: 0; }
-.gate-privacy a { text-underline-offset: 2px; }
+.gate-privacy { font-size: var(--fs-small); line-height: 1.5; color: var(--text-2); }
+.gate-privacy a {
+  color: var(--cat-text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.gate-privacy a:hover { color: var(--text); }
 
 .gate-success { text-align: center; padding: var(--s-8) 0; }
 .gate-success__icon {
@@ -246,29 +445,42 @@
   height: 56px;
   margin: 0 auto var(--s-16);
   border-radius: 50%;
-  background: var(--purple-pale);
-  color: var(--purple-deep);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--card-face);
+  border: 2px solid var(--cat-ink);
+  box-shadow: 0 0 0 3px var(--q-panel-bg), var(--sh-stop);
+  color: var(--cat-ink);
+  display: grid;
+  place-items: center;
   font-size: 26px;
   line-height: 1;
-  animation: q-check-pop 500ms var(--ease-spring) both;
+  animation: q-check-pop 500ms var(--spring) both;
 }
 @keyframes q-check-pop {
   0%   { transform: scale(0); opacity: 0; }
   60%  { transform: scale(1.15); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
-.gate-success__title { font-family: var(--font-display); font-size: 1.375rem; line-height: 1.15; color: var(--ink); margin: 0 0 var(--s-8); }
-.gate-success__text { font-size: var(--fs-small); line-height: 1.55; color: var(--ink-2); margin: 0; }
-#gate-confirmed:not(.state-hidden) { animation: q-fade-up 450ms var(--ease-out) both; }
+.gate-success__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: var(--s-8);
+}
+.gate-success__text { font-size: var(--fs-small); line-height: 1.55; color: var(--text-2); }
+#gate-confirmed:not(.state-hidden) { animation: q-fade-up 450ms var(--ease) both; }
 
 /* Invisible Turnstile widget */
 #turnstile-container { position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none; }
 
-/* ---- Calls to action ----------------------------------------------------- */
-#install-handoff { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-20); }
+/* --------------------------------------------------------------------------
+   7. Calls to action, on the base
+   Primary is the site's ink pill, secondary the ghost outline pill, both at
+   the full column width so they share the postcard's edge.
+   -------------------------------------------------------------------------- */
+#install-handoff { display: flex; flex-direction: column; gap: var(--s-12); }
 
 .cta-button {
   display: inline-flex;
@@ -276,84 +488,121 @@
   justify-content: center;
   gap: var(--s-8);
   width: 100%;
-  padding: 16px 28px;
-  border-radius: var(--radius-pill);
-  background: var(--ink);
-  color: #FFFFFF;
+  min-height: 54px;
+  padding: 14px 24px;
+  border-radius: var(--r-pill);
+  background: var(--text);
+  color: var(--page);
   font-family: var(--font-ui);
   font-size: 1rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
   line-height: 1.2;
   text-align: center;
-  text-decoration: none;
-  border: 1.5px solid transparent;
   cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), background-color 180ms var(--ease-out), opacity 180ms var(--ease-out);
+  transition: transform var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease);
 }
-.cta-button:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
-.cta-button:active { background: var(--ink-pressed); transform: translateY(0); box-shadow: var(--shadow-soft); }
-.cta-button--disabled { opacity: 0.3; pointer-events: none; box-shadow: none; }
+.cta-button:hover { opacity: 0.86; transform: translateY(-1px); }
+.cta-button:active { opacity: 1; transform: translateY(0); }
+/* Disabled is a real muted fill rather than a faded ink pill: dropping the
+   opacity of an ink plate takes its cream label with it and the button stops
+   being readable. This keeps the label at 4.4:1 light and 6.6:1 dark. */
+.cta-button--disabled { background: var(--veil-2); color: var(--text-2); opacity: 1; pointer-events: none; }
 .cta-button--loading { opacity: 0.7; pointer-events: none; }
 .cta-button__icon { font-size: 18px; line-height: 1; }
 
-/* Open in app, ghost pill */
 .link-secondary {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 13px 24px;
-  border-radius: var(--radius-pill);
-  border: 1.5px solid var(--ink);
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: var(--r-pill);
   background: transparent;
-  color: var(--ink);
+  color: var(--text);
   font-family: var(--font-ui);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   text-align: center;
-  text-decoration: none;
   cursor: pointer;
-  transition: background-color 160ms var(--ease-out);
+  box-shadow: inset 0 0 0 1.5px var(--edge);
+  transition: background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
-.link-secondary:hover { background: rgba(25, 25, 25, 0.04); }
-.link-secondary:active { background: rgba(25, 25, 25, 0.08); }
+.link-secondary:hover { background: var(--veil); box-shadow: inset 0 0 0 1.5px var(--text-2); }
+.link-secondary:active { background: var(--veil-2); }
 
-/* ---- Error state --------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   8. Error state
+   The road arrives from above and stops dead at the milestone, the same
+   figure the 404 uses, because this is the same moment: the path you were
+   following ends here.
+   -------------------------------------------------------------------------- */
 #quest-error {
+  display: grid;
+  justify-items: center;
+  gap: var(--s-20);
   text-align: center;
-  padding: clamp(var(--s-32), 9vh, var(--s-96)) 0 var(--s-40);
-  animation: q-fade-up 450ms var(--ease-out) both;
+  padding-top: clamp(8px, 5vh, 40px);
+  animation: q-fade-up 450ms var(--ease) both;
 }
+.error-stub { width: 60px; height: 130px; margin-bottom: calc(var(--s-20) * -1 - 34px); }
+.error-stub svg { width: 100%; height: 100%; overflow: visible; }
+.error-stub path { fill: none; stroke: var(--path-stroke); stroke-width: 22; stroke-linecap: round; }
+
 .error-icon {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto var(--s-20);
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
-  background: var(--purple-pale);
-  color: var(--purple-deep);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
+  display: grid;
+  place-items: center;
+  background: var(--card-face);
+  border: 2px solid var(--cat-ink);
+  box-shadow: 0 0 0 3px var(--page), var(--sh-stop);
+  color: var(--cat);
+  font-size: 30px;
   line-height: 1;
 }
-.error-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 5vw, 2.25rem);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin: 0 0 var(--s-12);
+.error-title { font-size: clamp(2.25rem, 8vw, 3rem); color: var(--text); }
+.error-text { font-size: var(--fs-lede); line-height: 1.5; color: var(--text-2); max-width: 30ch; }
+.invite__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-12);
+  width: 100%;
+  margin-top: var(--s-8);
 }
-.error-text { font-size: var(--fs-body); line-height: 1.6; color: var(--ink-2); margin: 0 auto var(--s-32); max-width: 34ch; }
-.invite__actions { display: flex; flex-direction: column; gap: var(--s-12); max-width: 340px; margin-inline: auto; }
 
-/* ---- Small screens ------------------------------------------------------- */
-@media (max-width: 380px) {
-  .quest-icon { width: 76px; height: 76px; font-size: 34px; }
-  .skeleton--icon { width: 76px; height: 76px; }
-  .cta-button { padding: 15px 20px; }
+/* --------------------------------------------------------------------------
+   9. Small screens
+   The frame tightens so the 354px card keeps its own padding as long as
+   possible, and the art loses a little height with it.
+   -------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  .q-skel-card { padding: 24px 24px 28px; }
+  .invite__title { font-size: clamp(2.5rem, 11vw, 3rem); }
 }
+/* Below 400px the frame would be eating the card's own 24px padding, so it
+   goes away and the postcard becomes the card's own art bleed. */
+@media (max-width: 400px) {
+  :root { --q-frame: 8px; }
+  .q-postcard { padding-top: 64px; }
+}
+
+/* --------------------------------------------------------------------------
+   10. QA hook
+   js/site.js adds .u-static on ?static=1 so the design lead's screenshots are
+   deterministic. site.css covers the shared reveal classes; these are this
+   page's own entrances, and the shimmer would otherwise be caught mid sweep.
+   Reduced motion is already handled globally in site.css.
+   -------------------------------------------------------------------------- */
+.u-static #quest-content,
+.u-static #quest-error,
+.u-static #gate-confirmed:not(.state-hidden),
+.u-static .gate-success__icon {
+  animation: none !important;
+  opacity: 1;
+  transform: none;
+}
+.u-static .skeleton { animation: none !important; background-position: 50% 0; }

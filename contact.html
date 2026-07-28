@@ -23,10 +23,10 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/page-contact.css">
-<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
+<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}.site-nav{background:rgba(243,241,231,.86);border-bottom-color:rgba(25,25,25,.07)}.site-nav .site-nav__logo img{filter:none}.site-nav .btn-outline-white{background:#191919;color:#FDFBF6;box-shadow:none}</style></noscript>
 <script src="/js/site.js" defer></script>
 
 <script type="application/ld+json">
@@ -58,33 +58,40 @@
     <a class="site-nav__logo" href="/" aria-label="Quests home">
       <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
     </a>
-    <a class="btn btn-sm" href="/#download">Download</a>
+    <a class="btn btn-outline-white" href="/#download" aria-label="Download Quests">Download</a>
   </div>
 </header>
 
-<main id="main">
-  <section class="section section--tight">
-    <div class="container container--narrow center reveal">
-      <p class="eyebrow">Contact</p>
-      <h1 class="serif" style="font-size:var(--fs-section)">Get in touch.</h1>
-      <p class="lede" style="margin-inline:auto;margin-top:var(--s-16)">Questions, feedback, or press, send us a note and we'll get back to you soon.</p>
-    </div>
-  </section>
+<section class="page-header cat-social">
+    <div class="container">
+      <div class="page-header__road">
+        <svg class="page-header__stub" viewBox="0 0 60 214" fill="none" aria-hidden="true" focusable="false">
+          <path d="M30 0 C30 70 12 120 30 178 C42 198 32 206 30 212"></path>
+        </svg>
+        <span class="page-header__mark cat-social" aria-hidden="true">
+          <img src="/assets/img/icon-social.svg" alt="" width="28" height="28" decoding="async">
+        </span>
+      </div>
+    <h1 class="page-header__title">Get in touch.</h1>
+    <p class="page-header__sub">Questions, feedback, or press, send us a note and we'll get back to you soon.</p>
+  </div>
+</section>
 
-  <section class="section--tight" style="padding-top:0">
+<main id="main">
+  <section class="section section--tight cat-social" style="padding-top:0">
     <div class="container container--narrow">
       <div class="contact-grid">
 
-        <div class="card card--feature reveal">
+        <div class="card reveal">
           <p class="eyebrow">Email us directly</p>
-          <h2 class="card__title" style="font-size:var(--fs-title)">Say hello</h2>
+          <h2 class="card__title" style="font-size:var(--fs-h3);margin-top:var(--s-12)">Say hello</h2>
           <p class="card__text">For support, feedback, or press, reach the team at Nothing Serious LLC.</p>
           <a class="btn btn-ghost btn-block" style="margin-top:var(--s-24)" href="mailto:hello@thequestsapp.com">hello@thequestsapp.com</a>
         </div>
 
-        <div class="card card--feature reveal" data-reveal-delay="100" id="contact-form-card">
+        <div class="card reveal" data-reveal-delay="100" id="contact-form-card">
           <p class="eyebrow">Send a message</p>
-          <h2 class="card__title" style="font-size:var(--fs-title)">We'll write back soon</h2>
+          <h2 class="card__title" style="font-size:var(--fs-h3);margin-top:var(--s-12)">We'll write back soon</h2>
 
           <form id="contact-form" class="stack" style="margin-top:var(--s-20)" action="https://formspree.io/f/xanoagql" method="POST">
             <div class="field">
@@ -115,7 +122,7 @@
 
 <div class="wordmark-band reveal">
   <div class="container">
-    <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
+    <img src="/assets/img/wordmark-caps-ink.png" alt="" aria-hidden="true" width="2241" height="593" loading="lazy" decoding="async">
   </div>
 </div>
 
@@ -124,23 +131,35 @@
     <div class="site-footer__top">
       <div class="site-footer__brand">
         <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
-        <p>The home of the healthy challenge. Grow better together.</p>
+        <p>The home of the healthy challenge.</p>
+        <div class="site-footer__social">
+          <a href="https://instagram.com/quests.app" target="_blank" rel="noopener" aria-label="Quests on Instagram">Instagram</a>
+          <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener" aria-label="Quests on TikTok">TikTok</a>
+          <a href="https://x.com/Quests_app_" target="_blank" rel="noopener" aria-label="Quests on X">X</a>
+        </div>
       </div>
 
-      <nav class="site-footer__nav" aria-label="Footer">
-        <a href="/blog.html">Blog</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
-        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
-        <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
+      <nav class="site-footer__col" aria-label="Product">
+        <h2>Product</h2>
+        <ul>
+          <li><a href="/#download">Download</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Legal">
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/privacy.html">Privacy</a></li>
+          <li><a href="/terms.html">Terms</a></li>
+        </ul>
       </nav>
     </div>
 
     <div class="site-footer__legal">
-      <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
-      <p>Habits with friends.</p>
+      <p>&copy; <span data-year>2026</span> Nothing Serious LLC</p>
+      <p>Download Quests on iOS and Android.</p>
     </div>
   </div>
 </footer>

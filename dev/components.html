@@ -8,19 +8,18 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/site.css">
-<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
-<script src="../js/site.js" defer></script>
-<script src="../js/quest-card.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}.site-nav{background:rgba(243,241,231,.86);border-bottom-color:rgba(25,25,25,.07)}.site-nav .site-nav__logo img{filter:none}.site-nav .btn-outline-white{background:#191919;color:#FDFBF6;box-shadow:none}</style></noscript>
+<script src="/js/site.js" defer></script>
+<script src="/js/quest-card.js" defer></script>
 
 <style>
   /* Dev page only. Never ships. */
-  .dev-label { font-family: var(--font-ui); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); margin-bottom: var(--s-16); }
+  .dev-label { font-family: var(--font-ui); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin-bottom: var(--s-16); }
+  .world .dev-label { color: rgba(255,255,255,.78); }
   .dev-row { display: flex; flex-wrap: wrap; gap: var(--s-16); align-items: center; }
-  .dev-grid { display: grid; gap: var(--s-24); grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-  .dev-note { font-size: 0.875rem; color: var(--ink-2); margin-top: var(--s-8); }
-  .dev-sep { border-top: 1px solid var(--hairline); }
+  .dev-note { font-size: .875rem; color: var(--ink-2); margin-top: var(--s-8); max-width: 34ch; }
   .dev-swatch { height: 64px; border-radius: 12px; border: 1px solid var(--hairline); }
 </style>
 </head>
@@ -28,297 +27,256 @@
 
 <a class="skip-link" href="#main">Skip to content</a>
 
-<!-- NAV -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="g-lotus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22.5085 15.4326C22.8337 15.8578 23.0089 16.3101 23.0089 16.7791C23.0089 19.2665 18.0799 21.2829 11.9996 21.2829C5.91928 21.2829 0.990234 19.2665 0.990234 16.7791C0.990234 16.3101 1.16548 15.8578 1.49063 15.4326"/>
+    <path d="M17.5045 10.9528C17.5045 7.45365 14.6834 4.5133 13.0804 3.12495C12.452 2.58075 11.5476 2.58075 10.9193 3.12495C9.31622 4.5133 6.49512 7.45365 6.49512 10.9528C6.49512 14.1922 8.95967 16.2793 11.9998 16.2793C15.04 16.2793 17.5045 14.1922 17.5045 10.9528Z"/>
+    <path d="M8.40171 5.82592C6.62991 5.26442 4.77841 5.22817 3.55566 5.29327C2.71101 5.33827 2.05991 5.98937 2.01496 6.83402C1.90886 8.82642 2.07181 12.4882 4.33811 14.7545C5.93751 16.3539 8.00091 16.641 9.76426 15.8668C7.83806 15.1074 6.49501 13.3439 6.49501 10.9526C6.49501 9.01662 7.35861 7.25167 8.40171 5.82592Z"/>
+    <path d="M15.5969 5.82592C16.64 7.25167 17.5036 9.01662 17.5036 10.9526C17.5036 13.3439 16.1606 15.1074 14.2344 15.8668C15.9977 16.641 18.0611 16.3539 19.6605 14.7545C21.9268 12.4882 22.0898 8.82642 21.9837 6.83407C21.9387 5.98937 21.2876 5.33827 20.443 5.29327C19.2202 5.22817 17.3687 5.26442 15.5969 5.82592Z"/>
+  </symbol>
+  <symbol id="g-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.8 13.1A8.6 8.6 0 0 1 10.9 3.2 8.9 8.9 0 1 0 20.8 13.1Z"/>
+  </symbol>
+  <symbol id="g-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 21V11"/>
+    <path d="M12 12.5C8.4 12.5 5.5 9.6 5.5 6 9.1 6 12 8.9 12 12.5Z"/>
+    <path d="M12 15.5C12 11.9 14.9 9 18.5 9 18.5 12.6 15.6 15.5 12 15.5Z"/>
+  </symbol>
+  <symbol id="g-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3.5C12.6 8.6 15.4 11.4 20.5 12 15.4 12.6 12.6 15.4 12 20.5 11.4 15.4 8.6 12.6 3.5 12 8.6 11.4 11.4 8.6 12 3.5Z"/>
+  </symbol>
+  <symbol id="g-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12.5 9.5 18 20 6.5"/>
+  </symbol>
+  <symbol id="g-flame" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
+  </symbol>
+</svg>
+
 <header class="site-nav">
   <div class="container site-nav__inner">
     <a class="site-nav__logo" href="/" aria-label="Quests home">
       <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
     </a>
-    <a class="btn btn-sm" href="#download">Download</a>
+    <a class="btn btn-outline-white" href="#cream">Download</a>
   </div>
 </header>
 
 <main id="main">
 
-  <!-- HERO SAMPLE: blobs, load sequence, quest card -->
-  <section class="section" style="position:relative;overflow:hidden">
-    <div class="blobs" aria-hidden="true">
-      <span class="blob blob--1"></span>
-      <span class="blob blob--2"></span>
-      <span class="blob blob--3"></span>
-      <span class="blob blob--4"></span>
-      <span class="blob blob--5"></span>
-    </div>
+  <!-- ================= WORLD MOOD ================= -->
+  <section class="page-header cat-mindfulness" style="padding-bottom:120px">
 
-    <div class="container layer-up split split--wide-left">
-      <div>
-        <p class="eyebrow cat-mindfulness load-in" style="--load-delay:0ms">Component library</p>
-        <h1 class="load-in" style="--load-delay:100ms">Better, <span class="accent">together.</span></h1>
-        <p class="lede load-in" style="--load-delay:200ms;margin-top:var(--s-24)">
-          Every token, component and interaction the V2 site is built from. Press and hold the card.
-        </p>
-        <div class="store-badges load-in" style="--load-delay:300ms;margin-top:var(--s-32)">
-          <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
-            <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
-          </a>
-          <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
-            <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
-          </a>
-        </div>
+    <div class="container">
+      <div class="page-header__road">
+        <svg class="page-header__stub" viewBox="0 0 60 214" fill="none" aria-hidden="true" focusable="false">
+          <path d="M30 0 C30 70 12 120 30 178 C42 198 32 206 30 212"></path>
+        </svg>
+        <span class="page-header__mark cat-mindfulness" aria-hidden="true">
+          <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28" decoding="async">
+        </span>
+      </div>
+      <p class="dev-label">World mood</p>
+      <h1 class="page-header__title">Better, <em class="accent">together.</em></h1>
+      <p class="page-header__sub">Wash gradient, two placements of the real roadmap tile, deepening scrim, grain, curved cream seam.</p>
+
+      <div class="dev-row" style="margin-top:var(--s-32)">
+        <span class="chip"><span class="chip__dot"></span>The home of the healthy challenge</span>
+        <span class="milestone">12</span>
+        <span class="milestone milestone--current">30</span>
       </div>
 
-      <div class="quest-card-stage load-settle" style="--load-delay:400ms">
-        <!-- QUEST CARD: markup contract lives in js/quest-card.js -->
-        <article class="quest-card cat-mindfulness" data-quest-card>
-          <span class="quest-card__fill" aria-hidden="true"></span>
+      <div class="dev-row" style="margin-top:var(--s-32)">
+        <a class="btn btn-outline-white" href="#cream">White outline pill</a>
+        <a class="store-badge" href="#cream" aria-label="Download Quests on the App Store">
+          <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+        </a>
+        <a class="store-badge" href="#cream" aria-label="Get Quests on Google Play">
+          <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+        </a>
+      </div>
+    </div>
+  </section>
 
-          <div class="quest-card__inner">
-            <div class="quest-card__head">
-              <span class="medallion quest-card__medallion" data-quest-medallion>
-                <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28">
+
+  <!-- ================= QUEST CARD ================= -->
+  <section class="section" id="cream">
+    <div class="container">
+      <p class="dev-label">Quest card, replica per CARD-SPEC.md</p>
+
+      <div class="dev-row" style="align-items:flex-start;gap:var(--s-40)">
+
+        <div>
+          <article class="quest-card cat-mindfulness" data-quest-card data-quest-done="Checked in for today." aria-label="Demo quest card. Hold to check in.">
+            <span class="quest-card__fill" aria-hidden="true"></span>
+            <div class="quest-card__inner">
+              <span class="quest-card__medallion" data-quest-medallion aria-hidden="true">
+                <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
               </span>
-              <div>
-                <h3 class="quest-card__name">Morning Run</h3>
-                <p class="quest-card__meta">
-                  <span class="quest-card__streak">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
-                    Day 12
-                  </span>
+              <div class="quest-card__names">
+                <p class="quest-card__name">Morning Run</p>
+                <p class="quest-card__duration">Day 12 of 30</p>
+              </div>
+              <div class="quest-card__actions">
+                <p class="quest-card__status">
                   <span class="avatar-stack" aria-hidden="true">
-                    <span></span><span style="background:var(--c-recharge)"></span><span style="background:var(--c-creativity)"></span>
-                    <span class="avatar-stack__more">+3</span>
+                    <span style="background:var(--c-mindfulness)"></span>
+                    <span style="background:var(--c-recharge)"></span>
+                    <span style="background:var(--c-creativity)"></span>
                   </span>
+                  <span class="quest-card__caption">+3 checked-in today</span>
                 </p>
+                <button class="quest-card__pill" type="button" aria-pressed="false" data-quest-press>
+                  <span class="quest-card__pill-label is-idle">Tap &amp; Hold to check in</span>
+                  <span class="quest-card__pill-label is-done">
+                    Checked in today
+                    <svg aria-hidden="true"><use href="#g-check"/></svg>
+                  </span>
+                  <span class="u-sr-only" data-quest-a11y>Hold to check in to Morning Run</span>
+                </button>
               </div>
             </div>
+          </article>
+          <p class="dev-note">Idle, live. 400ms engage, 1800ms fill, 150ms grace, 180ms rewind. Hold the pill, or focus it and hold Space.</p>
+        </div>
 
-            <p class="quest-card__hint" aria-hidden="true">
-              <span class="quest-card__hint-idle">Hold to check in</span>
-              <span class="quest-card__hint-done">
-                Checked in today
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg>
+        <div>
+          <article class="quest-card quest-card--roadmap cat-mindfulness" data-state="checked" aria-hidden="true">
+            <span class="quest-card__fill"></span>
+            <div class="quest-card__inner">
+              <span class="quest-card__medallion">
+                <svg class="glyph"><use href="#g-lotus"/></svg>
               </span>
-            </p>
-          </div>
+              <div class="quest-card__names">
+                <p class="quest-card__name">Daily Meditation</p>
+                <p class="quest-card__duration">Day 30 of 30</p>
+              </div>
+              <div class="quest-card__actions">
+                <p class="quest-card__status">
+                  <span class="quest-card__caption">29 check-ins</span>
+                </p>
+                <span class="quest-card__pill">
+                  <span class="quest-card__pill-label is-done">
+                    Checked in today
+                    <svg><use href="#g-check"/></svg>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </article>
+          <p class="dev-note">Checked flood, mindfulness pale pair. Roadmap padding, 32 top and bottom.</p>
+        </div>
 
-          <button class="quest-card__press" type="button" aria-pressed="false" data-quest-press>
-            <span class="u-sr-only" data-quest-a11y>Hold to check in to Morning Run</span>
-          </button>
+        <div>
+          <article class="quest-card quest-card--mini cat-recharge">
+            <span class="quest-card__fill"></span>
+            <div class="quest-card__inner">
+              <span class="quest-card__medallion"><svg class="glyph"><use href="#g-moon"/></svg></span>
+              <div class="quest-card__names">
+                <p class="quest-card__name">Cold Plunge</p>
+                <p class="quest-card__duration">Day 6 of 14</p>
+              </div>
+              <div class="quest-card__actions">
+                <span class="quest-card__pill">Tap &amp; Hold to check in</span>
+              </div>
+            </div>
+          </article>
+          <p class="dev-note">Mini, frozen mid-fill. The object inside step 02.</p>
+        </div>
 
-          <span class="quest-card__confetti" aria-hidden="true" data-quest-confetti></span>
-        </article>
       </div>
     </div>
   </section>
 
-  <!-- TYPE SCALE -->
-  <section class="section section--wash dev-sep">
-    <div class="container reveal">
-      <p class="dev-label">Type scale</p>
-      <h1>Hero, Instrument Serif <span class="accent">italic accent</span></h1>
-      <h2 style="margin-top:var(--s-40)">Section head, clamp 2 to 3.25rem</h2>
-      <h3 style="margin-top:var(--s-32)">Sub head, clamp 1.5 to 2.25rem</h3>
-      <h4 style="margin-top:var(--s-24)">Card title, clamp 1.25 to 1.5rem</h4>
-      <div class="prose" style="margin-top:var(--s-32)">
-        <p>Body copy is Manrope 400 at 1.0625rem with a 1.6 line height in secondary ink. Prose measures 65ch so long pages stay readable on wide screens. Contractions everywhere, plain verbs, specific beats clever.</p>
-        <p class="lede">Lede paragraph, 1.1875rem, used once under a headline.</p>
-      </div>
-      <div class="dev-row" style="margin-top:var(--s-40)">
-        <p class="eyebrow cat-mindfulness">Mindfulness</p>
-        <p class="eyebrow cat-recharge">Recharge</p>
-        <p class="eyebrow cat-creativity">Creativity</p>
-        <p class="eyebrow cat-growth">Growth</p>
-        <p class="eyebrow cat-social">Social</p>
-      </div>
-      <p class="dev-note">Eyebrows use the text safe category tone so small caps clear contrast on cream.</p>
-    </div>
-  </section>
 
-  <!-- BUTTONS AND BADGES -->
-  <section class="section">
-    <div class="container reveal">
-      <p class="dev-label">Buttons</p>
-      <div class="dev-row">
-        <a class="btn" href="#download">Download on the App Store</a>
-        <a class="btn btn-ghost" href="#download">Start your first Quest</a>
-        <a class="btn btn-sm" href="#download">Download</a>
-        <button class="btn btn-ghost btn-sm" type="button">Ghost small</button>
-      </div>
-
-      <p class="dev-label" style="margin-top:var(--s-64)">Store badges</p>
-      <div class="store-badges">
-        <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
-          <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
-        </a>
-        <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
-          <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
-        </a>
-      </div>
-      <p class="dev-note">The Google Play badge is a recreated SVG matched to the Apple badge height.</p>
-    </div>
-  </section>
-
-  <!-- COLOR -->
-  <section class="section section--wash">
-    <div class="container reveal">
-      <p class="dev-label">Surfaces and ink</p>
-      <div class="dev-grid">
-        <div><div class="dev-swatch" style="background:var(--cream)"></div><p class="dev-note">cream #FDFBF6</p></div>
-        <div><div class="dev-swatch" style="background:var(--wash)"></div><p class="dev-note">wash #F3F1E7</p></div>
-        <div><div class="dev-swatch" style="background:var(--card)"></div><p class="dev-note">card #FEFEFD</p></div>
-        <div><div class="dev-swatch" style="background:var(--ink)"></div><p class="dev-note">ink #191919</p></div>
-        <div><div class="dev-swatch" style="background:var(--ink-2)"></div><p class="dev-note">ink 2 #696969</p></div>
-        <div><div class="dev-swatch" style="background:var(--purple)"></div><p class="dev-note">purple #A961CC</p></div>
-      </div>
-
-      <p class="dev-label" style="margin-top:var(--s-64)">Category accents</p>
-      <div class="dev-grid">
-        <div><div class="dev-swatch" style="background:var(--c-mindfulness)"></div><p class="dev-note">mindfulness</p></div>
-        <div><div class="dev-swatch" style="background:var(--c-recharge)"></div><p class="dev-note">recharge</p></div>
-        <div><div class="dev-swatch" style="background:var(--c-creativity)"></div><p class="dev-note">creativity</p></div>
-        <div><div class="dev-swatch" style="background:var(--c-growth)"></div><p class="dev-note">growth</p></div>
-        <div><div class="dev-swatch" style="background:var(--c-social)"></div><p class="dev-note">social</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MEDALLIONS -->
-  <section class="section">
-    <div class="container reveal">
-      <p class="dev-label">Category medallions</p>
-      <div class="dev-row">
-        <span class="medallion cat-mindfulness"><img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28"></span>
-        <span class="medallion cat-recharge"><img src="/assets/img/icon-recharge.svg" alt="" width="28" height="28"></span>
-        <span class="medallion cat-creativity"><img src="/assets/img/icon-creativity.svg" alt="" width="28" height="28"></span>
-        <span class="medallion cat-growth"><img src="/assets/img/icon-growth.svg" alt="" width="28" height="28"></span>
-        <span class="medallion cat-social"><img src="/assets/img/icon-social.svg" alt="" width="28" height="28"></span>
-      </div>
-      <div class="dev-row" style="margin-top:var(--s-32)">
-        <span class="medallion medallion--sm cat-mindfulness"><img src="/assets/img/icon-mindfulness.svg" alt="" width="20" height="20"></span>
-        <span class="medallion cat-mindfulness"><img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28"></span>
-        <span class="medallion medallion--lg cat-mindfulness"><img src="/assets/img/icon-mindfulness.svg" alt="" width="38" height="38"></span>
-        <span class="medallion medallion--xl cat-mindfulness"><img src="/assets/img/icon-mindfulness.svg" alt="" width="50" height="50"></span>
-      </div>
-      <p class="dev-note">54px is the default. sm 40, lg 72, xl 96.</p>
-    </div>
-  </section>
-
-  <!-- CARDS -->
-  <section class="section section--wash">
-    <div class="container reveal">
-      <p class="dev-label">Cards and radius tiers</p>
-      <div class="grid-3">
-        <article class="card cat-mindfulness">
-          <span class="medallion medallion--sm" aria-hidden="true"><img src="/assets/img/icon-mindfulness.svg" alt="" width="20" height="20"></span>
-          <h4 class="card__title" style="margin-top:var(--s-16)">Card, 24px</h4>
-          <p class="card__text">The base tier. Use it for lists, quotes and small groupings.</p>
-        </article>
-
-        <article class="card card--feature card--hover cat-recharge">
-          <span class="pattern-band" aria-hidden="true"></span>
-          <span class="step__num">Step 02</span>
-          <h4 class="card__title" style="margin-top:var(--s-8)">Feature card, 32px</h4>
-          <p class="card__text">Carries a pattern header band in its category colour.</p>
-        </article>
-
-        <article class="card card--hero cat-growth">
-          <span class="medallion medallion--sm" aria-hidden="true"><img src="/assets/img/icon-growth.svg" alt="" width="20" height="20"></span>
-          <h4 class="card__title" style="margin-top:var(--s-16)">Hero card, 40px</h4>
-          <p class="card__text">The softest tier. The quest card uses it.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- PATTERNS -->
-  <section class="section">
-    <div class="container reveal">
-      <p class="dev-label">Brand pattern fields</p>
-      <div class="dev-grid">
-        <div><div class="pattern-swatch pattern-mindfulness"></div><p class="dev-note">Lavender dot grid, mindfulness</p></div>
-        <div><div class="pattern-swatch pattern-recharge"></div><p class="dev-note">Periwinkle capsule weave, recharge</p></div>
-        <div><div class="pattern-swatch pattern-social"></div><p class="dev-note">Acid lime pinwheel, social</p></div>
-        <div><div class="pattern-swatch pattern-creativity"></div><p class="dev-note">Peach cluster, creativity</p></div>
-        <div><div class="pattern-swatch pattern-growth"></div><p class="dev-note">Gold pixel step, growth</p></div>
-      </div>
-      <p class="dev-note" style="margin-top:var(--s-16)">Swatches show the patterns at full strength. In the page they only ever appear at 6 to 12 percent.</p>
-    </div>
-  </section>
-
-  <!-- SCIENCE STRIP with a pattern field at real opacity -->
-  <section class="section section--wash cat-mindfulness" style="position:relative;overflow:hidden">
-    <span class="pattern-field pattern-field--fade" aria-hidden="true"></span>
-    <div class="container layer-up center reveal">
-      <p class="eyebrow">Why it works</p>
-      <p class="serif text-ink" style="font-size:var(--fs-hero);line-height:0.95;letter-spacing:-0.02em">76%</p>
-      <p class="lede" style="margin-top:var(--s-16)">of people hit their goal when a friend checks in on them every week. Going it alone lands at 35%.</p>
-      <p style="font-size:0.8125rem;margin-top:var(--s-16)">Dominican University of California study</p>
-    </div>
-  </section>
-
-  <!-- REVEAL AND SPACING -->
-  <section class="section">
+  <!-- ================= CHIPS, BUTTONS, MEDALLIONS ================= -->
+  <section class="section section--tight">
     <div class="container">
-      <p class="dev-label">Reveal on scroll</p>
-      <div class="grid-3">
-        <div class="card reveal" data-reveal-delay="0"><p class="card__text">Delay 0ms</p></div>
-        <div class="card reveal" data-reveal-delay="100"><p class="card__text">Delay 100ms</p></div>
-        <div class="card reveal" data-reveal-delay="200"><p class="card__text">Delay 200ms</p></div>
+      <p class="dev-label">Chips</p>
+      <div class="dev-row">
+        <span class="chip cat-mindfulness"><span class="chip__dot"></span>Meditation Streak</span>
+        <span class="chip cat-recharge"><span class="chip__dot"></span>Cold Plunge</span>
+        <span class="chip cat-creativity"><span class="chip__dot"></span>Read Daily</span>
+        <span class="chip cat-growth"><span class="chip__dot"></span>75 Hard</span>
+        <span class="chip cat-social"><span class="chip__dot"></span>C25K</span>
+        <span class="chip chip--solid chip--bold">100+ curated challenges</span>
       </div>
-      <p class="dev-note">Single fade up, 400ms, threshold 0.2, fires once.</p>
+      <p class="dev-note">App spec: h32, 12x and 6y padding, r999, 14 over 20, white 60 percent, 1px #FDFBF6, ink #292929.</p>
+
+      <p class="dev-label" style="margin-top:var(--s-40)">Buttons and badges on cream</p>
+      <div class="dev-row">
+        <a class="btn" href="#cream">Start your first Quest</a>
+        <a class="btn btn-ghost" href="#cream">Back to home</a>
+        <a class="store-badge" href="#cream" aria-label="Download Quests on the App Store">
+          <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+        </a>
+        <a class="store-badge" href="#cream" aria-label="Get Quests on Google Play">
+          <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+        </a>
+      </div>
+
+      <p class="dev-label" style="margin-top:var(--s-40)">Medallions, 54px with the 2px category ring</p>
+      <div class="dev-row">
+        <span class="medallion cat-mindfulness"><svg class="glyph"><use href="#g-lotus"/></svg></span>
+        <span class="medallion cat-recharge"><svg class="glyph"><use href="#g-moon"/></svg></span>
+        <span class="medallion cat-growth"><svg class="glyph"><use href="#g-sprout"/></svg></span>
+        <span class="medallion cat-social"><svg class="glyph"><use href="#g-spark"/></svg></span>
+        <span class="medallion medallion--xl cat-creativity"><svg class="glyph"><use href="#g-flame"/></svg></span>
+      </div>
     </div>
   </section>
 
-  <!-- FINAL CTA -->
-  <section class="section section--cream center" id="download">
-    <div class="container reveal">
-      <h2>Your friends are <span class="accent">waiting.</span></h2>
-      <div class="store-badges store-badges--center" style="margin-top:var(--s-32)">
-        <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
-          <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+
+  <!-- ================= UTILITY MOOD ================= -->
+  <section class="section section--tight">
+    <div class="container">
+      <p class="dev-label">Utility mood, white cards on cream</p>
+      <ol class="grid-3 steps">
+        <li class="card step cat-mindfulness">
+          <span class="step__num">01</span>
+          <h3 class="card__title">Pick a quest with friends</h3>
+          <p class="card__text">Choose from 100+ curated challenges, then invite the people you want beside you.</p>
+          <div class="step__object" aria-hidden="true">
+            <span class="chip cat-growth"><span class="chip__dot"></span>75 Hard</span>
+            <span class="chip cat-mindfulness"><span class="chip__dot"></span>Dry January</span>
+            <span class="chip cat-social"><span class="chip__dot"></span>C25K</span>
+          </div>
+        </li>
+        <li class="card step cat-growth">
+          <span class="step__num">03</span>
+          <h3 class="card__title">Earn streaks, Cards, and real rewards</h3>
+          <p class="card__text">Your streak grows and your Points add up.</p>
+          <div class="step__object" aria-hidden="true">
+            <span class="chip mini-flame cat-creativity"><svg viewBox="0 0 24 24"><use href="#g-flame"/></svg>12 day streak</span>
+            <span class="chip mini-points">700 Points</span>
+            <span class="mini-card"><svg><use href="#g-spark"/></svg></span>
+          </div>
+        </li>
+        <li class="card card--hover">
+          <h3 class="card__title">Plain white card</h3>
+          <p class="card__text">Radius 26, borderless, two-part shadow, hover lift with no layout shift.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+
+  <!-- ================= WORLD BAND ================= -->
+  <section class="world world--band">
+    <div class="container container--narrow center">
+      <h2 class="cta__title">Your friends are waiting.</h2>
+      <p class="cta__sub">Curved slab, second tile, same grain. The final CTA surface.</p>
+      <div class="store-badges store-badges--center">
+        <a class="store-badge" href="#cream" aria-label="Download Quests on the App Store">
+          <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40" loading="lazy" decoding="async">
         </a>
-        <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
-          <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+        <a class="store-badge" href="#cream" aria-label="Get Quests on Google Play">
+          <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40" loading="lazy" decoding="async">
         </a>
       </div>
     </div>
   </section>
 
 </main>
-
-<!-- GIANT WORDMARK BAND -->
-<div class="wordmark-band reveal">
-  <div class="container">
-    <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer class="site-footer">
-  <div class="container">
-    <div class="site-footer__top">
-      <div class="site-footer__brand">
-        <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
-        <p>The home of the healthy challenge. Grow better together.</p>
-      </div>
-
-      <nav class="site-footer__nav" aria-label="Footer">
-        <a href="/blog.html">Blog</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
-        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
-        <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
-      </nav>
-    </div>
-
-    <div class="site-footer__legal">
-      <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
-      <p>Habits with friends.</p>
-    </div>
-  </div>
-</footer>
-
 </body>
 </html>

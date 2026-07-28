@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-world-rotate>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,20 +30,26 @@
   <!-- Icons and browser chrome -->
   <link rel="icon" type="image/png" href="/assets/img/app-icon.png">
   <link rel="apple-touch-icon" href="/assets/img/app-icon.png">
-  <meta name="theme-color" content="#FDFBF6">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F3F1E7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E0E12" media="(prefers-color-scheme: dark)">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Runs before the stylesheet, on purpose. It pins the theme for ?static=1
+       and stamps the day's category on the quest card, both of which must be
+       settled before CSS is parsed or the card repaints on load. Everything
+       else in the file still waits for DOMContentLoaded. -->
+  <script src="/js/site.js"></script>
 
   <!-- Styles -->
   <link rel="stylesheet" href="/css/site.css">
-  <link rel="stylesheet" href="/css/page-home.css">
-  <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
+  <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}.journey-stop{opacity:1}</style></noscript>
 
   <!-- Behaviour -->
-  <script src="/js/site.js" defer></script>
   <script src="/js/quest-card.js" defer></script>
 
   <script type="application/ld+json">
@@ -88,8 +94,10 @@
 
 <a class="skip-link" href="#main">Skip to content</a>
 
-<!-- Category line glyphs. Defined once, drawn wherever a medallion needs one.
-     currentColor strokes, so the ink comes from the element that uses them. -->
+<!-- Line glyphs, defined once and drawn wherever a medallion needs one.
+     currentColor strokes, so the ink comes from the element that uses them.
+     Category medallions do NOT live here: those are the app's own gradient
+     blob SVGs in /assets/img/icon-*.svg, referenced as images. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="g-lotus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M22.5085 15.4326C22.8337 15.8578 23.0089 16.3101 23.0089 16.7791C23.0089 19.2665 18.0799 21.2829 11.9996 21.2829C5.91928 21.2829 0.990234 19.2665 0.990234 16.7791C0.990234 16.3101 1.16548 15.8578 1.49063 15.4326"/>
@@ -97,16 +105,17 @@
     <path d="M8.40171 5.82592C6.62991 5.26442 4.77841 5.22817 3.55566 5.29327C2.71101 5.33827 2.05991 5.98937 2.01496 6.83402C1.90886 8.82642 2.07181 12.4882 4.33811 14.7545C5.93751 16.3539 8.00091 16.641 9.76426 15.8668C7.83806 15.1074 6.49501 13.3439 6.49501 10.9526C6.49501 9.01662 7.35861 7.25167 8.40171 5.82592Z"/>
     <path d="M15.5969 5.82592C16.64 7.25167 17.5036 9.01662 17.5036 10.9526C17.5036 13.3439 16.1606 15.1074 14.2344 15.8668C15.9977 16.641 18.0611 16.3539 19.6605 14.7545C21.9268 12.4882 22.0898 8.82642 21.9837 6.83407C21.9387 5.98937 21.2876 5.33827 20.443 5.29327C19.2202 5.22817 17.3687 5.26442 15.5969 5.82592Z"/>
   </symbol>
-  <symbol id="g-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M20.8 13.1A8.6 8.6 0 0 1 10.9 3.2 8.9 8.9 0 1 0 20.8 13.1Z"/>
-  </symbol>
-  <symbol id="g-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 21V11"/>
-    <path d="M12 12.5C8.4 12.5 5.5 9.6 5.5 6 9.1 6 12 8.9 12 12.5Z"/>
-    <path d="M12 15.5C12 11.9 14.9 9 18.5 9 18.5 12.6 15.6 15.5 12 15.5Z"/>
-  </symbol>
   <symbol id="g-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 3.5C12.6 8.6 15.4 11.4 20.5 12 15.4 12.6 12.6 15.4 12 20.5 11.4 15.4 8.6 12.6 3.5 12 8.6 11.4 11.4 8.6 12 3.5Z"/>
+  </symbol>
+  <symbol id="g-flame" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
+  </symbol>
+  <symbol id="g-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 12.5 9.5 18 20 6.5"/>
+  </symbol>
+  <symbol id="g-star" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/>
   </symbol>
 </svg>
 
@@ -115,192 +124,450 @@
     <a class="site-nav__logo" href="/" aria-label="Quests home">
       <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
     </a>
-    <a class="btn btn-sm" href="/#download" aria-label="Download Quests">Download</a>
+    <nav class="site-nav__links" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#inside">Inside the app</a>
+      <a href="/blog.html">Blog</a>
+    </nav>
+
+    <a class="btn btn-outline-white" href="#download" aria-label="Download Quests">Download</a>
   </div>
 </header>
 
-<main id="main">
+<!-- ============================== THE JOURNEY ==============================
+     One path element spans this whole element. js/site.js writes its viewBox
+     in real pixels and its d as a spline through the measured centres of the
+     [data-journey-point] markers below, so there is exactly one stroke from
+     the hero card to the gold milestone and no seam can exist at any width.
+     ====================================================================== -->
+<main id="main" class="journey" data-journey>
+
+  <svg class="journey__path" data-journey-svg aria-hidden="true" focusable="false">
+    <path class="journey__line" data-journey-line d=""></path>
+  </svg>
 
   <!-- ===================== HERO ===================== -->
   <section class="hero">
-    <!-- Cream base. Three discrete blurred blobs tint it: one behind the
-         headline, one behind the card, one quiet anchor between them. -->
-    <div class="blobs" aria-hidden="true">
-      <span class="blob blob--1"></span>
-      <span class="blob blob--2"></span>
-      <span class="blob blob--3"></span>
-      <span class="hero__pattern"></span>
-    </div>
-
-    <div class="hero__decor" aria-hidden="true">
-      <span class="medallion medallion--float hero__m1 cat-mindfulness">
-        <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
-      </span>
-      <span class="medallion medallion--float hero__m2 cat-recharge">
-        <svg class="glyph" aria-hidden="true"><use href="#g-moon"/></svg>
-      </span>
-      <span class="medallion medallion--float hero__m3 cat-growth">
-        <svg class="glyph" aria-hidden="true"><use href="#g-sprout"/></svg>
-      </span>
-      <span class="medallion medallion--float hero__m4 cat-social">
-        <svg class="glyph" aria-hidden="true"><use href="#g-spark"/></svg>
-      </span>
-    </div>
-
-    <div class="container hero__inner split split--wide-left">
-      <div>
-        <h1 class="hero__title load-in" style="--load-delay:0ms">Better, <em class="accent">together.</em></h1>
-
-        <p class="lede hero__sub load-in" style="--load-delay:100ms">
-          You're better at building habits when you do it with people you care about.
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <p class="hero__chip load-in" style="--load-delay:0ms">
+          <span class="chip cat-mindfulness"><span class="chip__dot"></span>The home of the healthy challenge</span>
         </p>
 
-        <div class="store-badges hero__cta load-in" style="--load-delay:200ms">
-          <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
-            <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
-          </a>
-          <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
-            <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
-          </a>
-        </div>
+        <h1 class="hero__title load-in" style="--load-delay:80ms">Better, <em class="accent">together.</em></h1>
 
-        <p class="note load-in" style="--load-delay:300ms">Free to download. iOS and Android.</p>
+        <div class="hero__rest">
+          <p class="hero__sub load-in" style="--load-delay:200ms">
+            You're better at building habits when you do it with people you care about.
+          </p>
+
+          <div class="store-badges hero__cta load-in" id="get" style="--load-delay:280ms">
+            <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
+              <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+            </a>
+            <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
+              <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+            </a>
+          </div>
+
+          <p class="hero__note load-in" style="--load-delay:360ms">Free to download. iOS and Android.</p>
+
+          <!-- The five loved glyphs, at the top of the page where they belong. -->
+          <div class="glyph-row hero__glyphs load-in" style="--load-delay:440ms">
+            <span class="glyph-row__set" aria-hidden="true">
+              <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28" decoding="async">
+              <img src="/assets/img/icon-recharge.svg" alt="" width="28" height="28" decoding="async">
+              <img src="/assets/img/icon-creativity.svg" alt="" width="28" height="28" decoding="async">
+              <img src="/assets/img/icon-growth.svg" alt="" width="28" height="28" decoding="async">
+              <img src="/assets/img/icon-social.svg" alt="" width="28" height="28" decoding="async">
+            </span>
+            <span class="glyph-row__line">Five ways to grow.</span>
+          </div>
+        </div>
       </div>
 
-      <div class="quest-card-stage load-settle" style="--load-delay:400ms">
-        <!-- Live quest card. Behaviour and markup contract: js/quest-card.js -->
-        <article class="quest-card cat-mindfulness" data-quest-card aria-label="Demo quest card. Hold to check in.">
+      <!-- The card is Day 12 ON the journey: the road starts at the marker
+           pinned under it and curls down to milestone 01. -->
+      <div class="hero__stage">
+        <span class="journey-start" data-journey-point aria-hidden="true"></span>
+
+        <!-- Live quest card. Replica of the app home card, CARD-SPEC.md.
+             Category, quest name, duration and medallion are stamped by the
+             day's category in js/site.js; the markup below is the mindfulness
+             default, which is also what runs with JavaScript off. This card is
+             the ONLY thing the rotation touches.
+             Behaviour contract: js/quest-card.js -->
+        <article class="quest-card cat-mindfulness load-settle" style="--load-delay:420ms" data-quest-card data-quest-done="Checked in for today." aria-label="Demo quest card. Hold to check in.">
           <span class="quest-card__fill" aria-hidden="true"></span>
 
           <div class="quest-card__inner">
-            <p class="eyebrow">Mindfulness</p>
+            <span class="quest-card__medallion" data-quest-medallion data-quest-glyph aria-hidden="true">
+              <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
+            </span>
 
-            <div class="quest-card__head">
-              <span class="medallion quest-card__medallion" data-quest-medallion>
-                <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
-              </span>
-              <div>
-                <p class="quest-card__name">Morning Run</p>
-                <p class="quest-card__meta">
-                  <span class="quest-card__streak">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
-                    Day 12
-                  </span>
-                  <span class="avatar-stack" aria-hidden="true">
-                    <span></span><span style="background:var(--c-recharge)"></span><span style="background:var(--c-creativity)"></span>
-                    <span class="avatar-stack__more">+3</span>
-                  </span>
-                </p>
-              </div>
+            <div class="quest-card__names">
+              <p class="quest-card__name" data-quest-name>Morning Meditation</p>
+              <p class="quest-card__duration" data-quest-duration>Day 12 of 30</p>
             </div>
 
-            <p class="quest-card__hint" aria-hidden="true">
-              <span class="quest-card__hint-idle">Hold to check in</span>
-              <span class="quest-card__hint-done">
-                Checked in today
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg>
-              </span>
-            </p>
+            <div class="quest-card__actions">
+              <p class="quest-card__status">
+                <span class="avatar-stack" aria-hidden="true">
+                  <span style="background:var(--c-mindfulness)"></span>
+                  <span style="background:var(--c-recharge)"></span>
+                  <span style="background:var(--c-creativity)"></span>
+                </span>
+                <span class="quest-card__caption">+3 checked-in today</span>
+              </p>
+
+              <button class="quest-card__pill" type="button" aria-pressed="false" data-quest-press>
+                <span class="quest-card__pill-label is-idle">Tap &amp; Hold to check in</span>
+                <span class="quest-card__pill-label is-done">
+                  Checked in today
+                  <svg aria-hidden="true"><use href="#g-check"/></svg>
+                </span>
+                <span class="u-sr-only" data-quest-a11y>Hold to check in to Morning Meditation</span>
+              </button>
+            </div>
           </div>
-
-          <button class="quest-card__press" type="button" aria-pressed="false" data-quest-press>
-            <span class="u-sr-only" data-quest-a11y>Hold to check in to Morning Run</span>
-          </button>
-
-          <span class="quest-card__confetti" aria-hidden="true" data-quest-confetti></span>
         </article>
       </div>
     </div>
   </section>
 
 
-  <!-- ===================== HOW IT WORKS ===================== -->
-  <section class="section" aria-labelledby="how-title">
+  <!-- ===================== CHALLENGE MARQUEE ===================== -->
+  <section class="marquee" aria-label="Challenges you can join">
+    <div class="marquee__track">
+      <ul class="marquee__group">
+        <li><span class="chip cat-growth"><img class="chip__icon" src="/assets/img/icon-growth.svg" alt="" width="18" height="18" loading="lazy" decoding="async">75 Hard</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Sober October</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Dry January</span></li>
+        <li><span class="chip cat-social"><img class="chip__icon" src="/assets/img/icon-social.svg" alt="" width="18" height="18" loading="lazy" decoding="async">C25K</span></li>
+        <li><span class="chip cat-recharge"><img class="chip__icon" src="/assets/img/icon-recharge.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Cold Plunge</span></li>
+        <li><span class="chip cat-social"><img class="chip__icon" src="/assets/img/icon-social.svg" alt="" width="18" height="18" loading="lazy" decoding="async">10,000 Steps</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">30 Days of Yoga</span></li>
+        <li><span class="chip cat-growth"><img class="chip__icon" src="/assets/img/icon-growth.svg" alt="" width="18" height="18" loading="lazy" decoding="async">No-Sugar Month</span></li>
+        <li><span class="chip cat-creativity"><img class="chip__icon" src="/assets/img/icon-creativity.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Read Daily</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Meditation Streak</span></li>
+      </ul>
+      <ul class="marquee__group" aria-hidden="true">
+        <li><span class="chip cat-growth"><img class="chip__icon" src="/assets/img/icon-growth.svg" alt="" width="18" height="18" loading="lazy" decoding="async">75 Hard</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Sober October</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Dry January</span></li>
+        <li><span class="chip cat-social"><img class="chip__icon" src="/assets/img/icon-social.svg" alt="" width="18" height="18" loading="lazy" decoding="async">C25K</span></li>
+        <li><span class="chip cat-recharge"><img class="chip__icon" src="/assets/img/icon-recharge.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Cold Plunge</span></li>
+        <li><span class="chip cat-social"><img class="chip__icon" src="/assets/img/icon-social.svg" alt="" width="18" height="18" loading="lazy" decoding="async">10,000 Steps</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">30 Days of Yoga</span></li>
+        <li><span class="chip cat-growth"><img class="chip__icon" src="/assets/img/icon-growth.svg" alt="" width="18" height="18" loading="lazy" decoding="async">No-Sugar Month</span></li>
+        <li><span class="chip cat-creativity"><img class="chip__icon" src="/assets/img/icon-creativity.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Read Daily</span></li>
+        <li><span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Meditation Streak</span></li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ===================== MILESTONE 01, HOW IT WORKS ===================== -->
+  <section class="section cat-mindfulness" id="how" aria-labelledby="how-title">
+    <span class="journey-stop journey-stop--left reveal" data-journey-point aria-hidden="true">
+      <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28" loading="lazy" decoding="async">
+    </span>
+
     <div class="container">
-      <div class="section__head center reveal">
-        <p class="eyebrow">How it works</p>
+      <div class="section__head reveal">
+        <p class="eyebrow eyebrow--stop"><span class="eyebrow__num">Milestone 01</span><span>How it works</span></p>
         <h2 id="how-title">Habits are hard to build. Friends make them stick.</h2>
-        <p class="lede" style="margin-top:var(--s-20)">Strava made running social. We're doing it for the rest of habits.</p>
+        <p class="lede">Strava made running social. We're doing it for the rest of habits.</p>
       </div>
 
       <ol class="grid-3 steps">
-        <li class="card card--feature cat-mindfulness reveal" data-reveal-delay="0">
-          <span class="pattern-band" aria-hidden="true"></span>
+        <li class="card step cat-mindfulness reveal" data-reveal-delay="0">
           <div class="step__head">
-            <span class="medallion">
-              <svg class="glyph" aria-hidden="true"><use href="#g-lotus"/></svg>
+            <span class="medallion medallion--sm" aria-hidden="true">
+              <svg class="glyph"><use href="#g-lotus"/></svg>
             </span>
             <span class="step__num">01</span>
           </div>
           <h3 class="card__title">Pick a quest with friends</h3>
           <p class="card__text">Choose from 100+ curated challenges like 75 Hard, Dry January, and C25K, then invite the people you want beside you.</p>
+
+          <div class="step__object" aria-hidden="true">
+            <span class="chip cat-growth"><img class="chip__icon" src="/assets/img/icon-growth.svg" alt="" width="18" height="18" loading="lazy" decoding="async">75 Hard</span>
+            <span class="chip cat-mindfulness"><img class="chip__icon" src="/assets/img/icon-mindfulness.svg" alt="" width="18" height="18" loading="lazy" decoding="async">Dry January</span>
+            <span class="chip cat-social"><img class="chip__icon" src="/assets/img/icon-social.svg" alt="" width="18" height="18" loading="lazy" decoding="async">C25K</span>
+          </div>
         </li>
 
-        <li class="card card--feature cat-recharge reveal" data-reveal-delay="100">
-          <span class="pattern-band" aria-hidden="true"></span>
+        <li class="card step cat-recharge reveal" data-reveal-delay="90">
           <div class="step__head">
-            <span class="medallion">
-              <svg class="glyph" aria-hidden="true"><use href="#g-moon"/></svg>
+            <span class="medallion medallion--sm" aria-hidden="true">
+              <img src="/assets/img/icon-recharge.svg" alt="" width="26" height="26" loading="lazy" decoding="async">
             </span>
             <span class="step__num">02</span>
           </div>
           <h3 class="card__title">Check in every day</h3>
           <p class="card__text">One tap logs your day, and everyone in your quest sees it land on the leaderboard.</p>
+
+          <div class="step__object" aria-hidden="true">
+            <article class="quest-card quest-card--mini cat-recharge">
+              <span class="quest-card__fill"></span>
+              <div class="quest-card__inner">
+                <span class="quest-card__medallion">
+                  <img src="/assets/img/icon-recharge.svg" alt="" width="20" height="20" loading="lazy" decoding="async">
+                </span>
+                <div class="quest-card__names">
+                  <p class="quest-card__name">Cold Plunge</p>
+                  <p class="quest-card__duration">Day 6 of 14</p>
+                </div>
+                <div class="quest-card__actions">
+                  <span class="quest-card__pill">Tap &amp; Hold to check in</span>
+                </div>
+              </div>
+            </article>
+          </div>
         </li>
 
-        <li class="card card--feature cat-growth reveal" data-reveal-delay="200">
-          <span class="pattern-band" aria-hidden="true"></span>
+        <li class="card step cat-growth reveal" data-reveal-delay="180">
           <div class="step__head">
-            <span class="medallion">
-              <svg class="glyph" aria-hidden="true"><use href="#g-sprout"/></svg>
+            <span class="medallion medallion--sm" aria-hidden="true">
+              <img src="/assets/img/icon-growth.svg" alt="" width="26" height="26" loading="lazy" decoding="async">
             </span>
             <span class="step__num">03</span>
           </div>
           <h3 class="card__title">Earn streaks, Cards, and real rewards</h3>
           <p class="card__text">Your streak grows, your Points add up, and you trade them for collectible Quest Cards and rewards in the marketplace.</p>
+
+          <div class="step__object" aria-hidden="true">
+            <span class="chip mini-flame cat-creativity">
+              <svg viewBox="0 0 24 24"><use href="#g-flame"/></svg>12 day streak
+            </span>
+            <span class="chip mini-points">700 Points</span>
+            <span class="mini-card"><svg><use href="#g-spark"/></svg></span>
+          </div>
         </li>
       </ol>
     </div>
   </section>
 
 
-  <!-- ===================== SCIENCE STRIP ===================== -->
-  <section class="section section--wash science cat-mindfulness" aria-labelledby="science-title">
-    <span class="pattern-field pattern-field--fade" aria-hidden="true"></span>
+  <!-- ===================== MILESTONE 02, INSIDE THE APP ===================== -->
+  <section class="section section--tight cat-recharge" id="inside" aria-labelledby="inside-title">
+    <span class="journey-stop journey-stop--right reveal" data-journey-point aria-hidden="true">
+      <img src="/assets/img/icon-recharge.svg" alt="" width="28" height="28" loading="lazy" decoding="async">
+    </span>
 
-    <div class="container container--narrow layer-up center reveal">
-      <p class="eyebrow">Backed by science</p>
-      <h2 id="science-title" class="science__headline">
-        <span class="science__stat">76%</span>
-        <span class="science__line">of people reach their goal when a friend checks in on their progress every week.</span>
-      </h2>
-      <p class="science__support">That's more than double the odds of going it alone.</p>
-      <p class="science__cite">Source: Dominican University of California study on goal achievement and accountability.</p>
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="eyebrow eyebrow--stop"><span class="eyebrow__num">Milestone 02</span><span>Inside the app</span></p>
+        <h2 id="inside-title">Beautiful, humanist, and effective.</h2>
+      </div>
+
+      <div class="inside__row cat-mindfulness reveal">
+        <div class="inside__art">
+          <div class="device">
+            <span class="device__notch" aria-hidden="true"></span>
+            <div class="device__screen">
+              <img src="/assets/img/app-screen-roadmap-560.png" alt="The Quests app showing a quest roadmap with a daily check-in card" width="560" height="1217" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="inside__copy">
+          <h3>Follow the path together</h3>
+          <ul class="inside__bullets">
+            <li>Every quest is a roadmap, and each check-in moves you one milestone further along it.</li>
+            <li>Your friends walk the same path, so you always see where everyone is.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="inside__row inside__row--flip cat-growth reveal">
+        <div class="inside__art">
+          <div class="device">
+            <span class="device__notch" aria-hidden="true"></span>
+            <div class="device__screen">
+              <img src="/assets/img/app-screen-marketplace-560.png" alt="The Quests app marketplace showing points, rewards, and the Quest Pass" width="560" height="1217" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+        <div class="inside__copy">
+          <h3>Turn streaks into rewards</h3>
+          <ul class="inside__bullets">
+            <li>Daily check-ins build your streak and stack up Points.</li>
+            <li>Spend Points in the marketplace on collectible Quest Cards and real rewards.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- The real journey canvas, cropped to display size. Light and dark
+           crops both ship; site.css shows the one that matches the mode. -->
+      <div class="inside__row cat-mindfulness reveal">
+        <div class="inside__art">
+          <div class="journey-panel">
+            <img class="art-light" src="/assets/img/journey/journey-mindfulness-light.webp" alt="A stretch of the mindfulness quest roadmap from the Quests app" width="402" height="830" loading="lazy" decoding="async">
+            <img class="art-dark" src="/assets/img/journey/journey-mindfulness-dark.webp" alt="A stretch of the mindfulness quest roadmap from the Quests app in dark mode" width="402" height="830" loading="lazy" decoding="async">
+            <span class="journey-panel__stop" aria-hidden="true">
+              <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28" loading="lazy" decoding="async">
+            </span>
+          </div>
+        </div>
+        <div class="inside__copy">
+          <h3>Every quest has its own world</h3>
+          <ul class="inside__bullets">
+            <li>The road you walk is drawn for your category, so a meditation streak and a run club feel like different places.</li>
+            <li>Milestones surface along the way, and the next stretch opens up as you go.</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
 
-  <!-- ===================== PROOF ROW ===================== -->
-  <section class="section section--tight section--fade" aria-labelledby="proof-title">
+  <!-- ===================== MILESTONE 03, FIVE WORLDS GALLERY ===================== -->
+  <section class="section section--tight cat-creativity" id="worlds" aria-labelledby="worlds-title">
+    <span class="journey-stop journey-stop--left reveal" data-journey-point aria-hidden="true">
+      <img src="/assets/img/icon-creativity.svg" alt="" width="28" height="28" loading="lazy" decoding="async">
+    </span>
+
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="eyebrow eyebrow--stop"><span class="eyebrow__num">Milestone 03</span><span>Pick your path</span></p>
+        <h2 id="worlds-title">Five worlds to grow in.</h2>
+      </div>
+
+      <ul class="worlds__row">
+        <li class="world-card cat-mindfulness reveal" data-reveal-delay="0">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="/assets/img/roadmap/path-block02a-mindfulness-dark.webp">
+            <img class="world-card__art" src="/assets/img/roadmap/path-block02a-mindfulness-light.webp" alt="" width="804" height="1510" loading="lazy" decoding="async">
+          </picture>
+          <div class="world-card__body">
+            <span class="world-card__medallion" aria-hidden="true">
+              <img src="/assets/img/icon-mindfulness.svg" alt="" width="22" height="22" loading="lazy" decoding="async">
+            </span>
+            <h3 class="world-card__name">Mindfulness</h3>
+            <p class="world-card__line">Breathe, journal, unplug.</p>
+          </div>
+        </li>
+
+        <li class="world-card cat-recharge reveal" data-reveal-delay="60">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="/assets/img/roadmap/path-block02a-recharge-dark.webp">
+            <img class="world-card__art" src="/assets/img/roadmap/path-block02a-recharge-light.webp" alt="" width="804" height="1510" loading="lazy" decoding="async">
+          </picture>
+          <div class="world-card__body">
+            <span class="world-card__medallion" aria-hidden="true">
+              <img src="/assets/img/icon-recharge.svg" alt="" width="22" height="22" loading="lazy" decoding="async">
+            </span>
+            <h3 class="world-card__name">Recharge</h3>
+            <p class="world-card__line">Sleep, cold plunges, recovery.</p>
+          </div>
+        </li>
+
+        <li class="world-card cat-creativity reveal" data-reveal-delay="120">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="/assets/img/roadmap/path-block02a-creativity-dark.webp">
+            <img class="world-card__art" src="/assets/img/roadmap/path-block02a-creativity-light.webp" alt="" width="804" height="1510" loading="lazy" decoding="async">
+          </picture>
+          <div class="world-card__body">
+            <span class="world-card__medallion" aria-hidden="true">
+              <img src="/assets/img/icon-creativity.svg" alt="" width="22" height="22" loading="lazy" decoding="async">
+            </span>
+            <h3 class="world-card__name">Creativity</h3>
+            <p class="world-card__line">Sketch, write, make things.</p>
+          </div>
+        </li>
+
+        <li class="world-card cat-growth reveal" data-reveal-delay="180">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="/assets/img/roadmap/path-block02a-productivity-dark.webp">
+            <img class="world-card__art" src="/assets/img/roadmap/path-block02a-productivity-light.webp" alt="" width="804" height="1510" loading="lazy" decoding="async">
+          </picture>
+          <div class="world-card__body">
+            <span class="world-card__medallion" aria-hidden="true">
+              <img src="/assets/img/icon-growth.svg" alt="" width="22" height="22" loading="lazy" decoding="async">
+            </span>
+            <h3 class="world-card__name">Growth</h3>
+            <p class="world-card__line">Read, learn, level up.</p>
+          </div>
+        </li>
+
+        <li class="world-card cat-social reveal" data-reveal-delay="240">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="/assets/img/roadmap/path-block02a-social-dark.webp">
+            <img class="world-card__art" src="/assets/img/roadmap/path-block02a-social-light.webp" alt="" width="804" height="1510" loading="lazy" decoding="async">
+          </picture>
+          <div class="world-card__body">
+            <span class="world-card__medallion" aria-hidden="true">
+              <img src="/assets/img/icon-social.svg" alt="" width="22" height="22" loading="lazy" decoding="async">
+            </span>
+            <h3 class="world-card__name">Social</h3>
+            <p class="world-card__line">Show up with your people.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ===================== MILESTONE 04, SCIENCE ===================== -->
+  <section class="section section--tight cat-growth" id="science" aria-labelledby="science-title">
+    <span class="journey-stop journey-stop--right reveal" data-journey-point aria-hidden="true">
+      <img src="/assets/img/icon-growth.svg" alt="" width="28" height="28" loading="lazy" decoding="async">
+    </span>
+
+    <div class="container">
+      <div class="card science__card reveal">
+        <p class="science__stat" aria-hidden="true">76%</p>
+        <div>
+          <p class="eyebrow eyebrow--stop" style="margin-bottom:var(--s-16)"><span class="eyebrow__num">Milestone 04</span><span>Backed by science</span></p>
+          <h2 id="science-title" class="science__line">
+            <span class="u-sr-only">76% </span>of people reach their goal when a friend checks in on their progress every week.
+          </h2>
+          <p class="science__support">That's more than double the odds of going it alone.</p>
+          <p class="science__cite">Source: Dominican University of California study on goal achievement and accountability.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== MILESTONE 05, PROOF ===================== -->
+  <section class="section section--tight cat-social" id="proof" aria-labelledby="proof-title">
+    <span class="journey-stop journey-stop--left reveal" data-journey-point aria-hidden="true">
+      <img src="/assets/img/icon-social.svg" alt="" width="28" height="28" loading="lazy" decoding="async">
+    </span>
+
     <div class="container container--narrow center reveal">
+      <p class="eyebrow eyebrow--stop" style="justify-content:center;margin-bottom:var(--s-20)"><span class="eyebrow__num">Milestone 05</span><span>The proof</span></p>
       <span class="proof__stars" role="img" aria-label="Rated 4.9 out of 5 on the App Store">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.31l-5.8 3.05 1.1-6.46-4.7-4.58 6.5-.94L12 2.5z"/></svg>
+        <svg aria-hidden="true"><use href="#g-star"/></svg>
+        <svg aria-hidden="true"><use href="#g-star"/></svg>
+        <svg aria-hidden="true"><use href="#g-star"/></svg>
+        <svg aria-hidden="true"><use href="#g-star"/></svg>
+        <svg aria-hidden="true"><use href="#g-star"/></svg>
       </span>
       <h2 id="proof-title" class="proof__title">4.9 stars on the App Store</h2>
       <p class="proof__line">Questers show up for each other every day, and they keep telling us it works.</p>
+
+      <ul class="proof__stats">
+        <li><span class="chip chip--solid chip--bold">100+ curated challenges</span></li>
+        <li><span class="chip chip--solid chip--bold">Free to download</span></li>
+        <li><span class="chip chip--solid chip--bold">iOS and Android</span></li>
+      </ul>
     </div>
   </section>
 
 
-  <!-- ===================== FINAL CTA ===================== -->
-  <section class="section final-cta" id="download" aria-labelledby="cta-title">
+  <!-- ===================== QUEST COMPLETE, FINAL CTA ===================== -->
+  <section class="cta cat-growth" id="download" aria-labelledby="cta-title">
+    <span class="journey-stop journey-stop--gold journey-stop--center reveal" data-journey-point aria-hidden="true">
+      <svg class="glyph"><use href="#g-check"/></svg>
+    </span>
+
     <div class="container container--narrow center reveal">
-      <h2 id="cta-title" class="final-cta__title">Your friends are waiting.</h2>
-      <p class="lede final-cta__sub">Pick a challenge, invite your people, and start your streak today.</p>
+      <p class="eyebrow eyebrow--stop cta__eyebrow"><span class="eyebrow__num">Quest complete</span></p>
+      <h2 id="cta-title" class="cta__title">Your friends are waiting.</h2>
+      <p class="cta__sub">Pick a challenge, invite your people, and start your streak today.</p>
 
       <div class="store-badges store-badges--center">
         <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
@@ -311,7 +578,7 @@
         </a>
       </div>
 
-      <p class="note">Free to download. iOS and Android.</p>
+      <p class="cta__note">Free to download. iOS and Android.</p>
     </div>
   </section>
 
@@ -321,7 +588,8 @@
 <!-- ===================== GIANT WORDMARK BAND ===================== -->
 <div class="wordmark-band reveal">
   <div class="container">
-    <img src="/assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async">
+    <img class="art-light" src="/assets/img/wordmark-caps-ink.png" alt="" aria-hidden="true" width="2241" height="593" loading="lazy" decoding="async">
+    <img class="art-dark" src="/assets/img/wordmark-caps-white.png" alt="" aria-hidden="true" width="2044" height="541" loading="lazy" decoding="async">
   </div>
 </div>
 
@@ -332,23 +600,35 @@
     <div class="site-footer__top">
       <div class="site-footer__brand">
         <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
-        <p>The home of the healthy challenge. Grow better together.</p>
+        <p>The home of the healthy challenge.</p>
+        <div class="site-footer__social">
+          <a href="https://instagram.com/quests.app" target="_blank" rel="noopener" aria-label="Quests on Instagram">Instagram</a>
+          <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener" aria-label="Quests on TikTok">TikTok</a>
+          <a href="https://x.com/Quests_app_" target="_blank" rel="noopener" aria-label="Quests on X">X</a>
+        </div>
       </div>
 
-      <nav class="site-footer__nav" aria-label="Footer">
-        <a href="/blog.html">Blog</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
-        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
-        <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
+      <nav class="site-footer__col" aria-label="Product">
+        <h2>Product</h2>
+        <ul>
+          <li><a href="#download">Download</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Legal">
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/privacy.html">Privacy</a></li>
+          <li><a href="/terms.html">Terms</a></li>
+        </ul>
       </nav>
     </div>
 
     <div class="site-footer__legal">
-      <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
-      <p>Habits with friends.</p>
+      <p>&copy; <span data-year>2026</span> Nothing Serious LLC</p>
+      <p>Download Quests on iOS and Android.</p>
     </div>
   </div>
 </footer>

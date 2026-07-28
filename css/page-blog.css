@@ -1,13 +1,9 @@
 /* ==========================================================================
-   Quests V2 — blog.html page-specific styles
-   Foundation tokens and components come from css/site.css. This file only
-   adds the things unique to the blog list: the post grid and its card meta
-   row and category chip.
+   Quests V4, blog.html page-specific styles
+   Foundation tokens and components (the journey system, page-header, .card,
+   .card--hover) come from css/site.css. This file only adds what's unique
+   to the blog list: the post grid, the category chip, and the hover lift.
    ========================================================================== */
-
-.blog-hero h1 {
-  font-size: var(--fs-section);
-}
 
 .blog-grid {
   display: grid;
@@ -18,18 +14,22 @@
 .blog-card {
   display: flex;
   flex-direction: column;
+  transition: transform var(--t-mid) var(--ease), box-shadow var(--t-mid) var(--ease);
+}
+.blog-card:hover {
+  transform: translateY(-4px);
 }
 
 .blog-card__category {
   display: inline-flex;
   align-self: flex-start;
   padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--purple-pale);
-  color: var(--purple-deep);
+  border-radius: var(--r-pill);
+  background: var(--cat-soft);
+  color: var(--cat-text);
   font-family: var(--font-ui);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin-bottom: var(--s-16);

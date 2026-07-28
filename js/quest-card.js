@@ -1,211 +1,204 @@
 /* ==========================================================================
-   Quests V2: hold to check in card (the signature element)
-   Vanilla, dependency free, safe to load with
-   <script src="/js/quest-card.js" defer>. Styles live in css/site.css.
+   Quests V2: hold to check in card
+   A replica of the app's home quest card interaction. Every timing below is
+   quoted from CARD-SPEC.md, which was extracted from the app source. The one
+   site-specific addition is the polite reset, so the demo can be tried again.
 
-   HOW IT FEELS
-   - Press and hold anywhere on the card. A category coloured fill rises from
-     the bottom over 1.2s.
-   - Hold all the way: quick spring, the medallion coin flips, the hint pill
-     becomes "Checked in today" with a check in the category colour, and a
-     small confetti burst fires once.
-   - Let go early: the fill drains back.
-   - 2.5s after a successful check in the card resets itself so the next
-     visitor gets to try.
-   - prefers-reduced-motion: a single tap toggles the checked state instantly,
-     no fill animation, no confetti.
-   - Keyboard: the press target is a real button. Hold Space or Enter.
+   TIMINGS (app source)
+     400ms   tap disambiguation before the press engages
+     1800ms  linear bottom-up fill (scaleY, origin bottom)
+     250ms   fill opacity fade-in
+     150ms   end grace window: release inside it still completes
+     180ms   rewind on early release
+     260ms   fill dissolve on completion
+     900ms   medallion lift 12px (250) > coin flip on Y (400) > drop (250)
+     460ms   card pop to 1.04 and spring back
+     3000ms  polite reset back to idle (site only)
 
-   MARKUP CONTRACT (copy this, swap the category class, icon, name and meta)
-   ---------------------------------------------------------------------------
-   <article class="quest-card cat-mindfulness" data-quest-card>
-     <span class="quest-card__fill" aria-hidden="true"></span>
+   BEHAVIOUR
+     Pointer: press and hold anywhere on the card body.
+     Keyboard: focus the pill, hold Space or Enter.
+     prefers-reduced-motion: a tap toggles the flood state instantly.
 
-     <div class="quest-card__inner">
-       <div class="quest-card__head">
-         <span class="medallion quest-card__medallion" data-quest-medallion>
-           <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28">
-         </span>
-         <div>
-           <h3 class="quest-card__name">Morning Run</h3>
-           <p class="quest-card__meta">
-             <span class="quest-card__streak">
-               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="..."/></svg>
-               Day 12
-             </span>
-             <span class="avatar-stack" aria-hidden="true">
-               <span></span><span></span><span></span>
-               <span class="avatar-stack__more">+3</span>
-             </span>
-           </p>
-         </div>
-       </div>
-
-       <p class="quest-card__hint" aria-hidden="true">
-         <span class="quest-card__hint-idle">Hold to check in</span>
-         <span class="quest-card__hint-done">
-           Checked in today
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-             <path d="M4 12.5 9.5 18 20 6.5"/>
-           </svg>
-         </span>
-       </p>
-     </div>
-
-     <button class="quest-card__press" type="button" aria-pressed="false" data-quest-press>
-       <span class="u-sr-only" data-quest-a11y>Hold to check in to Morning Run</span>
-     </button>
-
-     <span class="quest-card__confetti" aria-hidden="true" data-quest-confetti></span>
-   </article>
-   ---------------------------------------------------------------------------
-   Required hooks: [data-quest-card] root, .quest-card__fill, [data-quest-press].
-   Optional hooks: [data-quest-confetti], [data-quest-a11y], [data-quest-medallion].
-   The category class (.cat-mindfulness, .cat-recharge, .cat-creativity,
-   .cat-growth, .cat-social) drives the fill, pill and check colours.
-   State lives in data-state on the root: idle | holding | draining | checked.
-   Reduced motion note: the confetti layer sits inside the card, which clips at
-   its 40px radius, so dots travel a short distance and stay on the surface.
+   MARKUP CONTRACT
+     [data-quest-card]        root, carries data-state and a .cat-* class
+     .quest-card__fill        the fill sheet
+     [data-quest-press]       the button that receives the press
+     [data-quest-medallion]   optional, gets the coin flip
+     [data-quest-a11y]        optional live region text
+   State on the root: idle | holding | rewind | checked
    ========================================================================== */
 (function () {
   'use strict';
 
-  var HOLD_MS = 1200;   // fill duration, matches the CSS transition
-  var DRAIN_MS = 320;   // early release drain, matches the CSS transition
-  var POP_MS = 460;     // spring
-  var RESET_MS = 2500;  // polite reset after a successful check in
-  var CONFETTI = ['#FFD400', '#FF3333', '#48FF48', '#3BCCFF'];
+  var ENGAGE_MS = 400;
+  var FILL_MS = 1800;
+  var GRACE_MS = 150;
+  var REWIND_MS = 180;
+  var DISSOLVE_MS = 260;
+  var FLIP_MS = 900;
+  var POP_MS = 460;
+  var RESET_MS = 3000;
 
-  var motionQuery = window.matchMedia
+  var motion = window.matchMedia
     ? window.matchMedia('(prefers-reduced-motion: reduce)')
     : { matches: false };
 
-  function prefersReduced() { return !!motionQuery.matches; }
+  function reduced() { return !!motion.matches; }
 
   function QuestCard(root) {
     var press = root.querySelector('[data-quest-press]');
-    var confettiLayer = root.querySelector('[data-quest-confetti]');
-    var a11yLabel = root.querySelector('[data-quest-a11y]');
-    if (!press) return;
+    var fill = root.querySelector('.quest-card__fill');
+    var medallion = root.querySelector('[data-quest-medallion]');
+    var live = root.querySelector('[data-quest-a11y]');
+    if (!press || !fill) return;
 
-    var idleText = a11yLabel ? a11yLabel.textContent : '';
-    var holdTimer = null;
-    var drainTimer = null;
+    var idleText = live ? live.textContent : '';
+    var doneText = root.getAttribute('data-quest-done') || 'Checked in for today.';
+
+    var engageTimer = null;
+    var fillTimer = null;
+    var rewindTimer = null;
+    var flipTimer = null;
     var popTimer = null;
     var resetTimer = null;
-    var holding = false;
 
-    function clearTimer(t) { if (t) window.clearTimeout(t); return null; }
+    var pressed = false;    // pointer or key is down
+    var engaged = false;    // the 400ms delay has elapsed, the fill is running
+    var engagedAt = 0;
+
+    function clear(t) { if (t) window.clearTimeout(t); return null; }
+
+    function clearAll() {
+      engageTimer = clear(engageTimer);
+      fillTimer = clear(fillTimer);
+      rewindTimer = clear(rewindTimer);
+    }
 
     function setState(state) {
       root.setAttribute('data-state', state);
       var checked = state === 'checked';
       press.setAttribute('aria-pressed', checked ? 'true' : 'false');
-      if (a11yLabel) {
-        a11yLabel.textContent = checked ? 'Checked in today' : idleText;
-      }
+      if (live) live.textContent = checked ? doneText : idleText;
+    }
+
+    /* Park the fill at scale 0 with no transition, so the next hold starts clean. */
+    function parkFill() {
+      fill.style.transition = 'none';
+      fill.style.transform = '';
+      fill.style.opacity = '';
+      void fill.offsetWidth;
+      fill.style.transition = '';
     }
 
     function toIdle() {
-      holding = false;
-      holdTimer = clearTimer(holdTimer);
-      drainTimer = clearTimer(drainTimer);
-      resetTimer = clearTimer(resetTimer);
+      pressed = false;
+      engaged = false;
+      clearAll();
+      resetTimer = clear(resetTimer);
+      parkFill();
       setState('idle');
     }
 
-    function start(event) {
-      var checked = root.getAttribute('data-state') === 'checked';
+    function engage() {
+      engaged = true;
+      engagedAt = Date.now();
+      parkFill();
+      setState('holding');
+      fillTimer = clear(fillTimer);
+      fillTimer = window.setTimeout(complete, FILL_MS);
+    }
 
-      if (prefersReduced()) {
-        // Tap toggles, instantly, both ways.
-        if (checked) toIdle();
-        else complete();
+    function start(event) {
+      if (root.getAttribute('data-state') === 'checked') {
+        if (reduced()) toIdle();
         return;
       }
+      if (reduced()) { complete(); return; }
+      if (pressed) return;
 
-      if (checked) return;
-
-      if (holding) return;
-      holding = true;
-      drainTimer = clearTimer(drainTimer);
-      setState('holding');
+      pressed = true;
+      rewindTimer = clear(rewindTimer);
       if (event && event.pointerId !== undefined && press.setPointerCapture) {
         try { press.setPointerCapture(event.pointerId); } catch (err) { /* ignore */ }
       }
-      holdTimer = clearTimer(holdTimer);
-      holdTimer = window.setTimeout(complete, HOLD_MS);
+      engageTimer = clear(engageTimer);
+      engageTimer = window.setTimeout(engage, ENGAGE_MS);
     }
 
     function release() {
-      if (!holding) return;
-      holding = false;
-      holdTimer = clearTimer(holdTimer);
+      if (!pressed) return;
+      pressed = false;
+      engageTimer = clear(engageTimer);
+
+      if (!engaged) return;                 // released inside the 400ms tap window
       if (root.getAttribute('data-state') !== 'holding') return;
-      setState('draining');
-      drainTimer = clearTimer(drainTimer);
-      drainTimer = window.setTimeout(function () { setState('idle'); }, DRAIN_MS);
+
+      var elapsed = Date.now() - engagedAt;
+      if (elapsed >= FILL_MS - GRACE_MS) { complete(); return; }
+
+      // Rewind from wherever the fill currently sits, over 180ms. Read the
+      // live matrix first, then hand the sheet an inline transition so the
+      // drop starts from the exact height the visitor let go at.
+      engaged = false;
+      fillTimer = clear(fillTimer);
+      var now = window.getComputedStyle(fill).transform;
+      setState('rewind');
+      fill.style.transition = 'none';
+      fill.style.transform = (now && now !== 'none') ? now : 'scaleY(0)';
+      void fill.offsetWidth;
+      fill.style.transition = 'transform ' + REWIND_MS + 'ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+      fill.style.transform = 'scaleY(0)';
+      rewindTimer = clear(rewindTimer);
+      rewindTimer = window.setTimeout(function () {
+        parkFill();
+        setState('idle');
+      }, REWIND_MS);
     }
 
     function complete() {
-      holding = false;
-      holdTimer = clearTimer(holdTimer);
-      drainTimer = clearTimer(drainTimer);
+      pressed = false;
+      engaged = false;
+      clearAll();
+
+      // Freeze the fill where it is, then let the checked state dissolve it
+      // while the card floods with the category pale pair.
+      fill.style.transition = 'none';
+      fill.style.transform = 'scaleY(1)';
+      void fill.offsetWidth;
+      fill.style.transition = '';
       setState('checked');
 
-      if (!prefersReduced()) {
+      if (!reduced()) {
+        if (medallion) {
+          medallion.classList.remove('is-flip');
+          void medallion.offsetWidth;
+          medallion.classList.add('is-flip');
+          flipTimer = clear(flipTimer);
+          flipTimer = window.setTimeout(function () {
+            medallion.classList.remove('is-flip');
+          }, FLIP_MS);
+        }
+        root.classList.remove('is-pop');
+        void root.offsetWidth;
         root.classList.add('is-pop');
-        popTimer = clearTimer(popTimer);
+        popTimer = clear(popTimer);
         popTimer = window.setTimeout(function () { root.classList.remove('is-pop'); }, POP_MS);
-        burst();
       }
 
-      resetTimer = clearTimer(resetTimer);
-      resetTimer = window.setTimeout(function () {
-        if (prefersReduced()) {
-          toIdle();
-          return;
-        }
-        setState('draining');
-        drainTimer = clearTimer(drainTimer);
-        drainTimer = window.setTimeout(function () { setState('idle'); }, DRAIN_MS);
-      }, RESET_MS);
-    }
-
-    /* Small one shot confetti burst, transform and opacity only. */
-    function burst() {
-      if (!confettiLayer) return;
-      var count = 10;
-      var frag = document.createDocumentFragment();
-      var dots = [];
-
-      for (var i = 0; i < count; i++) {
-        var dot = document.createElement('i');
-        dot.className = 'qc-dot';
-        // upward fan, roughly 200deg of arc above the pill
-        var angle = (-160 + (i / (count - 1)) * 140 + (Math.random() * 16 - 8)) * Math.PI / 180;
-        var dist = 42 + Math.random() * 46;
-        dot.style.background = CONFETTI[i % CONFETTI.length];
-        dot.style.setProperty('--dx', Math.round(Math.cos(angle) * dist) + 'px');
-        dot.style.setProperty('--dy', Math.round(Math.sin(angle) * dist) + 'px');
-        dot.style.setProperty('--rot', Math.round(Math.random() * 300 - 150) + 'deg');
-        dot.style.animationDelay = (i * 12) + 'ms';
-        frag.appendChild(dot);
-        dots.push(dot);
+      // Polite reset so the next visitor gets to try it. Reduced motion keeps
+      // the flood until the visitor taps again, because there the tap is a
+      // toggle and a surprise state change would undo their own action.
+      resetTimer = clear(resetTimer);
+      if (!reduced()) {
+        resetTimer = window.setTimeout(toIdle, RESET_MS + DISSOLVE_MS);
       }
-
-      confettiLayer.appendChild(frag);
-      window.setTimeout(function () {
-        for (var j = 0; j < dots.length; j++) {
-          if (dots[j].parentNode) dots[j].parentNode.removeChild(dots[j]);
-        }
-      }, 1200);
     }
 
-    /* ---- Pointer (mouse, touch, pen) ---- */
+    /* ---- Pointer ---- */
     press.addEventListener('pointerdown', function (e) {
       if (e.button !== undefined && e.button !== 0) return;
+      e.preventDefault();
       start(e);
     });
     press.addEventListener('pointerup', release);
@@ -213,6 +206,7 @@
     press.addEventListener('pointerleave', release);
     press.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     press.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    press.addEventListener('click', function (e) { e.preventDefault(); });
 
     /* ---- Keyboard: hold Space or Enter ---- */
     press.addEventListener('keydown', function (e) {
@@ -227,11 +221,10 @@
       release();
     });
     press.addEventListener('blur', release);
-    press.addEventListener('click', function (e) { e.preventDefault(); });
 
-    /* Pointer devices without pointer events fall back to a plain tap. */
+    /* Devices without pointer events fall back to a tap that completes. */
     if (!window.PointerEvent) {
-      press.addEventListener('click', function () { complete(); });
+      press.addEventListener('touchstart', function (e) { e.preventDefault(); complete(); }, { passive: false });
     }
 
     toIdle();

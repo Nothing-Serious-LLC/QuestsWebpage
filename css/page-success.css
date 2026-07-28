@@ -1,33 +1,26 @@
 /* ==========================================================================
    Quests V2 - success.html page-specific styles
-   Foundation tokens and components come from css/site.css. This file only
-   adds the things unique to the Pro upgrade redirect card: the check
-   medallion and the fallback reveal.
+   Foundation tokens, the .world page-header band and the .card white surface
+   come from css/site.css. This file only adds the things unique to the Pro
+   upgrade redirect card: the check medallion and the fallback reveal.
    ========================================================================== */
-
-.success-section {
-  min-height: calc(100vh - var(--nav-h));
-  min-height: calc(100dvh - var(--nav-h));
-  display: flex;
-  align-items: center;
-}
 
 .success-card {
   max-width: 420px;
   margin-inline: auto;
-}
-
-.success-card h1 {
-  font-size: var(--fs-section);
-  margin-top: var(--s-24);
+  text-align: center;
 }
 
 .success-check {
-  width: 64px;
-  height: 64px;
+  /* Gold quest-complete medallion, per DESIGN-BRIEF-V4: this page's own
+     completion moment. Uses the site's gold tokens, fixed brand constants
+     that hold their color in both light and dark mode. */
+  width: 68px;
+  height: 68px;
   margin-inline: auto;
   border-radius: 50%;
-  background: var(--purple-pale);
+  border: 2px solid var(--gold);
+  background: linear-gradient(150deg, var(--gold-lit) 0%, var(--gold) 62%, #C79526 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,35 +29,37 @@
 .success-check svg {
   width: 30px;
   height: 30px;
-  color: var(--purple-deep);
+  color: var(--gold-ink);
 }
 
 .success-status {
-  margin-top: var(--s-12);
+  margin-top: var(--s-16);
+  color: var(--ink-2);
 }
 
 .success-fallback {
   margin-top: var(--s-32);
   opacity: 0;
-  transition: opacity 400ms var(--ease-out);
+  transition: opacity 400ms var(--ease);
 }
 
 .success-fallback.is-visible { opacity: 1; }
 
 .success-fallback__hint {
   font-size: var(--fs-small);
+  color: var(--ink-2);
   margin-bottom: var(--s-16);
 }
 
 .success-fallback .btn,
 .success-fallback .btn-ghost {
   width: 100%;
-}
-
-.success-fallback a.btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.success-fallback a.btn-ghost {
   margin-top: var(--s-12);
 }
 

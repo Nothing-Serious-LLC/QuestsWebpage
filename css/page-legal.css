@@ -1,18 +1,25 @@
 /* ============================================================================
-   Quests V2 — page-specific styles for privacy.html and terms.html
+   Quests V4: page-specific styles for privacy.html and terms.html
    Foundation tokens and .prose come from css/site.css. This file only adds
    the small handful of rules specific to the long-form legal layout:
    the header block, the table of contents card, and the CCPA data table.
    ============================================================================ */
 
-.legal-updated {
-  margin-top: var(--s-12);
-  color: var(--ink-2);
-  font-size: var(--fs-small);
+/* The legal column: page-header carries the title, so this is the whole
+   read column beneath it. Capped to a 65ch measure per the design brief,
+   independent of .container--narrow (which runs wider elsewhere on the
+   site). Cards stack inside it with one consistent gap. */
+.legal-col {
+  max-width: 65ch;
+  margin-inline: auto;
+  display: grid;
+  gap: var(--s-32);
 }
 
-.legal-toc {
-  margin-bottom: var(--s-40);
+.legal-updated {
+  color: var(--text-2);
+  font-size: var(--fs-small);
+  margin-bottom: var(--s-16);
 }
 
 .legal-toc__label {
@@ -21,7 +28,7 @@
   font-size: var(--fs-small);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ink-2);
+  color: var(--text-2);
   margin-bottom: var(--s-16);
 }
 
@@ -39,7 +46,7 @@
 }
 
 .legal-toc__list a {
-  color: var(--ink-2);
+  color: var(--text-2);
   text-decoration: none;
   text-underline-offset: 3px;
 }
@@ -50,7 +57,7 @@
 }
 
 .legal-body h2 {
-  font-size: var(--fs-sub);
+  font-size: 1.625rem;
   scroll-margin-top: calc(var(--nav-h) + var(--s-16));
 }
 
@@ -95,8 +102,8 @@
   text-align: left;
   padding: var(--s-12) var(--s-16);
   font-weight: 700;
-  color: var(--ink);
-  background: var(--wash);
+  color: var(--text);
+  background: var(--page);
 }
 
 .legal-table th,
@@ -105,13 +112,13 @@
   vertical-align: top;
   padding: var(--s-12) var(--s-16);
   border-bottom: 1px solid var(--hairline);
-  color: var(--ink-2);
+  color: var(--text-2);
 }
 
 .legal-table thead th {
-  color: var(--ink);
+  color: var(--text);
   font-weight: 700;
-  background: var(--wash);
+  background: var(--page);
 }
 
 .legal-table tbody tr:last-child th,

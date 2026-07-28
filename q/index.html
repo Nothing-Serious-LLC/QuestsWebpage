@@ -6,7 +6,8 @@
     <title>Join Quest - Quests</title>
     <meta name="description" content="You've been invited to a Quest. Preview and join on Quests." />
     <meta name="robots" content="noindex" />
-    <meta name="theme-color" content="#FDFBF6" />
+    <meta name="theme-color" content="#F3F1E7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0E0E12" media="(prefers-color-scheme: dark)" />
     <meta name="apple-itunes-app" content="app-id=6745767553" />
     <link rel="canonical" href="https://invite.thequestsapp.com/q/" />
 
@@ -24,17 +25,17 @@
     <meta name="twitter:description" content="Join your friend's quest on Quests, the app for doing healthy challenges with friends." />
     <meta name="twitter:image" content="https://thequestsapp.com/og-image-v2.png" />
 
-    <link rel="icon" type="image/png" href="/assets/img/app-icon.png" />
-    <link rel="apple-touch-icon" href="/icon.png" />
+    <link rel="icon" type="image/png" href="../assets/img/app-icon.png" />
+    <link rel="apple-touch-icon" href="../icon.png" />
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
     <!-- Material Design Icons: the render script writes mdi-* class names for the quest icon and the meta rows -->
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../css/site.css" />
     <link rel="stylesheet" href="../css/page-q.css" />
-    <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
+    <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}.site-nav{background:rgba(243,241,231,.86);border-bottom-color:rgba(25,25,25,.07)}.site-nav .site-nav__logo img{filter:none}.site-nav .btn-outline-white{background:#191919;color:#FDFBF6;box-shadow:none}</style></noscript>
     <script src="../js/site.js" defer></script>
   </head>
   <body>
@@ -45,101 +46,113 @@
         <a class="site-nav__logo" href="https://thequestsapp.com/" aria-label="Quests home">
           <img src="../assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24" />
         </a>
-        <a class="btn btn-sm" href="https://thequestsapp.com/#download">Download</a>
+        <a class="btn btn-outline-white" href="https://thequestsapp.com/#download" aria-label="Download Quests">Download</a>
       </div>
     </header>
 
-    <main class="invite" id="main">
-      <div class="blobs" aria-hidden="true">
-        <span class="blob blob--1"></span>
-        <span class="blob blob--2"></span>
-        <span class="blob blob--3"></span>
-      </div>
-
+    <!-- ========================= THE INVITE, V4 =========================
+         The base mode, mindfulness milestone. The invite is one centred
+         column, so the journey arrives here as a postcard: the app's own
+         roadmap art in a rounded framed panel, with the exact CARD-SPEC
+         quest-detail card mounted on it, the way the check-in card sits on
+         the path in the app's quest detail screen. Fixed mindfulness, no
+         rotation here. Everything below the postcard sits on the base.
+         ================================================================= -->
+    <main class="invite cat-mindfulness" id="main">
       <div class="container invite__wrap">
 
-        <!-- ===== LOADING STATE ===== -->
+        <!-- ===== LOADING STATE =====
+             Same silhouette as the loaded state, postcard included, so the
+             art is already on screen when the data lands and nothing jumps. -->
         <div id="quest-loading" role="status" aria-label="Loading quest details">
           <span class="sr-only">Loading quest details...</span>
-          <div class="skeleton-group" style="align-items: center; text-align: center;">
-            <div class="skeleton skeleton--icon"></div>
-            <div class="skeleton skeleton--title"></div>
-            <div class="skeleton skeleton--text" style="margin-top: 4px;"></div>
-            <div class="skeleton skeleton--text-short" style="margin-top: 2px;"></div>
+          <div class="skeleton skeleton--head"></div>
+          <div class="q-postcard">
+            <picture class="q-postcard__art">
+              <source media="(prefers-color-scheme: dark)" srcset="../assets/img/roadmap/q-postcard-dark.webp">
+              <img src="../assets/img/roadmap/q-postcard-light.webp" alt="" aria-hidden="true" width="804" height="1120" decoding="async">
+            </picture>
+            <div class="q-skel-card">
+              <div class="skeleton skeleton--icon"></div>
+              <div class="skeleton skeleton--title"></div>
+              <div class="skeleton skeleton--text-short"></div>
+              <div class="skeleton skeleton--text"></div>
+              <div class="skeleton--row">
+                <div class="skeleton skeleton--circle"></div>
+                <div class="skeleton skeleton--line"></div>
+              </div>
+              <div class="skeleton skeleton--pill"></div>
+            </div>
           </div>
-          <div class="skeleton skeleton--card"></div>
-          <div class="skeleton--row">
-            <div class="skeleton skeleton--circle"></div>
-            <div class="skeleton skeleton--line" style="max-width: 140px;"></div>
-          </div>
-          <div class="skeleton--row">
-            <div class="skeleton skeleton--circle" style="width: 28px; height: 28px;"></div>
-            <div class="skeleton skeleton--circle" style="width: 28px; height: 28px; margin-left: -8px;"></div>
-            <div class="skeleton skeleton--circle" style="width: 28px; height: 28px; margin-left: -8px;"></div>
-            <div class="skeleton skeleton--line" style="max-width: 100px;"></div>
-          </div>
+          <div class="skeleton skeleton--panel"></div>
           <div class="skeleton skeleton--button"></div>
         </div>
 
         <!-- ===== QUEST CONTENT (hidden until loaded) ===== -->
         <div id="quest-content" class="state-hidden">
 
-          <!-- Quest preview card -->
-          <article class="invite-card">
-            <section id="quest-hero">
-              <div class="quest-icon" id="quest-icon" role="img" aria-label="Quest icon">
-                <!-- Populated by JS with the quest icon -->
-              </div>
-              <p class="eyebrow">You're invited</p>
-              <h1 class="quest-title" id="quest-title"><!-- Quest Name --></h1>
-              <p class="quest-description" id="quest-description"><!-- Quest description --></p>
-            </section>
+          <p class="invite__eyebrow">Quest invite</p>
+          <p class="invite__title">You're invited</p>
 
-            <!-- Quest info rows -->
-            <div id="quest-meta" role="list" aria-label="Quest details">
-              <div class="meta-row meta-row--full" role="listitem">
-                <div class="meta-row__icon meta-row__icon--avatar" aria-hidden="true" id="creator-avatar">
-                  <span class="creator-avatar__fallback">&#128100;</span>
+          <!-- The postcard: the app's real roadmap art in a rounded frame,
+               with the quest preview mounted on the path. Quest-detail
+               geometry, CARD-SPEC.md: 354 wide, radius 24, cream face,
+               32/40/32 padding, gap 20, medallion > name > duration >
+               status row > 40px pill. -->
+          <div class="q-postcard">
+            <picture class="q-postcard__art">
+              <source media="(prefers-color-scheme: dark)" srcset="../assets/img/roadmap/q-postcard-dark.webp">
+              <img src="../assets/img/roadmap/q-postcard-light.webp" alt="" aria-hidden="true" width="804" height="1120" decoding="async">
+            </picture>
+
+            <article class="quest-card quest-card--roadmap cat-mindfulness">
+              <div class="quest-card__inner">
+
+                <section id="quest-hero" class="quest-card__hero">
+                  <div class="quest-card__medallion quest-icon" id="quest-icon" role="img" aria-label="Quest icon">
+                    <!-- Populated by JS with the quest icon -->
+                  </div>
+
+                  <div class="quest-card__names">
+                    <h1 class="quest-card__name" id="quest-title"><!-- Quest Name --></h1>
+                    <p class="quest-card__duration">
+                      <span id="meta-date">--</span>
+                      <span class="q-dot" aria-hidden="true"></span>
+                      <span id="meta-duration">--</span>
+                    </p>
+                  </div>
+
+                  <p class="quest-description" id="quest-description"><!-- Quest description --></p>
+                </section>
+
+                <!-- Quest info rows -->
+                <div class="quest-card__actions" id="quest-meta" role="list" aria-label="Quest details">
+                  <p class="quest-card__status" role="listitem">
+                    <span class="avatar-stack">
+                      <span class="q-avatar" id="creator-avatar" aria-hidden="true">
+                        <span class="creator-avatar__fallback"></span>
+                      </span>
+                    </span>
+                    <span class="quest-card__caption">
+                      Created by <span id="creator-name">--</span>
+                      <span class="q-dot" aria-hidden="true"></span>
+                      <span id="social-count">0</span> going
+                    </span>
+                  </p>
+
+                  <p class="quest-card__pill quest-card__pill--status" id="meta-status-row" role="listitem">
+                    <span class="meta-row__icon" aria-hidden="true"></span>
+                    <span id="meta-status" aria-live="polite">--</span>
+                  </p>
                 </div>
-                <div class="meta-row__text">
-                  <div class="meta-row__label">Created by</div>
-                  <div class="meta-row__value" id="creator-name">--</div>
-                </div>
+
               </div>
-              <div class="meta-row" role="listitem">
-                <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-account-group"></i></div>
-                <div class="meta-row__text">
-                  <div class="meta-row__label">Participants</div>
-                  <div class="meta-row__value" id="social-count">0</div>
-                </div>
-              </div>
-              <div class="meta-row" role="listitem" id="meta-status-row">
-                <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-information-outline"></i></div>
-                <div class="meta-row__text">
-                  <div class="meta-row__label">Status</div>
-                  <div class="meta-row__value" id="meta-status" aria-live="polite">--</div>
-                </div>
-              </div>
-              <div class="meta-row" role="listitem">
-                <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-calendar-clock"></i></div>
-                <div class="meta-row__text">
-                  <div class="meta-row__label">Starts</div>
-                  <div class="meta-row__value" id="meta-date">--</div>
-                </div>
-              </div>
-              <div class="meta-row" role="listitem">
-                <div class="meta-row__icon" aria-hidden="true"><i class="mdi mdi-timer-sand"></i></div>
-                <div class="meta-row__text">
-                  <div class="meta-row__label">Duration</div>
-                  <div class="meta-row__value" id="meta-duration">--</div>
-                </div>
-              </div>
-            </div>
-          </article>
+            </article>
+          </div>
 
           <!-- Quest ended notice (hidden by default) -->
-          <div id="quest-ended" class="state-hidden" role="alert">
-            <div class="ended-icon" aria-hidden="true">&#127942;</div>
+          <div id="quest-ended" class="state-hidden q-panel" role="alert">
+            <div class="ended-icon" aria-hidden="true"><i class="mdi mdi-trophy-outline"></i></div>
             <p class="ended-title">This quest has ended</p>
             <p class="ended-text">This quest is no longer accepting new participants. Download Quests to start your own.</p>
             <div class="store-badges store-badges--center">
@@ -153,8 +166,9 @@
           </div>
 
           <!-- Phone + Download unified flow -->
-          <div id="phone-gate" class="state-hidden">
+          <div id="phone-gate" class="state-hidden q-panel q-panel--gate">
             <div id="gate-form">
+              <p class="gate-title">Save your spot</p>
               <div class="phone-input-group" id="phone-input-group">
                 <label for="phone-input" class="sr-only">Phone number</label>
                 <input
@@ -169,7 +183,7 @@
                 />
               </div>
               <p id="phone-error" class="phone-error state-hidden" role="alert" aria-live="polite"></p>
-              <p class="gate-privacy">Enter your number to join this quest when you sign up. Your phone number is encrypted and only used to link this invite to your account. We won't call, text, or share your number. By submitting, you agree to our <a href="https://thequestsapp.com/privacy.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Privacy Policy</a> and <a href="https://thequestsapp.com/terms.html" target="_blank" rel="noreferrer" style="color: var(--accent-light); text-decoration: underline; text-underline-offset: 2px;">Terms of Service</a>.</p>
+              <p class="gate-privacy">Enter your number to join this quest when you sign up. Your phone number is encrypted and only used to link this invite to your account. We won't call, text, or share your number. By submitting, you agree to our <a href="https://thequestsapp.com/privacy.html" target="_blank" rel="noreferrer">Privacy Policy</a> and <a href="https://thequestsapp.com/terms.html" target="_blank" rel="noreferrer">Terms of Service</a>.</p>
               <div id="turnstile-container"></div>
             </div>
             <div id="gate-confirmed" class="state-hidden">
@@ -203,10 +217,17 @@
           </div>
         </div>
 
-        <!-- ===== ERROR STATE ===== -->
+        <!-- ===== ERROR STATE =====
+             The road arrives from above and stops dead at the milestone: the
+             same figure the 404 uses, because this is the same moment. -->
         <div id="quest-error" class="state-hidden" role="alert">
+          <span class="error-stub" aria-hidden="true">
+            <svg viewBox="0 0 60 130" fill="none" focusable="false">
+              <path d="M30 -30 C30 20 8 52 30 84 C40 100 32 108 30 116"></path>
+            </svg>
+          </span>
           <div class="error-icon" aria-hidden="true"><i class="mdi mdi-map-search-outline"></i></div>
-          <h1 class="error-title" id="error-title">Quest not found</h1>
+          <h2 class="error-title" id="error-title">Quest not found</h2>
           <p class="error-text" id="error-text">This quest may have been removed or the link is no longer valid.</p>
           <div class="invite__actions">
             <a
@@ -237,34 +258,49 @@
       </div>
     </main>
 
+    <!-- ===================== GIANT WORDMARK BAND ===================== -->
     <div class="wordmark-band reveal">
       <div class="container">
-        <img src="../assets/img/wordmark-caps-ink.png" alt="Quests" width="2241" height="593" loading="lazy" decoding="async" />
+        <img class="art-light" src="../assets/img/wordmark-caps-ink.png" alt="" aria-hidden="true" width="2241" height="593" loading="lazy" decoding="async">
+        <img class="art-dark" src="../assets/img/wordmark-caps-white.png" alt="" aria-hidden="true" width="2044" height="541" loading="lazy" decoding="async">
       </div>
     </div>
 
+    <!-- ===================== FOOTER ===================== -->
     <footer class="site-footer">
       <div class="container">
         <div class="site-footer__top">
           <div class="site-footer__brand">
-            <img src="../assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24" />
-            <p>The home of the healthy challenge. Grow better together.</p>
+            <img src="../assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+            <p>The home of the healthy challenge.</p>
+            <div class="site-footer__social">
+              <a href="https://instagram.com/quests.app" target="_blank" rel="noopener" aria-label="Quests on Instagram">Instagram</a>
+              <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener" aria-label="Quests on TikTok">TikTok</a>
+              <a href="https://x.com/Quests_app_" target="_blank" rel="noopener" aria-label="Quests on X">X</a>
+            </div>
           </div>
 
-          <nav class="site-footer__nav" aria-label="Footer">
-            <a href="https://thequestsapp.com/blog.html">Blog</a>
-            <a href="https://thequestsapp.com/contact.html">Contact</a>
-            <a href="https://thequestsapp.com/privacy.html">Privacy</a>
-            <a href="https://thequestsapp.com/terms.html">Terms</a>
-            <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
-            <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
-            <a href="https://x.com/Quests_app_" target="_blank" rel="noopener">X</a>
+          <nav class="site-footer__col" aria-label="Product">
+            <h2>Product</h2>
+            <ul>
+              <li><a href="https://thequestsapp.com/#download">Download</a></li>
+              <li><a href="https://thequestsapp.com/blog.html">Blog</a></li>
+              <li><a href="https://thequestsapp.com/contact.html">Contact</a></li>
+            </ul>
+          </nav>
+
+          <nav class="site-footer__col" aria-label="Legal">
+            <h2>Legal</h2>
+            <ul>
+              <li><a href="https://thequestsapp.com/privacy.html">Privacy</a></li>
+              <li><a href="https://thequestsapp.com/terms.html">Terms</a></li>
+            </ul>
           </nav>
         </div>
 
         <div class="site-footer__legal">
-          <p>&copy; <span data-year>2026</span> Nothing Serious LLC. All rights reserved.</p>
-          <p>Habits with friends.</p>
+          <p>&copy; <span data-year>2026</span> Nothing Serious LLC</p>
+          <p>Download Quests on iOS and Android.</p>
         </div>
       </div>
     </footer>
