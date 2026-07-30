@@ -265,7 +265,7 @@ function profilePage({ origin, shareCode, revision, metadata }) {
 
       @media (min-width: 900px) {
         .chips { gap: 16px; }
-        .actions { flex-direction: row; gap: 22px; justify-content: center; }
+        .subtitle { display: none; }
       }
     </style>
   </head>
