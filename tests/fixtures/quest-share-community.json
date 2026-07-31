@@ -1,0 +1,23 @@
+{
+  "presentationVersion": 1,
+  "revision": 9,
+  "title": "Neighborhood Clean Sweep",
+  "shortDescription": "One small cleanup every weekend for a brighter neighborhood.",
+  "icon": "leaf",
+  "iconColor": "#2F8C68",
+  "category": "social_lifestyle",
+  "hostDisplayName": "Common Ground",
+  "hostAvatarUrl": "https://project.supabase.co/storage/v1/object/public/avatars/common-ground.png",
+  "startDate": "2026-08-01T12:00:00.000Z",
+  "endDate": "2026-10-24T12:00:00.000Z",
+  "duration": "12 weeks",
+  "durationDays": 84,
+  "cadenceLabel": "Every weekend",
+  "frequency": "WEEKLY",
+  "status": "ACTIVE",
+  "availability": "joinable",
+  "participantCount": 128,
+  "coverImageUrl": null,
+  "isGroupQuest": true,
+  "privacyLevel": "PUBLIC"
+}

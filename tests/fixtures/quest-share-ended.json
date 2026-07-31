@@ -1,0 +1,23 @@
+{
+  "presentationVersion": 1,
+  "revision": 5,
+  "title": "Seven Days of Gratitude",
+  "shortDescription": "A completed week of noticing the good things.",
+  "icon": "heart-outline",
+  "iconColor": "#C45B72",
+  "category": "mindfulness",
+  "hostDisplayName": "Jordan Lee",
+  "hostAvatarUrl": null,
+  "startDate": "2026-07-01T12:00:00.000Z",
+  "endDate": "2026-07-07T12:00:00.000Z",
+  "duration": "7 days",
+  "durationDays": 7,
+  "cadenceLabel": "Daily",
+  "frequency": "DAILY",
+  "status": "COMPLETED",
+  "availability": "ended",
+  "participantCount": 14,
+  "coverImageUrl": null,
+  "isGroupQuest": true,
+  "privacyLevel": "PUBLIC"
+}
