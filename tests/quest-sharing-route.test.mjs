@@ -166,6 +166,31 @@ test("server HTML contains complete first-response Quest metadata", async () => 
   );
 });
 
+test("first link keeps rich HTML and phone claim available while artwork warms", async () => {
+  const presentation = {
+    ...(await fixture("quest-share-upcoming.json")),
+    revision: 0,
+  };
+  const response = await withFetch(
+    async () => Response.json(presentation, { status: 200 }),
+    () => onRequest(context()),
+  );
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /Morning Momentum/);
+  assert.match(html, /id="phone-claim-form"/);
+  assert.match(
+    html,
+    /<link rel="canonical" href="https:\/\/invite\.thequestsapp\.com\/q\/AbCd2345"/,
+  );
+  assert.match(
+    html,
+    /property="og:image" content="https:\/\/invite\.thequestsapp\.com\/q\/AbCd2345\/og\.png"/,
+  );
+  assert.doesNotMatch(html, /\?r=0/);
+});
+
 test("environment app handoff bindings flow into installed-build targets", async () => {
   const presentation = await fixture("quest-share-upcoming.json");
   const response = await withFetch(

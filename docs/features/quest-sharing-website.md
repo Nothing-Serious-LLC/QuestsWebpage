@@ -78,6 +78,13 @@ status, availability, privacy, category, and approved media. Joinable
 presentations carry `availability: "joinable"`. Completed presentations carry
 `availability: "ended"` and render without phone controls.
 
+An unpinned first link may carry `revision: 0` while its first compact artifact
+warms. The page then keeps the base `/q/{code}` canonical URL, emits the
+unpinned `/q/{code}/og.png` image URL, and preserves the full phone claim and
+installed-app handoff. Once publication completes, the same request resolves
+the positive immutable current revision. Explicit `?r={revision}` requests
+continue to require a positive published revision.
+
 Canceled, expired, deleted, disabled, malformed, and reset-code states resolve
 to a generic unavailable page. Malformed successful metadata also resolves to
 that generic page.
@@ -140,6 +147,7 @@ does not supply headers for Pages Function responses.
 |---|---|
 | Enhanced gate disabled | Exact legacy static Quest page |
 | Metadata upstream unavailable | Legacy static Quest page |
+| Valid first link with artwork warming | Rich HTML and phone flow with an unpinned image URL |
 | Metadata returns unavailable | Generic no-store 404 page |
 | Metadata schema is malformed | Generic no-store 404 page |
 | Open Graph upstream unavailable | Plain no-store 503 response |
@@ -161,6 +169,7 @@ The local suite covers:
 
 - Exact legacy fallback and query preservation
 - First-response Open Graph metadata and canonical revision URLs
+- Revision-zero first-link HTML while compact artwork warms
 - Strict presentation schema and case-preserving Quest codes
 - HTML escaping and same-project media allowlists
 - Private, Community, upcoming, active, and completed card states
