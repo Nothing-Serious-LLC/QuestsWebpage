@@ -27,6 +27,16 @@ function normalizeShareCode(value) {
   return QUEST_SHARE_CODE_PATTERN.test(candidate) ? candidate : null;
 }
 
+function appHandoffFromEnv(env) {
+  return {
+    appScheme: env?.QUEST_SHARE_APP_SCHEME ?? env?.QUEST_SHARE_IOS_SCHEME,
+    androidPackage: env?.QUEST_SHARE_ANDROID_PACKAGE,
+    appStoreUrl: env?.QUEST_SHARE_IOS_STORE_URL,
+    playStoreUrl: env?.QUEST_SHARE_ANDROID_STORE_URL,
+    appStoreId: env?.QUEST_SHARE_IOS_STORE_ID,
+  };
+}
+
 async function legacyQuestPage(context) {
   const url = new URL(context.request.url);
   url.pathname = "/q/";
@@ -138,7 +148,10 @@ async function questArtifactResponse({
 
 export async function onRequest(context) {
   if (context.request.method !== "GET" && context.request.method !== "HEAD") {
-    return new Response("Method not allowed", { status: 405 });
+    return new Response("Method not allowed", {
+      status: 405,
+      headers: { Allow: "GET, HEAD" },
+    });
   }
 
   if (!isQuestSharingEnabled(context.env)) {
@@ -170,7 +183,10 @@ export async function onRequest(context) {
   if (revisionParam && !revision) {
     return artifact
       ? imageNotFound(context.request.method)
-      : questUnavailablePage({ requestMethod: context.request.method });
+      : questUnavailablePage({
+        requestMethod: context.request.method,
+        appHandoff: appHandoffFromEnv(context.env),
+      });
   }
 
   if (artifact) {
@@ -189,7 +205,10 @@ export async function onRequest(context) {
   if (revision) body.revision = Number(revision);
   const { status, response } = await callQuestShareWeb(context.env, body);
   if (status === 404) {
-    return questUnavailablePage({ requestMethod: context.request.method });
+    return questUnavailablePage({
+      requestMethod: context.request.method,
+      appHandoff: appHandoffFromEnv(context.env),
+    });
   }
   if (status !== 200 || !response) return legacyQuestPage(context);
 
@@ -197,14 +216,23 @@ export async function onRequest(context) {
   try {
     rawPresentation = await response.json();
   } catch {
-    return questUnavailablePage({ requestMethod: context.request.method });
+    return questUnavailablePage({
+      requestMethod: context.request.method,
+      appHandoff: appHandoffFromEnv(context.env),
+    });
   }
 
   const presentation = normalizeQuestSharePresentation(rawPresentation, {
     supabaseUrl: context.env.QUEST_SHARE_SUPABASE_URL,
   });
-  if (!presentation) {
-    return questUnavailablePage({ requestMethod: context.request.method });
+  if (
+    !presentation ||
+    (revision !== null && presentation.revision !== Number(revision))
+  ) {
+    return questUnavailablePage({
+      requestMethod: context.request.method,
+      appHandoff: appHandoffFromEnv(context.env),
+    });
   }
 
   return questSharePage({
@@ -212,6 +240,7 @@ export async function onRequest(context) {
     shareCode,
     presentation,
     turnstileSiteKey: safeTurnstileSiteKey(context.env.TURNSTILE_SITE_KEY),
+    appHandoff: appHandoffFromEnv(context.env),
     requestMethod: context.request.method,
   });
 }

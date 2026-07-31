@@ -1,6 +1,10 @@
-export function questPhoneClaimScript({ shareCode, turnstileSiteKey }) {
+export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff }) {
   const serializedCode = JSON.stringify(shareCode);
   const serializedSiteKey = JSON.stringify(turnstileSiteKey);
+  const serializedAppScheme = JSON.stringify(appHandoff.appScheme);
+  const serializedAndroidPackage = JSON.stringify(appHandoff.androidPackage);
+  const serializedAppStoreUrl = JSON.stringify(appHandoff.appStoreUrl);
+  const serializedPlayStoreUrl = JSON.stringify(appHandoff.playStoreUrl);
 
   return `(function () {
     "use strict";
@@ -18,8 +22,10 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey }) {
     var turnstileToken = null;
     var turnstileWidget = null;
     var submitting = false;
-    var APP_STORE_URL = "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553";
-    var PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=info.nothingserious.quests";
+    var APP_SCHEME = ${serializedAppScheme};
+    var ANDROID_PACKAGE = ${serializedAndroidPackage};
+    var APP_STORE_URL = ${serializedAppStoreUrl};
+    var PLAY_STORE_URL = ${serializedPlayStoreUrl};
 
     function platform() {
       var ua = (navigator.userAgent || "").toLowerCase();
@@ -159,6 +165,7 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey }) {
 
         form.hidden = true;
         success.hidden = false;
+        success.focus();
         var target = platform() === "android" ? PLAY_STORE_URL : APP_STORE_URL;
         setTimeout(function () { window.location.href = target; }, 1600);
       }).catch(function () {
@@ -173,8 +180,8 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey }) {
 
     openApp.addEventListener("click", function () {
       if (platform() === "android") {
-        window.location.href = "intent://invite.thequestsapp.com/q/" + shareCode +
-          "#Intent;scheme=https;package=info.nothingserious.quests;S.browser_fallback_url=" +
+        window.location.href = "intent://q/" + shareCode +
+          "#Intent;scheme=" + APP_SCHEME + ";package=" + ANDROID_PACKAGE + ";S.browser_fallback_url=" +
           encodeURIComponent(PLAY_STORE_URL) + ";end";
         return;
       }
@@ -187,7 +194,7 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey }) {
         };
         document.addEventListener("visibilitychange", cancelFallback, { once: true });
         window.addEventListener("pagehide", function () { clearTimeout(fallbackTimer); }, { once: true });
-        window.location.href = "info.nothingserious.quests://q/" + shareCode;
+        window.location.href = APP_SCHEME + "://q/" + shareCode;
         return;
       }
       window.location.href = APP_STORE_URL;

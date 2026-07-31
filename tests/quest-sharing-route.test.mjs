@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { onRequest } from "../functions/q/[[path]].js";
+import { onRequestPost as startPhoneClaim } from "../functions/api/link-claims/start.js";
 import {
   normalizeQuestSharePresentation,
 } from "../functions/q/questSharePresentation.js";
@@ -23,6 +24,7 @@ function context({
   enabled = true,
   storyEnabled = false,
   assetCalls = [],
+  envOverrides = {},
 } = {}) {
   return {
     request: new Request(`https://invite.thequestsapp.com/q/${path.join("/")}${search}`, { method }),
@@ -42,6 +44,7 @@ function context({
           });
         },
       },
+      ...envOverrides,
     },
   };
 }
@@ -54,6 +57,45 @@ async function withFetch(mock, run) {
   } finally {
     globalThis.fetch = original;
   }
+}
+
+async function withSuppressedConsoleError(run) {
+  const original = console.error;
+  console.error = () => {};
+  try {
+    return await run();
+  } finally {
+    console.error = original;
+  }
+}
+
+function phoneClaimContext(bodyOverrides = {}) {
+  return {
+    request: new Request("https://invite.thequestsapp.com/api/link-claims/start", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "CF-Connecting-IP": "203.0.113.42",
+      },
+      body: JSON.stringify({
+        shareCode: "AbCd2345",
+        phone: "+12025550123",
+        turnstileToken: "verified-token",
+        ...bodyOverrides,
+      }),
+    }),
+    env: {
+      TURNSTILE_SECRET_KEY: "turnstile-secret",
+      SUPABASE_URL,
+      cloudflare_key: "server-secret",
+      RATE_LIMIT: {
+        async get() {
+          return null;
+        },
+        async put() {},
+      },
+    },
+  };
 }
 
 test("dark gate serves the exact legacy asset route", async () => {
@@ -98,13 +140,54 @@ test("server HTML contains complete first-response Quest metadata", async () => 
   assert.match(html, /4 people are doing this Quest/);
   assert.match(html, /fetch\("\/api\/link-claims\/start"/);
   assert.equal(presentation.availability, "joinable");
+  assert.equal(typeof presentation.revision, "number");
   assert.doesNotMatch(html, /rel="alternate"[^>]+story\.png/);
   assert.match(html, /var shareCode = "AbCd2345"/);
-  assert.match(html, /info\.nothingserious\.quests:\/\/q\//);
+  assert.match(html, /var APP_SCHEME = "info\.nothingserious\.quests"/);
+  assert.match(html, /APP_SCHEME \+ ":\/\/q\/" \+ shareCode/);
   assert.match(html, /window\.location\.href = APP_STORE_URL/);
   assert.match(html, /Your number is securely matched/);
+  assert.match(html, /class="visually-hidden" for="phone-input"/);
+  assert.match(html, /success\.focus\(\)/);
   assert.doesNotMatch(html, /Your number is encrypted/);
   assert.doesNotMatch(html, /rest\/v1\/rpc\/get_quest_preview/);
+  assert.match(response.headers.get("Content-Security-Policy"), /frame-ancestors 'none'/);
+  assert.equal(response.headers.get("X-Frame-Options"), "DENY");
+  assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex, nofollow");
+  assert.equal(response.headers.get("Referrer-Policy"), "no-referrer");
+  assert.equal(
+    response.headers.get("Strict-Transport-Security"),
+    "max-age=31536000; includeSubDomains",
+  );
+  assert.equal(
+    response.headers.get("Permissions-Policy"),
+    "camera=(), microphone=(), geolocation=()",
+  );
+});
+
+test("environment app handoff bindings flow into installed-build targets", async () => {
+  const presentation = await fixture("quest-share-upcoming.json");
+  const response = await withFetch(
+    async () => Response.json(presentation, { status: 200 }),
+    () => onRequest(context({
+      envOverrides: {
+        QUEST_SHARE_APP_SCHEME: "quests-preview",
+        QUEST_SHARE_ANDROID_PACKAGE: "info.nothingserious.quests.preview",
+        QUEST_SHARE_IOS_STORE_URL: "https://install.example.com/quests-ios",
+        QUEST_SHARE_ANDROID_STORE_URL: "https://install.example.com/quests-android",
+      },
+    })),
+  );
+
+  const html = await response.text();
+  assert.match(html, /var APP_SCHEME = "quests-preview"/);
+  assert.match(html, /var ANDROID_PACKAGE = "info\.nothingserious\.quests\.preview"/);
+  assert.match(html, /var APP_STORE_URL = "https:\/\/install\.example\.com\/quests-ios"/);
+  assert.match(html, /var PLAY_STORE_URL = "https:\/\/install\.example\.com\/quests-android"/);
+  assert.match(html, /APP_SCHEME \+ ":\/\/q\/" \+ shareCode/);
+  assert.match(html, /"intent:\/\/q\/" \+ shareCode/);
+  assert.match(html, /"#Intent;scheme=" \+ APP_SCHEME \+ ";package=" \+ ANDROID_PACKAGE/);
 });
 
 test("presentation mapper escapes copy at render time and validates media origins", async () => {
@@ -208,6 +291,17 @@ test("schema v1 requires the complete join-safe presentation contract", async ()
     durationDays: null,
   }, { supabaseUrl: SUPABASE_URL });
   assert.ok(nullable);
+  assert.equal(nullable.shortDescription, null);
+  assert.equal(nullable.iconColor, raw.iconColor);
+
+  assert.equal(
+    normalizeQuestSharePresentation({ ...raw, isGroupQuest: "true" }, { supabaseUrl: SUPABASE_URL }),
+    null,
+  );
+  assert.equal(
+    normalizeQuestSharePresentation({ ...raw, endDate: "not-a-date" }, { supabaseUrl: SUPABASE_URL }),
+    null,
+  );
 });
 
 test("Community presentation maps public, category, duration, and cadence card slots", async () => {
@@ -341,6 +435,29 @@ test("malformed metadata fails closed", async () => {
   assert.doesNotMatch(html, /Leaked Quest/);
 });
 
+test("pinned revision fails closed when upstream returns another revision", async () => {
+  const presentation = {
+    ...(await fixture("quest-share-upcoming.json")),
+    revision: 4,
+  };
+  let edgeBody;
+  const response = await withFetch(
+    async (_url, init) => {
+      edgeBody = JSON.parse(init.body);
+      return Response.json(presentation, { status: 200 });
+    },
+    () => onRequest(context({ search: "?r=3" })),
+  );
+  const html = await response.text();
+  assert.deepEqual(edgeBody, {
+    action: "metadata",
+    shareCode: "AbCd2345",
+    revision: 3,
+  });
+  assert.equal(response.status, 404);
+  assert.doesNotMatch(html, /Morning Momentum/);
+});
+
 test("upstream failure preserves the legacy Quest experience", async () => {
   const assetCalls = [];
   const response = await withFetch(
@@ -362,6 +479,115 @@ test("HEAD and unsupported methods follow HTTP contracts", async () => {
 
   const post = await onRequest(context({ method: "POST" }));
   assert.equal(post.status, 405);
+  assert.equal(post.headers.get("Allow"), "GET, HEAD");
+});
+
+test("phone claim maps a lifecycle race to the stable unavailable response", async () => {
+  let call = 0;
+  const response = await withFetch(async () => {
+    call += 1;
+    if (call === 1) {
+      return Response.json({
+        success: true,
+        hostname: "invite.thequestsapp.com",
+      });
+    }
+    return Response.json({ error: "quest_not_joinable" });
+  }, () => startPhoneClaim(phoneClaimContext()));
+
+  assert.equal(response.status, 409);
+  assert.equal(response.headers.get("Cache-Control"), "no-store");
+  assert.deepEqual(await response.json(), {
+    _v: "rl-600-v2",
+    error: "quest_unavailable",
+  });
+});
+
+test("phone claim bounds public bodies and Turnstile tokens before fetch", async () => {
+  let fetchCalls = 0;
+  const oversizedBody = await withFetch(
+    async () => {
+      fetchCalls += 1;
+      return Response.json({});
+    },
+    () => startPhoneClaim(phoneClaimContext({ padding: "x".repeat(9000) })),
+  );
+  assert.equal(oversizedBody.status, 413);
+  assert.deepEqual(await oversizedBody.json(), {
+    _v: "rl-600-v2",
+    error: "invalid_request",
+  });
+
+  const oversizedToken = await withFetch(
+    async () => {
+      fetchCalls += 1;
+      return Response.json({});
+    },
+    () => startPhoneClaim(phoneClaimContext({ turnstileToken: "x".repeat(2049) })),
+  );
+  assert.equal(oversizedToken.status, 400);
+  assert.equal(fetchCalls, 0);
+});
+
+test("phone claim requires a bounded Turnstile response from an allowed host", async () => {
+  let suppliedSignal;
+  const response = await withSuppressedConsoleError(() =>
+    withFetch(
+      async (_url, init) => {
+        suppliedSignal = init.signal;
+        return Response.json({ success: true });
+      },
+      () => startPhoneClaim(phoneClaimContext()),
+    )
+  );
+
+  assert.ok(suppliedSignal instanceof AbortSignal);
+  assert.equal(response.status, 403);
+  assert.deepEqual(await response.json(), {
+    _v: "rl-600-v2",
+    error: "turnstile_failed",
+  });
+});
+
+test("phone claim keeps backend diagnostics out of anonymous errors", async () => {
+  let call = 0;
+  const response = await withSuppressedConsoleError(() =>
+    withFetch(async () => {
+      call += 1;
+      if (call === 1) {
+        return Response.json({
+          success: true,
+          hostname: "invite.thequestsapp.com",
+        });
+      }
+      return new Response("sensitive database function detail", { status: 500 });
+    }, () => startPhoneClaim(phoneClaimContext()))
+  );
+
+  assert.equal(response.status, 500);
+  assert.equal(response.headers.get("Cache-Control"), "no-store");
+  const body = await response.json();
+  assert.deepEqual(body, { _v: "rl-600-v2", error: "internal_error" });
+  assert.equal(JSON.stringify(body).includes("sensitive"), false);
+  assert.equal("debug_message" in body, false);
+  assert.equal("debug_stack" in body, false);
+});
+
+test("phone claim keeps thrown diagnostics out of anonymous errors", async () => {
+  const response = await withSuppressedConsoleError(() =>
+    withFetch(
+      async () => {
+        throw new Error("sensitive stack path");
+      },
+      () => startPhoneClaim(phoneClaimContext()),
+    )
+  );
+
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), {
+    _v: "rl-600-v2",
+    error: "service_unavailable",
+  });
 });
 
 test("existing Profile, link claim, association, and route contracts remain present", async () => {

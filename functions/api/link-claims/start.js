@@ -11,10 +11,13 @@
 // Backend dependency:
 //   Supabase RPC `start_link_claim(p_share_code, p_phone, p_phone_last4)` must exist.
 //   Expected return: { claim_id, masked_phone, status, expires_at }
-//   Or error:        { error: "quest_not_found" | "quest_unavailable" | "already_claimed" }
+//   Or error:        { error: "quest_not_found" | "quest_not_joinable" | "already_claimed" }
 
 const SHARE_CODE_RE = /^[A-HJ-NP-Za-hj-kmnp-z2-9]{8}$/;
 const E164_RE = /^\+\d{10,15}$/;
+const MAX_REQUEST_BODY_BYTES = 8 * 1024;
+const MAX_TURNSTILE_TOKEN_LENGTH = 2048;
+const TURNSTILE_TIMEOUT_MS = 5000;
 const DEFAULT_TURNSTILE_HOSTS = [
   "invite.thequestsapp.com",
   "thequestsapp.com",
@@ -32,7 +35,11 @@ const RATE_LIMITS = {
 function jsonResponse(status, body, extraHeaders) {
   return new Response(JSON.stringify({ _v: "rl-600-v2", ...body }), {
     status,
-    headers: { "Content-Type": "application/json", ...extraHeaders },
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      ...extraHeaders,
+    },
   });
 }
 
@@ -63,12 +70,45 @@ function getPhoneLast4(normalized) {
   return normalized.slice(-4);
 }
 
+async function readJsonBody(request) {
+  const declaredLength = Number(request.headers.get("Content-Length"));
+  if (
+    Number.isFinite(declaredLength) &&
+    declaredLength > MAX_REQUEST_BODY_BYTES
+  ) {
+    throw new Error("request_too_large");
+  }
+
+  if (!request.body) throw new Error("invalid_json");
+  const reader = request.body.getReader();
+  const chunks = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_REQUEST_BODY_BYTES) {
+      await reader.cancel();
+      throw new Error("request_too_large");
+    }
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 function getTurnstileAllowedHosts(env) {
   const raw = env && env.TURNSTILE_ALLOWED_HOSTS;
   if (!raw) return DEFAULT_TURNSTILE_HOSTS;
   return raw
     .split(",")
-    .map((host) => host.trim())
+    .map((host) => host.trim().toLowerCase())
     .filter(Boolean);
 }
 
@@ -166,8 +206,11 @@ export async function onRequestPost(context) {
     // Step 1: Parse JSON body
     let body;
     try {
-      body = await context.request.json();
-    } catch {
+      body = await readJsonBody(context.request);
+    } catch (error) {
+      if (error instanceof Error && error.message === "request_too_large") {
+        return jsonResponse(413, { error: "invalid_request" });
+      }
       return jsonResponse(400, { error: "invalid_json" });
     }
 
@@ -191,7 +234,11 @@ export async function onRequestPost(context) {
     const phoneLast4 = getPhoneLast4(normalizedPhone);
 
     // Step 5: Validate turnstileToken is a non-empty string
-    if (typeof turnstileToken !== "string" || turnstileToken.length === 0) {
+    if (
+      typeof turnstileToken !== "string" ||
+      turnstileToken.length === 0 ||
+      turnstileToken.length > MAX_TURNSTILE_TOKEN_LENGTH
+    ) {
       return jsonResponse(400, { error: "missing_fields" });
     }
 
@@ -205,11 +252,33 @@ export async function onRequestPost(context) {
       turnstileBody.append("remoteip", clientIP);
     }
 
-    const turnstileResp = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      { method: "POST", body: turnstileBody }
+    const turnstileController = new AbortController();
+    const turnstileTimeout = setTimeout(
+      () => turnstileController.abort(),
+      TURNSTILE_TIMEOUT_MS
     );
-    const turnstileResult = await turnstileResp.json();
+    let turnstileResp;
+    let turnstileResult;
+    try {
+      turnstileResp = await fetch(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        {
+          method: "POST",
+          body: turnstileBody,
+          signal: turnstileController.signal,
+        }
+      );
+      if (!turnstileResp.ok) {
+        console.error("Turnstile verification upstream failed:", turnstileResp.status);
+        return jsonResponse(503, { error: "service_unavailable" });
+      }
+      turnstileResult = await turnstileResp.json();
+    } catch (error) {
+      console.error("Turnstile verification request failed:", error);
+      return jsonResponse(503, { error: "service_unavailable" });
+    } finally {
+      clearTimeout(turnstileTimeout);
+    }
 
     if (!turnstileResult.success) {
       return jsonResponse(403, { error: "turnstile_failed" });
@@ -217,12 +286,12 @@ export async function onRequestPost(context) {
 
     // Validate Turnstile hostname to prevent cross-site token reuse
     const allowedHosts = getTurnstileAllowedHosts(context.env);
-    if (
-      turnstileResult.hostname &&
-      !allowedHosts.includes(turnstileResult.hostname)
-    ) {
+    const verifiedHostname = typeof turnstileResult.hostname === "string"
+      ? turnstileResult.hostname.trim().toLowerCase()
+      : "";
+    if (!verifiedHostname || !allowedHosts.includes(verifiedHostname)) {
       console.error("Turnstile hostname mismatch:", {
-        hostname: turnstileResult.hostname,
+        hostname: verifiedHostname || "missing",
         allowedHosts,
       });
       return jsonResponse(403, { error: "turnstile_failed" });
@@ -283,7 +352,7 @@ export async function onRequestPost(context) {
       }
     } else {
       console.error(
-        "RATE_LIMIT KV binding not available — rejecting request"
+        "RATE_LIMIT KV binding unavailable, rejecting request"
       );
       return jsonResponse(503, { error: "service_unavailable" });
     }
@@ -313,22 +382,21 @@ export async function onRequestPost(context) {
         rpcResponse.status,
         rpcText
       );
-      return jsonResponse(500, {
-        error: "internal_error",
-        debug_status: rpcResponse.status,
-        debug_message: rpcText.slice(0, 200),
-      });
+      return jsonResponse(500, { error: "internal_error" });
     }
 
     const result = await rpcResponse.json();
 
     // Step 9: Map Supabase result to API response
     if (result.error) {
-      if (
-        result.error === "quest_not_found" ||
-        result.error === "quest_unavailable"
-      ) {
+      if (result.error === "quest_not_found") {
         return jsonResponse(404, { error: "quest_not_found" });
+      }
+      if (
+        result.error === "quest_unavailable" ||
+        result.error === "quest_not_joinable"
+      ) {
+        return jsonResponse(409, { error: "quest_unavailable" });
       }
       if (result.error === "already_claimed") {
         return jsonResponse(200, {
@@ -350,10 +418,6 @@ export async function onRequestPost(context) {
     });
   } catch (err) {
     console.error("Unhandled error in /api/link-claims/start:", err);
-    return jsonResponse(500, {
-      error: "internal_error",
-      debug_catch: String(err),
-      debug_stack: err && err.stack ? err.stack.slice(0, 300) : null,
-    });
+    return jsonResponse(500, { error: "internal_error" });
   }
 }
