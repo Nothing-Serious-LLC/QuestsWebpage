@@ -233,8 +233,9 @@ export function questSharePage({
 }) {
   const handoff = normalizeQuestAppHandoff(appHandoff);
   const revision = presentation.revision;
-  const canonicalUrl = `${origin}/q/${shareCode}?r=${revision}`;
-  const imageUrl = `${origin}/q/${shareCode}/og.png?r=${revision}`;
+  const revisionQuery = revision > 0 ? `?r=${revision}` : "";
+  const canonicalUrl = `${origin}/q/${shareCode}${revisionQuery}`;
+  const imageUrl = `${origin}/q/${shareCode}/og.png${revisionQuery}`;
   const pageTitle = presentation.availability === "ended"
     ? `${presentation.title} has ended | Quests`
     : `Join ${presentation.title} on Quests`;

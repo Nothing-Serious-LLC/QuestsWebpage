@@ -73,8 +73,9 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   if (Number(raw.presentationVersion) !== QUEST_SHARE_PRESENTATION_VERSION) return null;
 
+  if (raw.revision == null) return null;
   const revision = positiveInteger(raw.revision, Number.MAX_SAFE_INTEGER);
-  if (revision == null || revision < 1) return null;
+  if (revision == null) return null;
 
   const title = boundedText(raw.title, QUEST_TITLE_LIMIT);
   const status = boundedText(raw.status, 24).toUpperCase();
