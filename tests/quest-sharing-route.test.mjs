@@ -304,6 +304,29 @@ test("schema v1 requires the complete join-safe presentation contract", async ()
   );
 });
 
+test("schema v1 accepts exact backend field and integer bounds", async () => {
+  const raw = await fixture("quest-share-ended.json");
+  const presentation = normalizeQuestSharePresentation({
+    ...raw,
+    title: "T".repeat(80),
+    shortDescription: "D".repeat(200),
+    hostDisplayName: "H".repeat(120),
+    duration: "R".repeat(80),
+    cadenceLabel: "C".repeat(80),
+    durationDays: 2_147_483_647,
+    participantCount: 2_147_483_647,
+  }, { supabaseUrl: SUPABASE_URL });
+
+  assert.ok(presentation);
+  assert.equal(presentation.title.length, 80);
+  assert.equal(presentation.shortDescription.length, 200);
+  assert.equal(presentation.hostDisplayName.length, 120);
+  assert.equal(presentation.duration.length, 80);
+  assert.equal(presentation.cadenceLabel.length, 80);
+  assert.equal(presentation.durationDays, 2_147_483_647);
+  assert.equal(presentation.participantCount, 2_147_483_647);
+});
+
 test("Community presentation maps public, category, duration, and cadence card slots", async () => {
   const raw = await fixture("quest-share-community.json");
   const presentation = normalizeQuestSharePresentation(raw, { supabaseUrl: SUPABASE_URL });

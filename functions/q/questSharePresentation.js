@@ -13,6 +13,12 @@ const QUEST_CATEGORIES = new Set([
   "productivity",
 ]);
 const ICON_PATTERN = /^[a-z0-9-]{1,64}$/;
+const QUEST_TITLE_LIMIT = 80;
+const QUEST_DESCRIPTION_LIMIT = 200;
+const QUEST_HOST_LIMIT = 120;
+const QUEST_DURATION_LIMIT = 80;
+const QUEST_CADENCE_LIMIT = 80;
+const POSTGRES_INTEGER_MAX = 2_147_483_647;
 const AVATAR_PATH_PREFIXES = [
   "/storage/v1/object/public/avatars/",
   "/storage/v1/render/image/public/avatars/",
@@ -70,7 +76,7 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   const revision = positiveInteger(raw.revision, Number.MAX_SAFE_INTEGER);
   if (revision == null || revision < 1) return null;
 
-  const title = boundedText(raw.title, 120);
+  const title = boundedText(raw.title, QUEST_TITLE_LIMIT);
   const status = boundedText(raw.status, 24).toUpperCase();
   if (!title || !DISPLAYABLE_STATUSES.has(status)) return null;
 
@@ -89,12 +95,12 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
 
   const durationDays = raw.durationDays == null
     ? null
-    : positiveInteger(raw.durationDays, 3650);
+    : positiveInteger(raw.durationDays, POSTGRES_INTEGER_MAX);
   if (raw.durationDays != null && durationDays == null) return null;
 
   const participantCount = raw.participantCount == null
     ? null
-    : positiveInteger(raw.participantCount, 1_000_000);
+    : positiveInteger(raw.participantCount, POSTGRES_INTEGER_MAX);
   if (participantCount == null) return null;
 
   const privacyCandidate = boundedText(raw.privacyLevel, 16).toUpperCase();
@@ -104,11 +110,11 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   const categoryCandidate = boundedText(raw.category, 32).toLowerCase();
   const category = QUEST_CATEGORIES.has(categoryCandidate) ? categoryCandidate : null;
   if (raw.category != null && !category) return null;
-  const hostDisplayName = boundedText(raw.hostDisplayName, 80);
+  const hostDisplayName = boundedText(raw.hostDisplayName, QUEST_HOST_LIMIT);
   const startDate = isoDate(raw.startDate);
   const endDate = isoDate(raw.endDate);
-  const duration = boundedText(raw.duration, 40);
-  const cadenceLabel = boundedText(raw.cadenceLabel, 48);
+  const duration = boundedText(raw.duration, QUEST_DURATION_LIMIT);
+  const cadenceLabel = boundedText(raw.cadenceLabel, QUEST_CADENCE_LIMIT);
   const frequencyCandidate = boundedText(raw.frequency, 32).toUpperCase();
   const frequency = FREQUENCIES.has(frequencyCandidate) ? frequencyCandidate : null;
   if (
@@ -120,7 +126,10 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
     return null;
   }
 
-  const shortDescription = boundedText(raw.shortDescription, 280) || null;
+  const shortDescription = boundedText(
+    raw.shortDescription,
+    QUEST_DESCRIPTION_LIMIT,
+  ) || null;
 
   return Object.freeze({
     presentationVersion: QUEST_SHARE_PRESENTATION_VERSION,
