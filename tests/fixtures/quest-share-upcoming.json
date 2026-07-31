@@ -1,0 +1,23 @@
+{
+  "presentationVersion": 1,
+  "revision": 3,
+  "title": "Morning Momentum",
+  "shortDescription": "Start each day with one focused action and build a rhythm together.",
+  "icon": "weather-sunset-up",
+  "iconColor": "#765BC4",
+  "category": "productivity",
+  "hostDisplayName": "Maya Chen",
+  "hostAvatarUrl": "https://project.supabase.co/storage/v1/object/public/avatars/maya.jpg",
+  "startDate": "2026-08-03T12:00:00.000Z",
+  "endDate": "2026-09-01T12:00:00.000Z",
+  "duration": "30 days",
+  "durationDays": 30,
+  "cadenceLabel": "Daily",
+  "frequency": "DAILY",
+  "status": "UPCOMING",
+  "availability": "joinable",
+  "participantCount": 4,
+  "coverImageUrl": null,
+  "isGroupQuest": true,
+  "privacyLevel": "PRIVATE"
+}
