@@ -7,6 +7,7 @@ import {
 import { questSharePage, questUnavailablePage } from "./questPage.js";
 
 const EDGE_TIMEOUT_MS = 4_000;
+const REVISION_ZERO_OG_FALLBACK_PATH = "/quest-share-og-fallback.png";
 
 export function isQuestSharingEnabled(env) {
   return String(env?.QUEST_SHARING_ENABLED || "").trim().toLowerCase() === "true";
@@ -99,6 +100,46 @@ function imageServiceUnavailable(requestMethod) {
   });
 }
 
+async function revisionZeroOgFallback(context) {
+  if (!context.env?.ASSETS?.fetch) {
+    return imageServiceUnavailable(context.request.method);
+  }
+
+  const url = new URL(context.request.url);
+  url.pathname = REVISION_ZERO_OG_FALLBACK_PATH;
+  url.search = "";
+
+  let assetResponse;
+  try {
+    assetResponse = await context.env.ASSETS.fetch(new Request(url.toString()));
+  } catch {
+    return imageServiceUnavailable(context.request.method);
+  }
+
+  const contentType = String(assetResponse.headers.get("Content-Type") || "")
+    .split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+  if (!assetResponse.ok || contentType !== "image/png") {
+    return imageServiceUnavailable(context.request.method);
+  }
+
+  const headers = new Headers({
+    "Content-Type": "image/png",
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+  });
+  const contentLength = assetResponse.headers.get("Content-Length");
+  if (contentLength && /^\d+$/.test(contentLength)) {
+    headers.set("Content-Length", contentLength);
+  }
+
+  return new Response(
+    context.request.method === "HEAD" ? null : assetResponse.body,
+    { status: 200, headers },
+  );
+}
+
 async function questArtifactResponse({
   context,
   shareCode,
@@ -113,8 +154,14 @@ async function questArtifactResponse({
   if (revision) body.revision = Number(revision);
 
   const { status, response } = await callQuestShareWeb(context.env, body);
-  if (status === 404) return imageNotFound(context.request.method);
+  const canUseRevisionZeroFallback = artifact === "og" && revision === null;
+  if (status === 404) {
+    return canUseRevisionZeroFallback
+      ? revisionZeroOgFallback(context)
+      : imageNotFound(context.request.method);
+  }
   if (status !== 200 || !response) {
+    if (canUseRevisionZeroFallback) return revisionZeroOgFallback(context);
     return artifact === "story"
       ? imageNotFound(context.request.method)
       : imageServiceUnavailable(context.request.method);
@@ -125,6 +172,7 @@ async function questArtifactResponse({
     .trim()
     .toLowerCase();
   if (contentType !== "image/png") {
+    if (canUseRevisionZeroFallback) return revisionZeroOgFallback(context);
     return artifact === "story"
       ? imageNotFound(context.request.method)
       : imageServiceUnavailable(context.request.method);
