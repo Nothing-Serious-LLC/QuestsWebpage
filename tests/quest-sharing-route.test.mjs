@@ -12,6 +12,7 @@ import { questSharePage } from "../functions/q/questPage.js";
 const ROOT = new URL("../", import.meta.url);
 const SUPABASE_URL = "https://project.supabase.co";
 const LEGACY_MARKUP = "<!doctype html><title>Legacy Quest invite</title>";
+const FALLBACK_PNG = await readFile(new URL("quest-share-og-fallback.png", ROOT));
 
 async function fixture(name) {
   return JSON.parse(await readFile(new URL(`fixtures/${name}`, import.meta.url), "utf8"));
@@ -38,6 +39,15 @@ function context({
       ASSETS: {
         async fetch(request) {
           assetCalls.push(request.url);
+          if (new URL(request.url).pathname === "/quest-share-og-fallback.png") {
+            return new Response(FALLBACK_PNG, {
+              status: 200,
+              headers: {
+                "Content-Type": "image/png",
+                "Content-Length": String(FALLBACK_PNG.length),
+              },
+            });
+          }
           return new Response(LEGACY_MARKUP, {
             status: 200,
             headers: { "Content-Type": "text/html" },
@@ -101,6 +111,7 @@ function phoneClaimContext(bodyOverrides = {}) {
 test("dark gate serves the exact legacy asset route", async () => {
   const assetCalls = [];
   const response = await onRequest(context({
+    path: ["AbCd2345", "og.png"],
     enabled: false,
     search: "?r=7",
     assetCalls,
@@ -110,6 +121,16 @@ test("dark gate serves the exact legacy asset route", async () => {
   assert.equal(response.headers.get("Cache-Control"), "public, max-age=300, s-maxage=600");
   assert.equal(response.headers.get("Vary"), "Accept-Encoding");
   assert.deepEqual(assetCalls, ["https://invite.thequestsapp.com/q/?r=7"]);
+});
+
+test("bundled revision-zero fallback is a compact 1200 by 630 PNG", () => {
+  assert.deepEqual(
+    Array.from(FALLBACK_PNG.subarray(0, 8)),
+    [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+  );
+  assert.equal(FALLBACK_PNG.readUInt32BE(16), 1200);
+  assert.equal(FALLBACK_PNG.readUInt32BE(20), 630);
+  assert.ok(FALLBACK_PNG.length <= 300 * 1024);
 });
 
 test("server HTML contains complete first-response Quest metadata", async () => {
@@ -405,6 +426,33 @@ test("OG and Story routes proxy the requested PNG artifact", async () => {
   }
 });
 
+test("published unpinned Open Graph requests keep the upstream artifact", async () => {
+  const assetCalls = [];
+  let edgeBody;
+  const response = await withFetch(async (_url, init) => {
+    edgeBody = JSON.parse(init.body);
+    return new Response(new Uint8Array([137, 80, 78, 71]), {
+      status: 200,
+      headers: {
+        "Content-Type": "image/png",
+        "Content-Length": "4",
+      },
+    });
+  }, () => onRequest(context({
+    path: ["AbCd2345", "og.png"],
+    assetCalls,
+  })));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Content-Length"), "4");
+  assert.deepEqual(edgeBody, {
+    action: "image",
+    artifact: "og",
+    shareCode: "AbCd2345",
+  });
+  assert.deepEqual(assetCalls, []);
+});
+
 test("unpublished Story artifact returns a private 404 response", async () => {
   const response = await withFetch(
     async () => Response.json({ code: "unavailable" }, { status: 404 }),
@@ -413,6 +461,53 @@ test("unpublished Story artifact returns a private 404 response", async () => {
   assert.equal(response.status, 404);
   assert.equal(response.headers.get("Cache-Control"), "no-store");
   assert.equal(await response.text(), "Not found");
+});
+
+test("unpinned Open Graph failures serve the branded revision-zero fallback", async () => {
+  for (const upstream of [
+    Response.json({ code: "unavailable" }, { status: 404 }),
+    Response.json({ code: "upstream_failed" }, { status: 502 }),
+    new Response("unexpected", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    }),
+  ]) {
+    const assetCalls = [];
+    const response = await withFetch(
+      async () => upstream.clone(),
+      () => onRequest(context({
+        path: ["AbCd2345", "og.png"],
+        assetCalls,
+      })),
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/png");
+    assert.equal(response.headers.get("Content-Length"), String(FALLBACK_PNG.length));
+    assert.equal(response.headers.get("Cache-Control"), "no-store");
+    assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+    assert.deepEqual(assetCalls, [
+      "https://invite.thequestsapp.com/quest-share-og-fallback.png",
+    ]);
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(bytes.length, FALLBACK_PNG.length);
+    assert.deepEqual(bytes.subarray(0, 24), FALLBACK_PNG.subarray(0, 24));
+  }
+});
+
+test("revision-zero fallback preserves HEAD image headers with an empty body", async () => {
+  const response = await withFetch(
+    async () => Response.json({ code: "unavailable" }, { status: 404 }),
+    () => onRequest(context({
+      path: ["AbCd2345", "og.png"],
+      method: "HEAD",
+    })),
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Content-Type"), "image/png");
+  assert.equal(response.headers.get("Content-Length"), String(FALLBACK_PNG.length));
+  assert.equal(await response.text(), "");
 });
 
 test("Story route stays dark behind its independent feature gate", async () => {
@@ -428,10 +523,18 @@ test("Story route stays dark behind its independent feature gate", async () => {
   assert.equal(edgeCalled, false);
 });
 
-test("artifact upstream failures preserve image content contracts", async () => {
+test("pinned Open Graph and Story failures preserve image content contracts", async () => {
+  const unpublishedOg = await withFetch(
+    async () => Response.json({ code: "unavailable" }, { status: 404 }),
+    () => onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=4" })),
+  );
+  assert.equal(unpublishedOg.status, 404);
+  assert.match(unpublishedOg.headers.get("Content-Type"), /^text\/plain/);
+  assert.equal(unpublishedOg.headers.get("Cache-Control"), "no-store");
+
   const og = await withFetch(
     async () => Response.json({ code: "upstream_failed" }, { status: 502 }),
-    () => onRequest(context({ path: ["AbCd2345", "og.png"] })),
+    () => onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=4" })),
   );
   assert.equal(og.status, 503);
   assert.match(og.headers.get("Content-Type"), /^text\/plain/);

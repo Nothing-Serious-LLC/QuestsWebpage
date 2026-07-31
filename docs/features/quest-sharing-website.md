@@ -81,9 +81,13 @@ presentations carry `availability: "joinable"`. Completed presentations carry
 An unpinned first link may carry `revision: 0` while its first compact artifact
 warms. The page then keeps the base `/q/{code}` canonical URL, emits the
 unpinned `/q/{code}/og.png` image URL, and preserves the full phone claim and
-installed-app handoff. Once publication completes, the same request resolves
-the positive immutable current revision. Explicit `?r={revision}` requests
-continue to require a positive published revision.
+installed-app handoff. If the artifact is still absent, the image route serves
+a bundled, branded 1200 x 630 invitation with zero Quest or host fields. This
+keeps the first Messages fetch image-shaped and lightweight while publication
+finishes. Once publication completes, the same request resolves the positive
+immutable current revision. Explicit `?r={revision}` requests continue to
+require a positive published revision. The generic fallback is scoped to
+unpinned Open Graph requests.
 
 Canceled, expired, deleted, disabled, malformed, and reset-code states resolve
 to a generic unavailable page. Malformed successful metadata also resolves to
@@ -150,7 +154,9 @@ does not supply headers for Pages Function responses.
 | Valid first link with artwork warming | Rich HTML and phone flow with an unpinned image URL |
 | Metadata returns unavailable | Generic no-store 404 page |
 | Metadata schema is malformed | Generic no-store 404 page |
-| Open Graph upstream unavailable | Plain no-store 503 response |
+| Unpinned Open Graph artifact absent or upstream unavailable | Branded generic no-store 1200 x 630 PNG |
+| Pinned Open Graph upstream unavailable | Plain no-store 503 response |
+| Pinned Open Graph artifact absent | Plain no-store 404 response |
 | Story gate disabled | Private no-store 404 response |
 | Story unpublished or unavailable | Private no-store 404 response |
 
@@ -178,12 +184,20 @@ The local suite covers:
 - Security headers emitted directly by the Pages Function
 - Bounded Turnstile validation and anonymous-error redaction
 - Open Graph and Story proxy requests, status codes, content types, and caching
+- Revision-zero fallback dimensions, byte ceiling, GET body, and HEAD headers
 - Independent Story gating
 - Profile routes, association files, Pages routing, and phone endpoint presence
 
-Actual PNG rendering and pixel fixtures live in
+Quest-specific PNG rendering and pixel fixtures live in
 `supabase/functions/quest-share-artifact` in the Quests application repository.
-This repository has one responsive HTML renderer and two secure image proxies.
+This repository also commits the generic revision-zero fallback. Regenerate it
+from the shared Profile brand assets with ImageMagick available:
+
+```bash
+npm run generate:quest-og-fallback
+```
+
+The website has one responsive HTML renderer and two secure image proxies.
 
 ## Hosted gates
 
@@ -201,7 +215,8 @@ Hosted staging still requires:
    install.
 6. Verify compiled iOS scheme and Android package values, then exercise both
    installed-app handoffs against the matching staging artifacts.
-7. Verify physical Messages rendering for the 1200 x 630 artifact.
+7. Verify physical Messages rendering for the 1200 x 630 published artifact
+   and the revision-zero fallback.
 8. Complete Story renderer capacity and physical Instagram acceptance.
 9. Activate HTML and Open Graph separately from Story through reviewed gates.
 
