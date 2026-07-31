@@ -11,8 +11,23 @@ import { questPhoneClaimScript } from "./phoneClaimScript.js";
 const SURFACE = "#f3f1e7";
 const TITLE_INK = "#191919";
 const BODY_INK = "#4f4f4f";
-const APP_STORE_URL = "https://apps.apple.com/app/id6745767553";
-const APP_STORE_ID = "6745767553";
+const DEFAULT_APP_HANDOFF = Object.freeze({
+  appScheme: "info.nothingserious.quests",
+  androidPackage: "info.nothingserious.quests",
+  appStoreUrl: "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553",
+  playStoreUrl: "https://play.google.com/store/apps/details?id=info.nothingserious.quests",
+  appStoreId: "6745767553",
+});
+const QUEST_PAGE_CSP =
+  "default-src 'self'; " +
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; " +
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
+  "font-src https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
+  "connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com; " +
+  "img-src 'self' https://*.supabase.co data:; " +
+  "frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; " +
+  "form-action 'self' https://apps.apple.com https://play.google.com; " +
+  "base-uri 'self'; object-src 'none'";
 
 const ICON_FIELD = [
   { svg: ICON_GROWTH, size: "clamp(58px, 8vw, 118px)", top: "4%", left: "5%", rotate: "-10deg" },
@@ -118,19 +133,57 @@ function coverMarkup(presentation) {
   return `<div class="quest-cover"><img src="${escapeHtml(presentation.coverImageUrl)}" alt="" /></div>`;
 }
 
+function safeHttpsUrl(value, fallback) {
+  try {
+    const parsed = new URL(String(value || ""));
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password) return fallback;
+    return parsed.toString();
+  } catch {
+    return fallback;
+  }
+}
+
+export function normalizeQuestAppHandoff(value = {}) {
+  const appScheme = /^[A-Za-z][A-Za-z0-9+.-]{0,63}$/.test(String(value.appScheme || ""))
+    ? String(value.appScheme)
+    : DEFAULT_APP_HANDOFF.appScheme;
+  const androidPackage = /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*)+$/.test(
+    String(value.androidPackage || ""),
+  )
+    ? String(value.androidPackage)
+    : DEFAULT_APP_HANDOFF.androidPackage;
+  const appStoreId = /^\d{6,20}$/.test(String(value.appStoreId || ""))
+    ? String(value.appStoreId)
+    : DEFAULT_APP_HANDOFF.appStoreId;
+
+  return {
+    appScheme,
+    androidPackage,
+    appStoreId,
+    appStoreUrl: safeHttpsUrl(value.appStoreUrl, DEFAULT_APP_HANDOFF.appStoreUrl),
+    playStoreUrl: safeHttpsUrl(value.playStoreUrl, DEFAULT_APP_HANDOFF.playStoreUrl),
+  };
+}
+
 function response(markup, status, requestMethod = "GET") {
   return new Response(requestMethod === "HEAD" ? null : markup, {
     status,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "no-store",
+      "Content-Security-Policy": QUEST_PAGE_CSP,
       "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
       "Referrer-Policy": "no-referrer",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+      "X-Robots-Tag": "noindex, nofollow",
     },
   });
 }
 
-export function questUnavailablePage({ requestMethod = "GET" } = {}) {
+export function questUnavailablePage({ requestMethod = "GET", appHandoff } = {}) {
+  const handoff = normalizeQuestAppHandoff(appHandoff);
   return response(`<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -164,7 +217,7 @@ export function questUnavailablePage({ requestMethod = "GET" } = {}) {
       <span class="wordmark">${WORDMARK}</span>
       <h1>This Quest link is unavailable</h1>
       <p>The Quest may have ended, expired, or been canceled.</p>
-      <a class="cta" href="${APP_STORE_URL}">Get Quests</a>
+      <a class="cta" href="${escapeHtml(handoff.appStoreUrl)}">Get Quests</a>
     </main>
   </body>
 </html>`, 404, requestMethod);
@@ -175,8 +228,10 @@ export function questSharePage({
   shareCode,
   presentation,
   turnstileSiteKey,
+  appHandoff,
   requestMethod = "GET",
 }) {
+  const handoff = normalizeQuestAppHandoff(appHandoff);
   const revision = presentation.revision;
   const canonicalUrl = `${origin}/q/${shareCode}?r=${revision}`;
   const imageUrl = `${origin}/q/${shareCode}/og.png?r=${revision}`;
@@ -188,7 +243,7 @@ export function questSharePage({
   const safeTitle = escapeHtml(presentation.title);
   const safeHost = escapeHtml(presentation.hostDisplayName);
   const safeDescription = escapeHtml(pageDescription);
-  const accent = presentation.iconColor;
+  const accent = presentation.iconColor ?? "#765BC4";
   const socialProof = escapeHtml(participantLabel(presentation.participantCount));
   const isEnded = presentation.availability === "ended";
   const statusLabel = isEnded
@@ -203,7 +258,7 @@ export function questSharePage({
   const shareHeadline = isEnded ? "This Quest has ended" : "You've been invited to a Quest";
   const phoneScript = isEnded
     ? ""
-    : questPhoneClaimScript({ shareCode, turnstileSiteKey });
+    : questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff: handoff });
   const turnstileScript = isEnded
     ? ""
     : `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`;
@@ -212,14 +267,14 @@ export function questSharePage({
         <div class="ended-mark" aria-hidden="true">&#10003;</div>
         <h2 id="ended-heading">This Quest is complete</h2>
         <p>Explore Quests to find another challenge or start your own.</p>
-        <a class="store-button" href="${APP_STORE_URL}">Get Quests</a>
+        <a class="store-button" href="${escapeHtml(handoff.appStoreUrl)}">Get Quests</a>
       </section>`
     : `<section class="join-panel" aria-labelledby="join-heading">
         <h2 id="join-heading">Join this Quest</h2>
         <p>Enter your phone number and Quests will keep this invitation ready for you.</p>
         <form id="phone-claim-form" novalidate>
           <div class="phone-row">
-            <label for="phone-input" hidden>Phone number</label>
+            <label class="visually-hidden" for="phone-input">Phone number</label>
             <input id="phone-input" class="phone-input" type="tel" inputmode="tel" autocomplete="tel"
               placeholder="+1 (555) 000-0000" aria-describedby="phone-error phone-privacy" />
             <button id="join-quest-button" class="join-button" type="submit" disabled>
@@ -232,7 +287,7 @@ export function questSharePage({
             <a href="https://thequestsapp.com/terms.html">Terms of Service</a>.</p>
           <div id="turnstile-container"></div>
         </form>
-        <div id="claim-success" class="success" role="status" aria-live="polite" hidden>
+        <div id="claim-success" class="success" role="status" aria-live="polite" tabindex="-1" hidden>
           <div class="success-mark" aria-hidden="true">&#10003;</div>
           <h2>Your invitation is saved</h2>
           <p>Continue in Quests with this phone number to join.</p>
@@ -249,7 +304,7 @@ export function questSharePage({
     <meta name="description" content="${safeDescription}" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="theme-color" content="${SURFACE}" />
-    <meta name="apple-itunes-app" content="app-id=${APP_STORE_ID}, app-argument=${escapeHtml(canonicalUrl)}" />
+    <meta name="apple-itunes-app" content="app-id=${handoff.appStoreId}, app-argument=${escapeHtml(canonicalUrl)}" />
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
     <meta property="og:title" content="${shareHeadline}" />
     <meta property="og:description" content="${safeDescription}" />
@@ -351,6 +406,9 @@ export function questSharePage({
         font-weight: 700; text-decoration: none; }
       footer { padding-top: 24px; text-align: center; color: #777771; font-size: 12px; }
       footer a { color: inherit; }
+      .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important;
+        margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important; border: 0 !important; }
       [hidden] { display: none !important; }
       @media (max-width: 560px) {
         .page { padding-left: 14px; padding-right: 14px; }

@@ -31,6 +31,13 @@ route is explicitly enabled.
 | `QUEST_SHARE_SUPABASE_URL` | Project URL containing `quest-share-web` | Staging project URL |
 | `QUEST_SHARE_WEB_SECRET` | Shared secret sent as `x-quest-share-secret` | Separate staging secret |
 | `TURNSTILE_SITE_KEY` | Public widget key used by the phone claim form | Current invite-domain key |
+| `TURNSTILE_SECRET_KEY` | Server-side key paired with the environment widget | Separate staging secret |
+| `TURNSTILE_ALLOWED_HOSTS` | Exact comma-separated hosts accepted by the phone endpoint | Preview and custom staging hosts |
+| `QUEST_SHARE_APP_SCHEME` | Custom scheme for the matching installed iOS and Android build | Value verified from staging build artifacts |
+| `QUEST_SHARE_ANDROID_PACKAGE` | Android package for the installed-app intent | Value verified from the staging build artifact |
+| `QUEST_SHARE_IOS_STORE_URL` | iOS fallback or internal-install destination | Environment-specific HTTPS URL |
+| `QUEST_SHARE_ANDROID_STORE_URL` | Android fallback or internal-install destination | Environment-specific HTTPS URL |
+| `QUEST_SHARE_IOS_STORE_ID` | Smart App Banner App Store identifier | `6745767553` unless a separate listing applies |
 
 Profile Sharing keeps its independent `PROFILE_SHARE_*` bindings. The legacy
 Quest page and phone endpoint keep their current `SUPABASE_*`, Turnstile, and KV
@@ -110,8 +117,22 @@ hierarchy:
 
 Joinable pages preserve the current phone claim endpoint. A successful claim
 opens the platform store so the pending claim can be consumed after sign-in.
-The installed-app action keeps the share code through the Android intent or the
-iOS Quest custom scheme, with a timed store fallback.
+The installed-app action keeps the share code through the environment-bound
+Android intent or iOS Quest custom scheme, with a timed store fallback. Staging
+bindings must come from the compiled native artifacts used for acceptance.
+`app.config.js` alone is insufficient evidence because this project commits
+native directories and EAS can build those projects without prebuild.
+
+The phone endpoint limits body and Turnstile token sizes, applies a bounded
+Siteverify timeout, requires an allowlisted nonempty hostname, emits no-store
+JSON, and keeps backend diagnostics in server logs. A Quest that becomes
+unjoinable between page render and phone submit returns the stable
+`quest_unavailable` response.
+
+Enhanced Pages Function responses set their own CSP, HSTS, frame denial,
+permissions policy, robots policy, referrer policy, MIME protection, and
+no-store cache headers. Cloudflare `_headers` remains a static-route defense and
+does not supply headers for Pages Function responses.
 
 ## Failure behavior
 
@@ -144,6 +165,9 @@ The local suite covers:
 - HTML escaping and same-project media allowlists
 - Private, Community, upcoming, active, and completed card states
 - Phone claim and installed-app handoff source contracts
+- Production and staging app-handoff bindings
+- Security headers emitted directly by the Pages Function
+- Bounded Turnstile validation and anonymous-error redaction
 - Open Graph and Story proxy requests, status codes, content types, and caching
 - Independent Story gating
 - Profile routes, association files, Pages routing, and phone endpoint presence
@@ -162,10 +186,15 @@ Hosted staging still requires:
 3. Deploy a branch preview and verify valid, ended, canceled, expired, and
    malformed codes.
 4. Verify first-response metadata with crawler-style requests.
-5. Verify the phone claim flow with a real staging Quest and a fresh install.
-6. Verify physical Messages rendering for the 1200 x 630 artifact.
-7. Complete Story renderer capacity and physical Instagram acceptance.
-8. Activate HTML and Open Graph separately from Story through reviewed gates.
+5. Configure a separate staging Turnstile widget, paired site and secret keys,
+   and the exact preview or custom host in `TURNSTILE_ALLOWED_HOSTS`. Recheck the
+   historical `403 turnstile_failed` case with a real staging Quest and fresh
+   install.
+6. Verify compiled iOS scheme and Android package values, then exercise both
+   installed-app handoffs against the matching staging artifacts.
+7. Verify physical Messages rendering for the 1200 x 630 artifact.
+8. Complete Story renderer capacity and physical Instagram acceptance.
+9. Activate HTML and Open Graph separately from Story through reviewed gates.
 
 Cloudflare publication, Supabase changes, production mutation, branch push, and
 gate activation remain outside this source lane.

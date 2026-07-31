@@ -67,8 +67,8 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   if (Number(raw.presentationVersion) !== QUEST_SHARE_PRESENTATION_VERSION) return null;
 
-  const revision = String(raw.revision ?? "");
-  if (!QUEST_SHARE_REVISION_PATTERN.test(revision)) return null;
+  const revision = positiveInteger(raw.revision, Number.MAX_SAFE_INTEGER);
+  if (revision == null || revision < 1) return null;
 
   const title = boundedText(raw.title, 120);
   const status = boundedText(raw.status, 24).toUpperCase();
@@ -85,7 +85,7 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   const iconColorCandidate = boundedText(raw.iconColor, 7);
   const iconColor = /^#[0-9a-f]{6}$/i.test(iconColorCandidate)
     ? iconColorCandidate.toUpperCase()
-    : "#765BC4";
+    : null;
 
   const durationDays = raw.durationDays == null
     ? null
@@ -106,19 +106,27 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   if (raw.category != null && !category) return null;
   const hostDisplayName = boundedText(raw.hostDisplayName, 80);
   const startDate = isoDate(raw.startDate);
+  const endDate = isoDate(raw.endDate);
   const duration = boundedText(raw.duration, 40);
   const cadenceLabel = boundedText(raw.cadenceLabel, 48);
   const frequencyCandidate = boundedText(raw.frequency, 32).toUpperCase();
   const frequency = FREQUENCIES.has(frequencyCandidate) ? frequencyCandidate : null;
-  if (!hostDisplayName || !startDate || !duration || !cadenceLabel || !frequency || !privacyLevel) {
+  if (
+    !hostDisplayName || !startDate ||
+    (raw.endDate != null && !endDate) ||
+    !duration || !cadenceLabel || !frequency || !privacyLevel ||
+    typeof raw.isGroupQuest !== "boolean"
+  ) {
     return null;
   }
+
+  const shortDescription = boundedText(raw.shortDescription, 280) || null;
 
   return Object.freeze({
     presentationVersion: QUEST_SHARE_PRESENTATION_VERSION,
     revision,
     title,
-    shortDescription: boundedText(raw.shortDescription, 280),
+    shortDescription,
     icon,
     iconColor,
     category,
@@ -129,7 +137,7 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
       AVATAR_PATH_PREFIXES,
     ),
     startDate,
-    endDate: isoDate(raw.endDate),
+    endDate,
     duration,
     durationDays,
     cadenceLabel,
@@ -142,7 +150,7 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
       supabaseUrl,
       COVER_PATH_PREFIXES,
     ),
-    isGroupQuest: raw.isGroupQuest === true,
+    isGroupQuest: raw.isGroupQuest,
     privacyLevel,
   });
 }
