@@ -8,17 +8,29 @@ import {
   normalizeQuestSharePresentation,
 } from "../functions/q/questSharePresentation.js";
 import { questSharePage } from "../functions/q/questPage.js";
+import {
+  STAGING_QUEST_FIXTURE_CODE,
+  STAGING_QUEST_FIXTURE_CUTOFF,
+  STAGING_QUEST_FIXTURE_HOST,
+  STAGING_QUEST_FIXTURE_OG_PATH,
+  STAGING_QUEST_FIXTURE_TOKEN,
+  stagingQuestFixtureForRequest,
+} from "../functions/q/stagingQuestFixture.js";
 
 const ROOT = new URL("../", import.meta.url);
 const SUPABASE_URL = "https://project.supabase.co";
 const LEGACY_MARKUP = "<!doctype html><title>Legacy Quest invite</title>";
 const FALLBACK_PNG = await readFile(new URL("quest-share-og-fallback.png", ROOT));
+const STAGING_FIXTURE_PNG = await readFile(
+  new URL("quest-share-fixtures/PHLYrwGR-og.png", ROOT),
+);
 
 async function fixture(name) {
   return JSON.parse(await readFile(new URL(`fixtures/${name}`, import.meta.url), "utf8"));
 }
 
 function context({
+  origin = "https://invite.thequestsapp.com",
   path = ["AbCd2345"],
   method = "GET",
   search = "",
@@ -28,7 +40,7 @@ function context({
   envOverrides = {},
 } = {}) {
   return {
-    request: new Request(`https://invite.thequestsapp.com/q/${path.join("/")}${search}`, { method }),
+    request: new Request(`${origin}/q/${path.join("/")}${search}`, { method }),
     params: { path },
     env: {
       QUEST_SHARING_ENABLED: enabled ? "true" : "false",
@@ -45,6 +57,15 @@ function context({
               headers: {
                 "Content-Type": "image/png",
                 "Content-Length": String(FALLBACK_PNG.length),
+              },
+            });
+          }
+          if (new URL(request.url).pathname === STAGING_QUEST_FIXTURE_OG_PATH) {
+            return new Response(STAGING_FIXTURE_PNG, {
+              status: 200,
+              headers: {
+                "Content-Type": "image/png",
+                "Content-Length": String(STAGING_FIXTURE_PNG.length),
               },
             });
           }
@@ -133,6 +154,101 @@ test("bundled revision-zero fallback is a compact 1200 by 630 PNG", () => {
   assert.ok(FALLBACK_PNG.length <= 300 * 1024);
 });
 
+test("sealed staging fixture serves rich HTML only on its exact host, code, and token", async () => {
+  let edgeCalled = false;
+  const response = await withFetch(async () => {
+    edgeCalled = true;
+    return Response.json({ code: "unexpected" }, { status: 500 });
+  }, () => onRequest(context({
+    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+    path: [STAGING_QUEST_FIXTURE_CODE],
+    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+    enabled: false,
+  })));
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.equal(edgeCalled, false);
+  assert.match(html, /\[DEV STACK TEST\] Creativity 1/);
+  assert.match(html, /Quests Test Account/);
+  assert.match(html, /1 participant/);
+  assert.match(html, /Open Quests \[Staging\]/);
+  assert.match(html, /href="quests-staging:\/\/q\/PHLYrwGR"/);
+  assert.match(
+    html,
+    /property="og:image" content="https:\/\/quest-sharing-staging\.quests-invite\.pages\.dev\/q\/PHLYrwGR\/og\.png\?preview=20260801-1"/,
+  );
+  assert.doesNotMatch(html, /phone-claim-form/);
+  assert.doesNotMatch(html, /challenges\.cloudflare\.com\/turnstile/);
+  assert.doesNotMatch(html, /apple-itunes-app/);
+  assert.doesNotMatch(html, /Delete with --cleanup/);
+  assert.equal(response.headers.get("Cache-Control"), "no-store");
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex, nofollow");
+});
+
+test("sealed staging fixture serves its exact compact PNG contract", async () => {
+  for (const method of ["GET", "HEAD"]) {
+    const response = await onRequest(context({
+      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+      path: [STAGING_QUEST_FIXTURE_CODE, "og.png"],
+      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+      enabled: false,
+      method,
+    }));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/png");
+    assert.equal(response.headers.get("Content-Length"), String(STAGING_FIXTURE_PNG.length));
+    assert.equal(response.headers.get("Cache-Control"), "no-store");
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (method === "HEAD") {
+      assert.equal(bytes.length, 0);
+    } else {
+      assert.deepEqual(bytes, STAGING_FIXTURE_PNG);
+      assert.equal(bytes.readUInt32BE(16), 1200);
+      assert.equal(bytes.readUInt32BE(20), 630);
+      assert.ok(bytes.length <= 300 * 1024);
+    }
+  }
+
+  const story = await onRequest(context({
+    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+    path: [STAGING_QUEST_FIXTURE_CODE, "story.png"],
+    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+    enabled: false,
+  }));
+  assert.equal(story.status, 404);
+});
+
+test("production, nonfixture, wrong-token, and expired fixture requests stay legacy", async () => {
+  const cases = [
+    {
+      origin: "https://invite.thequestsapp.com",
+      path: [STAGING_QUEST_FIXTURE_CODE],
+      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+    },
+    {
+      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+      path: ["AbCd2345"],
+      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+    },
+    {
+      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+      path: [STAGING_QUEST_FIXTURE_CODE],
+      search: "?preview=wrong",
+    },
+  ];
+  for (const route of cases) {
+    const response = await onRequest(context({ ...route, enabled: false }));
+    assert.equal(await response.text(), LEGACY_MARKUP);
+  }
+
+  assert.equal(stagingQuestFixtureForRequest({
+    url: `https://${STAGING_QUEST_FIXTURE_HOST}/q/${STAGING_QUEST_FIXTURE_CODE}?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+    shareCode: STAGING_QUEST_FIXTURE_CODE,
+    now: new Date(STAGING_QUEST_FIXTURE_CUTOFF),
+  }), null);
+});
+
 test("server HTML contains complete first-response Quest metadata", async () => {
   const presentation = await fixture("quest-share-upcoming.json");
   let edgeRequest;
@@ -158,7 +274,7 @@ test("server HTML contains complete first-response Quest metadata", async () => 
   assert.match(html, />Private</);
   assert.match(html, />Productivity</);
   assert.match(html, /Check in daily/);
-  assert.match(html, /4 people are doing this Quest/);
+  assert.match(html, /4 participants/);
   assert.match(html, /fetch\("\/api\/link-claims\/start"/);
   assert.equal(presentation.availability, "joinable");
   assert.equal(typeof presentation.revision, "number");
@@ -167,7 +283,7 @@ test("server HTML contains complete first-response Quest metadata", async () => 
   assert.match(html, /var APP_SCHEME = "info\.nothingserious\.quests"/);
   assert.match(html, /APP_SCHEME \+ ":\/\/q\/" \+ shareCode/);
   assert.match(html, /window\.location\.href = APP_STORE_URL/);
-  assert.match(html, /Your number is securely matched/);
+  assert.match(html, /By continuing, you agree to the/);
   assert.match(html, /class="visually-hidden" for="phone-input"/);
   assert.match(html, /success\.focus\(\)/);
   assert.doesNotMatch(html, /Your number is encrypted/);
@@ -391,7 +507,7 @@ test("Community presentation maps public, category, duration, and cadence card s
   assert.match(html, />12 weeks</);
   assert.match(html, />Social &amp; Lifestyle</);
   assert.match(html, /Check in every weekend/);
-  assert.match(html, /128 people are doing this Quest/);
+  assert.match(html, /128 participants/);
   assert.doesNotMatch(html, /class="quest-cover"/);
 });
 
@@ -558,7 +674,7 @@ test("ended Quest page keeps the card and removes joining controls", async () =>
   const html = await response.text();
   assert.equal(response.status, 200);
   assert.match(html, /This Quest has ended/);
-  assert.match(html, /This Quest is complete/);
+  assert.doesNotMatch(html, /find another challenge/);
   assert.match(html, /Seven Days of Gratitude/);
   assert.equal(presentation.availability, "ended");
   assert.doesNotMatch(html, /id="phone-claim-form"/);
@@ -572,7 +688,8 @@ test("unavailable valid link returns a generic page with zero Quest fields", asy
   );
   const html = await response.text();
   assert.equal(response.status, 404);
-  assert.match(html, /This Quest link is unavailable/);
+  assert.match(html, /This Quest link is unavailable or has expired\./);
+  assert.doesNotMatch(html, /may have ended|been canceled/);
   assert.doesNotMatch(html, /phone-claim-form/);
 });
 

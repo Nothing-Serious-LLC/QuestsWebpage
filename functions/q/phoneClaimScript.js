@@ -109,11 +109,11 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
         return "Too many attempts. Try again in " + minutes + " minute" + (minutes === 1 ? "" : "s") + ".";
       }
       var code = body && body.error;
-      if (status === 404 || code === "quest_not_found") return "This Quest is no longer available.";
-      if (code === "quest_unavailable") return "This Quest is no longer accepting participants.";
+      if (status === 404 || code === "quest_not_found") return "This Quest is unavailable.";
+      if (code === "quest_unavailable") return "This Quest is unavailable.";
       if (code === "invalid_phone") return "Enter a valid phone number.";
       if (code === "turnstile_failed") return "Verification failed. Try again.";
-      if (status === 503) return "Joining is temporarily unavailable. Try again shortly.";
+      if (status === 503) return "Joining is temporarily unavailable. Try again.";
       return "Something went wrong. Try again.";
     }
 
@@ -141,7 +141,7 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
 
       submitting = true;
       setError("");
-      submitLabel.textContent = "Saving your invite...";
+      submitLabel.textContent = "Saving...";
       updateButton();
 
       fetch("/api/link-claims/start", {
