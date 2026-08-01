@@ -5,6 +5,11 @@ import {
   safeTurnstileSiteKey,
 } from "./questSharePresentation.js";
 import { questSharePage, questUnavailablePage } from "./questPage.js";
+import {
+  STAGING_QUEST_FIXTURE_OG_PATH,
+  STAGING_QUEST_FIXTURE_TOKEN,
+  stagingQuestFixtureForRequest,
+} from "./stagingQuestFixture.js";
 
 const EDGE_TIMEOUT_MS = 4_000;
 const REVISION_ZERO_OG_FALLBACK_PATH = "/quest-share-og-fallback.png";
@@ -128,6 +133,7 @@ async function revisionZeroOgFallback(context) {
     "Content-Type": "image/png",
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
+    "X-Robots-Tag": "noindex, nofollow",
   });
   const contentLength = assetResponse.headers.get("Content-Length");
   if (contentLength && /^\d+$/.test(contentLength)) {
@@ -137,6 +143,47 @@ async function revisionZeroOgFallback(context) {
   return new Response(
     context.request.method === "HEAD" ? null : assetResponse.body,
     { status: 200, headers },
+  );
+}
+
+async function stagingFixtureOg(context) {
+  if (!context.env?.ASSETS?.fetch) {
+    return imageServiceUnavailable(context.request.method);
+  }
+  const url = new URL(context.request.url);
+  url.pathname = STAGING_QUEST_FIXTURE_OG_PATH;
+  url.search = "";
+  let assetResponse;
+  try {
+    assetResponse = await context.env.ASSETS.fetch(
+      new Request(url.toString()),
+    );
+  } catch {
+    return imageServiceUnavailable(context.request.method);
+  }
+  const contentType = String(assetResponse.headers.get("Content-Type") || "")
+    .split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+  if (!assetResponse.ok || contentType !== "image/png") {
+    return imageServiceUnavailable(context.request.method);
+  }
+  const headers = new Headers({
+    "Content-Type": "image/png",
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+    "X-Robots-Tag": "noindex, nofollow",
+  });
+  const contentLength = assetResponse.headers.get("Content-Length");
+  if (contentLength && /^\d+$/.test(contentLength)) {
+    headers.set("Content-Length", contentLength);
+  }
+  return new Response(
+    context.request.method === "HEAD" ? null : assetResponse.body,
+    {
+      status: 200,
+      headers,
+    },
   );
 }
 
@@ -202,10 +249,6 @@ export async function onRequest(context) {
     });
   }
 
-  if (!isQuestSharingEnabled(context.env)) {
-    return legacyQuestPage(context);
-  }
-
   const segments = pathSegments(context.params);
   if (segments.length < 1 || segments.length > 2) {
     return legacyQuestPage(context);
@@ -224,6 +267,35 @@ export async function onRequest(context) {
   if (segments.length === 2 && !artifact) return legacyQuestPage(context);
 
   const url = new URL(context.request.url);
+  const stagingFixture = stagingQuestFixtureForRequest({
+    url,
+    shareCode,
+  });
+  if (stagingFixture) {
+    if (artifact === "og") {
+      return stagingFixtureOg(context);
+    }
+    if (artifact === "story") {
+      return imageNotFound(context.request.method);
+    }
+    return questSharePage({
+      origin: url.origin,
+      shareCode,
+      presentation: stagingFixture,
+      appHandoff: {
+        appScheme: "quests-staging",
+        androidPackage: "info.nothingserious.quests.staging",
+      },
+      interactionMode: "staging-app-only",
+      previewQuery: `preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+      requestMethod: context.request.method,
+    });
+  }
+
+  if (!isQuestSharingEnabled(context.env)) {
+    return legacyQuestPage(context);
+  }
+
   const revisionParam = url.searchParams.get("r");
   const revision = revisionParam && QUEST_SHARE_REVISION_PATTERN.test(revisionParam)
     ? revisionParam

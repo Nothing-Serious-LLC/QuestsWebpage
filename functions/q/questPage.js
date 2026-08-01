@@ -116,9 +116,9 @@ function checkInRuleMarkup(presentation) {
 }
 
 function participantLabel(count) {
-  if (count === 0) return "Be the first to join";
-  if (count === 1) return "1 person is doing this Quest";
-  return `${count.toLocaleString("en-US")} people are doing this Quest`;
+  if (count === 0) return "No participants yet";
+  if (count === 1) return "1 participant";
+  return `${count.toLocaleString("en-US")} participants`;
 }
 
 function questIconMarkup(presentation) {
@@ -215,8 +215,7 @@ export function questUnavailablePage({ requestMethod = "GET", appHandoff } = {})
     ${iconFieldMarkup()}
     <main>
       <span class="wordmark">${WORDMARK}</span>
-      <h1>This Quest link is unavailable</h1>
-      <p>The Quest may have ended, expired, or been canceled.</p>
+      <h1>This Quest link is unavailable or has expired.</h1>
       <a class="cta" href="${escapeHtml(handoff.appStoreUrl)}">Get Quests</a>
     </main>
   </body>
@@ -229,50 +228,55 @@ export function questSharePage({
   presentation,
   turnstileSiteKey,
   appHandoff,
+  interactionMode = "phone",
+  previewQuery = "",
   requestMethod = "GET",
 }) {
   const handoff = normalizeQuestAppHandoff(appHandoff);
   const revision = presentation.revision;
-  const revisionQuery = revision > 0 ? `?r=${revision}` : "";
+  const revisionQuery = previewQuery
+    ? `?${previewQuery}`
+    : revision > 0
+      ? `?r=${revision}`
+      : "";
   const canonicalUrl = `${origin}/q/${shareCode}${revisionQuery}`;
   const imageUrl = `${origin}/q/${shareCode}/og.png${revisionQuery}`;
   const pageTitle = presentation.availability === "ended"
     ? `${presentation.title} has ended | Quests`
     : `Join ${presentation.title} on Quests`;
   const pageDescription = presentation.shortDescription ||
-    `${presentation.hostDisplayName} invited you to join a Quest.`;
+    `Hosted by ${presentation.hostDisplayName}`;
   const safeTitle = escapeHtml(presentation.title);
   const safeHost = escapeHtml(presentation.hostDisplayName);
   const safeDescription = escapeHtml(pageDescription);
   const accent = presentation.iconColor ?? "#765BC4";
   const socialProof = escapeHtml(participantLabel(presentation.participantCount));
   const isEnded = presentation.availability === "ended";
-  const statusLabel = isEnded
-    ? "Ended Quest"
-    : presentation.status === "UPCOMING"
-      ? "Upcoming Quest"
-      : "Active Quest";
   const startLabel = formatStartDate(presentation.startDate);
   const statusSupportingLabel = presentation.status === "UPCOMING" && startLabel
-    ? `${statusLabel} · Starts ${startLabel}`
-    : statusLabel;
+    ? `Starts ${startLabel}`
+    : "";
   const shareHeadline = isEnded ? "This Quest has ended" : "You've been invited to a Quest";
-  const phoneScript = isEnded
-    ? ""
-    : questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff: handoff });
-  const turnstileScript = isEnded
-    ? ""
-    : `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`;
+  const usesPhoneClaim = !isEnded && interactionMode === "phone";
+  const phoneScript = usesPhoneClaim
+    ? questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff: handoff })
+    : "";
+  const turnstileScript = usesPhoneClaim
+    ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`
+    : "";
   const actionPanel = isEnded
     ? `<section class="join-panel ended-panel" aria-labelledby="ended-heading">
         <div class="ended-mark" aria-hidden="true">&#10003;</div>
-        <h2 id="ended-heading">This Quest is complete</h2>
-        <p>Explore Quests to find another challenge or start your own.</p>
+        <h2 id="ended-heading">This Quest has ended</h2>
         <a class="store-button" href="${escapeHtml(handoff.appStoreUrl)}">Get Quests</a>
       </section>`
-    : `<section class="join-panel" aria-labelledby="join-heading">
+    : interactionMode === "staging-app-only"
+      ? `<section class="join-panel" aria-labelledby="join-heading">
         <h2 id="join-heading">Join this Quest</h2>
-        <p>Enter your phone number and Quests will keep this invitation ready for you.</p>
+        <a class="store-button" href="${escapeHtml(`${handoff.appScheme}://q/${shareCode}`)}">Open Quests [Staging]</a>
+      </section>`
+      : `<section class="join-panel" aria-labelledby="join-heading">
+        <h2 id="join-heading">Join this Quest</h2>
         <form id="phone-claim-form" novalidate>
           <div class="phone-row">
             <label class="visually-hidden" for="phone-input">Phone number</label>
@@ -283,17 +287,15 @@ export function questSharePage({
             </button>
           </div>
           <p id="phone-error" class="phone-error" role="alert" aria-live="polite" hidden></p>
-          <p id="phone-privacy" class="privacy">Your number is securely matched to connect this invitation after sign-in.
-            By continuing, you agree to the <a href="https://thequestsapp.com/privacy.html">Privacy Policy</a> and
+          <p id="phone-privacy" class="privacy">By continuing, you agree to the <a href="https://thequestsapp.com/privacy.html">Privacy Policy</a> and
             <a href="https://thequestsapp.com/terms.html">Terms of Service</a>.</p>
           <div id="turnstile-container"></div>
         </form>
         <div id="claim-success" class="success" role="status" aria-live="polite" tabindex="-1" hidden>
           <div class="success-mark" aria-hidden="true">&#10003;</div>
-          <h2>Your invitation is saved</h2>
-          <p>Continue in Quests with this phone number to join.</p>
+          <h2>Invitation saved</h2>
         </div>
-        <button id="open-app-link" class="open-app" type="button">I already have the app</button>
+        <button id="open-app-link" class="open-app" type="button">Open in Quests</button>
       </section>`;
 
   return response(`<!DOCTYPE html>
@@ -305,7 +307,7 @@ export function questSharePage({
     <meta name="description" content="${safeDescription}" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="theme-color" content="${SURFACE}" />
-    <meta name="apple-itunes-app" content="app-id=${handoff.appStoreId}, app-argument=${escapeHtml(canonicalUrl)}" />
+    ${interactionMode === "staging-app-only" ? "" : `<meta name="apple-itunes-app" content="app-id=${handoff.appStoreId}, app-argument=${escapeHtml(canonicalUrl)}" />`}
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
     <meta property="og:title" content="${shareHeadline}" />
     <meta property="og:description" content="${safeDescription}" />
@@ -428,7 +430,6 @@ export function questSharePage({
     <main class="page">
       <span class="wordmark">${WORDMARK}</span>
       <header class="intro">
-        <p class="eyebrow">Quest invitation</p>
         <h1>${shareHeadline}</h1>
       </header>
 
@@ -436,7 +437,7 @@ export function questSharePage({
         ${coverMarkup(presentation)}
         <div class="quest-content">
           <div class="medallion">${questIconMarkup(presentation)}</div>
-          <p class="status">${statusSupportingLabel}</p>
+          ${statusSupportingLabel ? `<p class="status">${statusSupportingLabel}</p>` : ""}
           <h2 class="quest-title">${safeTitle}</h2>
           ${presentation.shortDescription ? `<p class="quest-description">${escapeHtml(presentation.shortDescription)}</p>` : ""}
           <div class="pills">${pillMarkup(presentation)}</div>
