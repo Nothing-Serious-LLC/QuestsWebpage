@@ -11,6 +11,14 @@ import { questPhoneClaimScript } from "./phoneClaimScript.js";
 const SURFACE = "#f3f1e7";
 const TITLE_INK = "#191919";
 const BODY_INK = "#4f4f4f";
+const CATEGORY_VISUALS = Object.freeze({
+  recharge_move: Object.freeze({ background: "#ECF0FE", ink: "#889FE9" }),
+  social_lifestyle: Object.freeze({ background: "#DFF2E2", ink: "#57A56C" }),
+  mindfulness: Object.freeze({ background: "#F1E2F8", ink: "#A961CC" }),
+  creativity: Object.freeze({ background: "#FFE4D6", ink: "#F0925B" }),
+  productivity: Object.freeze({ background: "#F5E9CF", ink: "#DBB66B" }),
+});
+const DEFAULT_CATEGORY_VISUAL = CATEGORY_VISUALS.mindfulness;
 const DEFAULT_APP_HANDOFF = Object.freeze({
   appScheme: "info.nothingserious.quests",
   androidPackage: "info.nothingserious.quests",
@@ -71,30 +79,17 @@ function avatarMarkup(presentation) {
   return `<span class="host-avatar host-initials" aria-hidden="true">${escapeHtml(displayInitials(presentation.hostDisplayName))}</span>`;
 }
 
-function formatStartDate(value) {
-  if (!value) return "";
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      timeZone: "UTC",
-    }).format(new Date(value));
-  } catch {
-    return "";
-  }
-}
-
 function pillMarkup(presentation) {
   const pills = [];
   if (presentation.privacyLevel === "PRIVATE") pills.push("Private");
   if (presentation.privacyLevel === "PUBLIC") pills.push("Public");
   if (presentation.duration) pills.push(presentation.duration);
   const categoryLabels = {
-    recharge_move: "Recharge & Move",
-    social_lifestyle: "Social & Lifestyle",
-    mindfulness: "Mindfulness",
-    creativity: "Creativity",
-    productivity: "Productivity",
+    recharge_move: "Healthy",
+    social_lifestyle: "Social",
+    mindfulness: "Mindful",
+    creativity: "Creative",
+    productivity: "Productive",
   };
   if (presentation.category && categoryLabels[presentation.category]) {
     pills.push(categoryLabels[presentation.category]);
@@ -107,18 +102,33 @@ function pillMarkup(presentation) {
 function checkInRuleMarkup(presentation) {
   if (!presentation.cadenceLabel) return "";
   const cadence = presentation.cadenceLabel.trim();
-  let rule = cadence;
-  if (/^daily$/i.test(cadence)) rule = "Check in daily";
-  else if (/^weekly$/i.test(cadence)) rule = "Check in weekly";
-  else if (/^every\b/i.test(cadence)) rule = `Check in ${cadence.toLowerCase()}`;
-  else if (!/^check in\b/i.test(cadence)) rule = `Check in ${cadence.toLowerCase()}`;
+  let rule;
+  switch (cadence.toLowerCase()) {
+    case "weekly":
+    case "every week":
+      rule = "Check in every week";
+      break;
+    case "monthly":
+    case "every month":
+      rule = "Check in every month";
+      break;
+    case "daily":
+    case "every day":
+      rule = "Check in every day";
+      break;
+    default:
+      rule = /^check in\b/i.test(cadence)
+        ? cadence
+        : `Check in ${cadence.toLowerCase()}`;
+      break;
+  }
   return `<div class="check-in-rule"><span class="mdi mdi-calendar-check-outline" aria-hidden="true"></span><span>${escapeHtml(rule)}</span></div>`;
 }
 
 function participantLabel(count) {
-  if (count === 0) return "No participants yet";
-  if (count === 1) return "1 participant";
-  return `${count.toLocaleString("en-US")} participants`;
+  if (count === 0) return "is hosting this Quest";
+  if (count === 1) return "& 1 Quester";
+  return `& ${count.toLocaleString("en-US")} Questers`;
 }
 
 function questIconMarkup(presentation) {
@@ -195,7 +205,7 @@ export function questUnavailablePage({ requestMethod = "GET", appHandoff } = {})
     <link rel="icon" type="image/png" href="/icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; overflow: hidden;
@@ -244,39 +254,43 @@ export function questSharePage({
   const pageTitle = presentation.availability === "ended"
     ? `${presentation.title} has ended | Quests`
     : `Join ${presentation.title} on Quests`;
-  const pageDescription = presentation.shortDescription ||
-    `Hosted by ${presentation.hostDisplayName}`;
+  const pageDescription = `Hosted by ${presentation.hostDisplayName}`;
   const safeTitle = escapeHtml(presentation.title);
   const safeHost = escapeHtml(presentation.hostDisplayName);
   const safeDescription = escapeHtml(pageDescription);
-  const accent = presentation.iconColor ?? "#765BC4";
+  const categoryVisual = presentation.category
+    ? CATEGORY_VISUALS[presentation.category] ?? DEFAULT_CATEGORY_VISUAL
+    : DEFAULT_CATEGORY_VISUAL;
+  const accent = categoryVisual.ink;
+  const categoryBackground = categoryVisual.background;
   const socialProof = escapeHtml(participantLabel(presentation.participantCount));
   const isEnded = presentation.availability === "ended";
-  const startLabel = formatStartDate(presentation.startDate);
-  const statusSupportingLabel = presentation.status === "UPCOMING" && startLabel
-    ? `Starts ${startLabel}`
-    : "";
-  const shareHeadline = isEnded ? "This Quest has ended" : "You've been invited to a Quest";
-  const usesPhoneClaim = !isEnded && interactionMode === "phone";
+  const shareHeadline = isEnded ? "This Quest has ended" : "You’ve been invited to a Quest";
+  const pageHeadline = isEnded ? "This Quest has ended" : "You’ve been invited!";
+  const usesPhoneClaim =
+    !isEnded &&
+    (interactionMode === "phone" || interactionMode === "phone-demo");
   const phoneScript = usesPhoneClaim
-    ? questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff: handoff })
+    ? questPhoneClaimScript({
+      shareCode,
+      turnstileSiteKey,
+      appHandoff: handoff,
+      demoMode: interactionMode === "phone-demo",
+    })
     : "";
-  const turnstileScript = usesPhoneClaim
+  const turnstileScript = !isEnded && interactionMode === "phone"
     ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`
     : "";
   const actionPanel = isEnded
-    ? `<section class="join-panel ended-panel" aria-labelledby="ended-heading">
+    ? `<section class="join-panel ended-panel" aria-label="This Quest has ended">
         <div class="ended-mark" aria-hidden="true">&#10003;</div>
-        <h2 id="ended-heading">This Quest has ended</h2>
         <a class="store-button" href="${escapeHtml(handoff.appStoreUrl)}">Get Quests</a>
       </section>`
-    : interactionMode === "staging-app-only"
-      ? `<section class="join-panel" aria-labelledby="join-heading">
-        <h2 id="join-heading">Join this Quest</h2>
-        <a class="store-button" href="${escapeHtml(`${handoff.appScheme}://q/${shareCode}`)}">Open Quests [Staging]</a>
+    : !usesPhoneClaim
+      ? `<section class="join-panel" aria-label="Join this Quest">
+        <a class="store-button" href="${escapeHtml(`${handoff.appScheme}://q/${shareCode}`)}">Open Quests</a>
       </section>`
-      : `<section class="join-panel" aria-labelledby="join-heading">
-        <h2 id="join-heading">Join this Quest</h2>
+      : `<section class="join-panel" aria-label="Join this Quest">
         <form id="phone-claim-form" novalidate>
           <div class="phone-row">
             <label class="visually-hidden" for="phone-input">Phone number</label>
@@ -293,10 +307,12 @@ export function questSharePage({
         </form>
         <div id="claim-success" class="success" role="status" aria-live="polite" tabindex="-1" hidden>
           <div class="success-mark" aria-hidden="true">&#10003;</div>
-          <h2>Invitation saved</h2>
+          <h2>Opening Quests<span class="dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></h2>
         </div>
-        <button id="open-app-link" class="open-app" type="button">Open in Quests</button>
       </section>`;
+  const openAppSlot = !isEnded && usesPhoneClaim
+    ? `<button id="open-app-link" class="open-app" type="button">Open in Quests</button>`
+    : "";
 
   return response(`<!DOCTYPE html>
 <html lang="en">
@@ -307,7 +323,7 @@ export function questSharePage({
     <meta name="description" content="${safeDescription}" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="theme-color" content="${SURFACE}" />
-    ${interactionMode === "staging-app-only" ? "" : `<meta name="apple-itunes-app" content="app-id=${handoff.appStoreId}, app-argument=${escapeHtml(canonicalUrl)}" />`}
+    ${interactionMode === "staging-app-only" || interactionMode === "phone-demo" ? "" : `<meta name="apple-itunes-app" content="app-id=${handoff.appStoreId}, app-argument=${escapeHtml(canonicalUrl)}" />`}
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
     <meta property="og:title" content="${shareHeadline}" />
     <meta property="og:description" content="${safeDescription}" />
@@ -317,8 +333,8 @@ export function questSharePage({
     <meta property="og:image" content="${escapeHtml(imageUrl)}" />
     <meta property="og:image:secure_url" content="${escapeHtml(imageUrl)}" />
     <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:width" content="1080" />
+    <meta property="og:image:height" content="1350" />
     <meta property="og:image:alt" content="Invitation to ${safeTitle}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${shareHeadline}" />
@@ -328,11 +344,25 @@ export function questSharePage({
     <link rel="apple-touch-icon" href="/icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet"
+      integrity="sha384-HphS8cQyN+eYiJ5PMbzShG6qZdRtvHPVLPkYb8JwMkmNgaIxrFVDhQe3jIbq3EZ2" crossorigin="anonymous" />
     ${turnstileScript}
     <style>
-      :root { --accent: ${accent}; --surface: ${SURFACE}; --title: ${TITLE_INK}; --body: ${BODY_INK}; }
+      :root { --accent: ${accent}; --category-bg: ${categoryBackground}; --surface: ${SURFACE}; --title: ${TITLE_INK}; --body: ${BODY_INK};
+        --ease-out: cubic-bezier(0.33, 1, 0.68, 1); --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+        --pull-drop: calc(50vh - 190px); --pull-drop: calc(50dvh - 190px); --content-rise: 22px; }
+      @keyframes fade-soft { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes pull-up {
+        0% { transform: translateY(var(--pull-drop)); animation-timing-function: linear; }
+        55% { transform: translateY(var(--pull-drop)); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+        100% { transform: translateY(0); }
+      }
+      .reveal { margin-top: auto; margin-bottom: auto; animation: pull-up 2.5s linear 0.15s both; }
+      @keyframes rise-in {
+        from { opacity: 0; transform: translateY(var(--content-rise)); }
+        to { opacity: 1; transform: translateY(0); }
+      }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       html, body { min-height: 100%; }
       body { min-height: 100vh; min-height: 100dvh; background: var(--surface); color: var(--title);
@@ -340,88 +370,99 @@ export function questSharePage({
       button, input { font: inherit; }
       .field-icon { position: fixed; opacity: .42; pointer-events: none; z-index: 0; }
       .field-icon svg { display: block; width: 100%; height: 100%; }
-      .page { position: relative; z-index: 1; width: min(100%, 660px); margin: 0 auto; padding:
-        max(26px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom)); }
-      .wordmark { display: block; width: 112px; margin: 0 auto 28px; }
+      .page { position: relative; z-index: 1; display: flex; flex-direction: column;
+        min-height: 100vh; min-height: 100dvh;
+        width: min(calc(100% - 32px), 420px); margin: 0 auto; padding:
+        max(24px, env(safe-area-inset-top)) 0 max(28px, env(safe-area-inset-bottom)); }
+      .wordmark { display: block; width: 112px; margin: 0 auto 30px; }
       .wordmark svg { display: block; width: 100%; height: auto; }
-      .intro { text-align: center; margin: 0 auto 22px; }
-      .eyebrow { color: #62625f; font-size: 15px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
-      .intro h1 { margin-top: 8px; font-size: clamp(30px, 7vw, 43px); line-height: 1.1; letter-spacing: -.8px; }
-      .quest-card { position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.9); border-radius: 34px;
-        background: #ffffff; background: color-mix(in srgb, var(--accent) 16%, #ffffff); box-shadow: 0 24px 68px rgba(85,82,70,.17);
-        text-align: center; }
-      .quest-cover { width: 100%; height: clamp(170px, 36vw, 220px); overflow: hidden; }
+      .intro { text-align: center; margin: 0 auto 32px;
+        animation: fade-soft 0.55s var(--ease-out) 0.2s both,
+          intro-out 0.5s var(--ease-out) 2.15s both; }
+      @keyframes intro-out { from { opacity: 1; } to { opacity: 0; } }
+      .intro h1 { font-family: "Instrument Serif", Georgia, serif; font-size: clamp(34px, 9vw, 40px); line-height: 1.08;
+        font-weight: 400; letter-spacing: .2px; }
+      .quest-card { position: relative; overflow: hidden; border: 1px solid #ffffff; border-radius: 40px;
+        background: var(--category-bg); box-shadow: 4px 4px 30px rgba(0,0,0,.12); text-align: center;
+        animation: fade-soft 0.6s var(--ease-out) 1.7s both; }
+      .quest-cover { width: 100%; height: 184px; overflow: hidden; }
       .quest-cover img { width: 100%; height: 100%; display: block; object-fit: cover; }
-      .quest-content { display: flex; flex-direction: column; align-items: center; padding: 30px clamp(22px, 6vw, 42px) 32px; }
+      .quest-content { display: flex; flex-direction: column; align-items: center; padding: 32px 24px; }
       .quest-cover + .quest-content { padding-top: 0; }
-      .medallion { width: 86px; height: 86px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%;
-        background: #ffffff; border: 3px solid var(--accent); color: var(--accent); font-size: 43px;
-        box-shadow: 0 8px 24px rgba(62,57,44,.16); }
-      .quest-cover + .quest-content .medallion { margin-top: -43px; }
-      .quest-icon-fallback { font-size: 31px; font-weight: 700; }
-      .status { margin-top: 17px; font-size: 14px; line-height: 1.4; font-weight: 700; color: #65655f; }
-      .quest-title { margin-top: 7px; max-width: 520px; font-size: clamp(29px, 7vw, 42px); line-height: 1.08;
-        letter-spacing: -.7px; overflow-wrap: anywhere; }
-      .quest-description { margin-top: 13px; max-width: 500px; color: var(--body); font-size: 17px; line-height: 1.52; }
-      .pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; margin-top: 22px; }
-      .quest-pill { display: inline-flex; min-height: 42px; align-items: center; padding: 9px 15px; border: 1px solid rgba(43,43,43,.08);
-        border-radius: 999px; background: rgba(255,255,255,.88); color: #50504d; font-size: 15px; font-weight: 700;
-        box-shadow: 0 5px 15px rgba(86,80,61,.08); }
-      .check-in-rule { display: flex; width: min(100%, 430px); min-height: 46px; align-items: center; justify-content: center;
-        gap: 8px; margin-top: 11px; padding: 10px 16px; border: 1px solid rgba(43,43,43,.08); border-radius: 17px;
-        background: rgba(255,255,255,.76); color: #50504d; font-size: 15px; font-weight: 700; }
-      .check-in-rule .mdi { color: var(--accent); font-size: 20px; }
-      .host { display: flex; align-items: center; gap: 12px; width: min(100%, 430px); margin-top: 25px; padding-top: 22px;
-        border-top: 1px solid rgba(49,49,45,.11); text-align: left; }
-      .host-avatar { width: 48px; height: 48px; flex: 0 0 auto; border-radius: 50%; object-fit: cover; }
-      .host-initials { display: grid; place-items: center; background: var(--accent); color: #ffffff; font-size: 16px; font-weight: 700; }
-      .host-copy { min-width: 0; }
-      .host-name { font-size: 16px; line-height: 1.35; font-weight: 700; overflow-wrap: anywhere; }
-      .host-meta { margin-top: 2px; color: #65655f; font-size: 14px; line-height: 1.4; }
-      .join-panel { width: min(100%, 540px); margin: 22px auto 0; padding: 22px; border-radius: 28px;
-        background: rgba(255,255,255,.82); box-shadow: 0 15px 42px rgba(85,82,70,.12); backdrop-filter: blur(10px); }
-      .join-panel h2 { font-size: 21px; line-height: 1.25; }
-      .join-panel > p { margin-top: 6px; color: var(--body); font-size: 15px; line-height: 1.5; }
-      .phone-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 17px; }
-      .phone-input { width: 100%; min-width: 0; min-height: 54px; border: 1px solid #d7d5cd; border-radius: 17px;
-        background: #ffffff; color: var(--title); padding: 0 16px; font-size: 17px; outline: none; }
+      .medallion { width: 58px; height: 58px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%;
+        background: #ffffff; border: 2px solid var(--category-bg); color: var(--accent); font-size: 30px; }
+      .quest-cover + .quest-content .medallion { margin-top: -29px; }
+      .quest-icon-fallback { font-size: 24px; font-weight: 700; }
+      .quest-title { margin-top: 20px; max-width: 314px; font-family: "Instrument Serif", Georgia, serif;
+        font-size: 32px; line-height: 40px; font-weight: 400; letter-spacing: .8px; overflow-wrap: anywhere; }
+      .quest-description { margin-top: 12px; max-width: 314px; color: #696969; font-size: 17px; line-height: 24px; font-weight: 400; }
+      .pills { display: flex; width: min(100%, 314px); justify-content: center; gap: 5px; margin-top: 24px; }
+      .quest-pill { display: inline-flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; padding: 10px 16px;
+        border: 1px solid #e4e2dd; border-radius: 200px; background: #fdfbf6; color: #292929; font-size: 14px;
+        line-height: 20px; font-weight: 500; white-space: nowrap; box-shadow: 0 4px 30px rgba(255,255,255,.5); }
+      .quest-pill:not(:last-child) { flex: 1 1 0; }
+      .check-in-rule { display: flex; width: min(100%, 314px); min-height: 44px; align-items: center; justify-content: center;
+        gap: 8px; margin-top: 16px; padding: 10px 24px; border: 1px solid #e4e2dd; border-radius: 32px;
+        background: #fdfbf6; color: #292929; font-size: 14px; line-height: 20px; font-weight: 500;
+        box-shadow: 0 4px 30px rgba(255,255,255,.5); }
+      .check-in-rule .mdi { color: #292929; font-size: 18px; }
+      .host { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 8px; margin-top: 24px; }
+      .host-avatar { width: 24px; height: 24px; flex: 0 0 auto; border: 1px solid #ffffff; border-radius: 50%; object-fit: cover; }
+      .host-initials { display: grid; place-items: center; background: #fdfbf6; color: var(--accent); font-size: 9px; font-weight: 700; }
+      .host-name { min-width: 0; color: #292929; font-size: 14px; line-height: 20px; font-weight: 700; overflow-wrap: anywhere; }
+      .host-meta { color: #696969; font-size: 14px; line-height: 20px; white-space: nowrap; }
+      .join-panel { width: 100%; margin-top: 18px; padding: 0 4px; text-align: center;
+        animation: fade-soft 0.6s var(--ease-out) 1.85s both; }
+      .phone-row { display: flex; flex-direction: column; gap: 10px; }
+      .phone-input { width: 100%; min-width: 0; min-height: 54px; border: 1px solid #e4e2dd; border-radius: 999px;
+        background: #ffffff; color: var(--title); padding: 0 22px; font-size: 17px; text-align: center; outline: none;
+        box-shadow: 0 4px 30px rgba(255,255,255,.5); }
+      .phone-input::placeholder { color: #9b9b95; }
       .phone-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
       .phone-input[aria-invalid="true"] { border-color: #b74040; }
-      .join-button { min-height: 54px; border: 0; border-radius: 17px; background: var(--title); color: #ffffff;
-        padding: 0 21px; font-size: 16px; font-weight: 700; cursor: pointer; }
+      .join-button { width: 100%; min-height: 54px; border: 0; border-radius: 999px; background: var(--title); color: #ffffff;
+        padding: 0 22px; font-size: 16px; font-weight: 700; cursor: pointer; }
       .join-button:disabled { cursor: default; opacity: .42; }
       .phone-error { margin-top: 9px; color: #a82f2f; font-size: 14px; line-height: 1.4; }
-      .privacy { margin-top: 12px; color: #72726d; font-size: 12px; line-height: 1.5; }
+      .privacy { margin-top: 12px; color: #72726d; font-size: 11px; line-height: 1.5; }
       .privacy a { color: inherit; }
       #turnstile-container { min-height: 1px; }
       .success { padding: 13px 4px 3px; text-align: center; }
       .success-mark { width: 48px; height: 48px; display: grid; place-items: center; margin: 0 auto 10px; border-radius: 50%;
         background: color-mix(in srgb, var(--accent) 14%, #ffffff); color: var(--accent); font-size: 25px; font-weight: 700; }
       .success h2 { font-size: 21px; }
+      .dots span { display: inline-block; animation: dot-pulse 1.2s infinite; }
+      .dots span:nth-child(2) { animation-delay: 0.2s; }
+      .dots span:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes dot-pulse { 0%, 60%, 100% { opacity: .2; } 30% { opacity: 1; } }
       .success p { margin-top: 5px; color: var(--body); font-size: 15px; }
-      .open-app { display: block; margin: 16px auto 0; border: 0; background: transparent; color: #5e5e5a;
+      .open-app { display: block; margin: 26px auto 0; border: 0; background: transparent; color: #5e5e5a;
         font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
       .ended-panel { text-align: center; }
-      .ended-mark { width: 50px; height: 50px; display: grid; place-items: center; margin: 0 auto 12px; border-radius: 50%;
+      .ended-mark { width: 50px; height: 50px; display: grid; place-items: center; margin: 0 auto 14px; border-radius: 50%;
         background: color-mix(in srgb, var(--accent) 14%, #ffffff); color: var(--accent); font-size: 24px; font-weight: 700; }
-      .store-button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; margin-top: 18px;
-        padding: 0 27px; border-radius: 17px; background: var(--title); color: #ffffff; font-size: 16px;
+      .store-button { display: inline-flex; width: 100%; min-height: 54px; align-items: center; justify-content: center;
+        padding: 0 22px; border-radius: 999px; background: var(--title); color: #ffffff; font-size: 16px;
         font-weight: 700; text-decoration: none; }
-      footer { padding-top: 24px; text-align: center; color: #777771; font-size: 12px; }
+      footer { padding-top: 22px; text-align: center; color: #777771; font-size: 11px; }
       footer a { color: inherit; }
       .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important;
         margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
         white-space: nowrap !important; border: 0 !important; }
       [hidden] { display: none !important; }
-      @media (max-width: 560px) {
-        .page { padding-left: 14px; padding-right: 14px; }
+      @media (max-width: 460px) {
+        .page { width: min(calc(100% - 28px), 420px); }
         .field-icon { opacity: .25; }
-        .quest-card { border-radius: 28px; }
-        .phone-row { grid-template-columns: 1fr; }
-        .join-button { width: 100%; }
+      }
+      @media (min-width: 700px) {
+        .page { min-height: 100dvh; }
+        .intro { margin-bottom: 40px; }
+        .open-app { margin-top: auto; padding-top: 26px; }
+        .join-panel + footer, .ended-panel ~ footer { margin-top: auto; }
       }
       @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important;
+          animation-duration: .01ms !important; animation-delay: 0s !important; }
       }
     </style>
   </head>
@@ -429,30 +470,31 @@ export function questSharePage({
     ${iconFieldMarkup()}
     <main class="page">
       <span class="wordmark">${WORDMARK}</span>
+      <div class="reveal">
       <header class="intro">
-        <h1>${shareHeadline}</h1>
+        <h1>${pageHeadline}</h1>
       </header>
 
       <article class="quest-card" aria-label="${safeTitle}">
         ${coverMarkup(presentation)}
         <div class="quest-content">
           <div class="medallion">${questIconMarkup(presentation)}</div>
-          ${statusSupportingLabel ? `<p class="status">${statusSupportingLabel}</p>` : ""}
           <h2 class="quest-title">${safeTitle}</h2>
           ${presentation.shortDescription ? `<p class="quest-description">${escapeHtml(presentation.shortDescription)}</p>` : ""}
           <div class="pills">${pillMarkup(presentation)}</div>
           ${checkInRuleMarkup(presentation)}
           <div class="host">
             ${avatarMarkup(presentation)}
-            <div class="host-copy">
-              <p class="host-name">${safeHost}</p>
-              <p class="host-meta">${socialProof}</p>
-            </div>
+            <p class="host-name">${safeHost}</p>
+            <p class="host-meta">${socialProof}</p>
           </div>
         </div>
       </article>
 
       ${actionPanel}
+      </div>
+
+      ${openAppSlot}
 
       <footer>
         <a href="https://thequestsapp.com/privacy.html">Privacy</a> &middot;
