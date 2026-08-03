@@ -563,6 +563,11 @@ test("Community presentation maps public, category, duration, and cadence card s
   assert.ok(presentation);
   assert.equal(presentation.isGroupQuest, true);
   assert.equal(presentation.privacyLevel, "PUBLIC");
+  const community = normalizeQuestSharePresentation(
+    { ...raw, privacyLevel: "COMMUNITY" },
+    { supabaseUrl: SUPABASE_URL },
+  );
+  assert.equal(community.privacyLevel, "COMMUNITY");
 
   const response = questSharePage({
     origin: "https://invite.thequestsapp.com",

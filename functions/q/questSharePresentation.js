@@ -3,7 +3,7 @@ export const QUEST_SHARE_CODE_PATTERN = /^[A-HJ-NP-Za-hj-kmnp-z2-9]{8}$/;
 export const QUEST_SHARE_REVISION_PATTERN = /^[1-9][0-9]{0,9}$/;
 
 const DISPLAYABLE_STATUSES = new Set(["ACTIVE", "UPCOMING", "COMPLETED"]);
-const PRIVACY_LEVELS = new Set(["PUBLIC", "PRIVATE"]);
+const PRIVACY_LEVELS = new Set(["PUBLIC", "PRIVATE", "COMMUNITY"]);
 const FREQUENCIES = new Set(["DAILY", "WEEKLY", "MONTHLY"]);
 const QUEST_CATEGORIES = new Set([
   "recharge_move",
