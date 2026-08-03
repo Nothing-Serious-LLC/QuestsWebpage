@@ -1,6 +1,12 @@
-export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff }) {
+export function questPhoneClaimScript({
+  shareCode,
+  turnstileSiteKey,
+  appHandoff,
+  demoMode = false,
+}) {
   const serializedCode = JSON.stringify(shareCode);
-  const serializedSiteKey = JSON.stringify(turnstileSiteKey);
+  const serializedSiteKey = JSON.stringify(turnstileSiteKey ?? null);
+  const serializedDemo = JSON.stringify(Boolean(demoMode));
   const serializedAppScheme = JSON.stringify(appHandoff.appScheme);
   const serializedAndroidPackage = JSON.stringify(appHandoff.androidPackage);
   const serializedAppStoreUrl = JSON.stringify(appHandoff.appStoreUrl);
@@ -11,6 +17,7 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
 
     var shareCode = ${serializedCode};
     var siteKey = ${serializedSiteKey};
+    var DEMO = ${serializedDemo};
     var form = document.getElementById("phone-claim-form");
     var input = document.getElementById("phone-input");
     var error = document.getElementById("phone-error");
@@ -36,7 +43,7 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
     }
 
     function inputDigits(value) {
-      var digits = String(value || "").replace(/\D/g, "");
+      var digits = String(value || "").replace(/\\D/g, "");
       if (digits.charAt(0) === "1") digits = digits.substring(1);
       return digits.substring(0, 10);
     }
@@ -118,8 +125,14 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
     }
 
     input.addEventListener("input", function () {
-      input.value = formatPhone(input.value);
-      input.setSelectionRange(input.value.length, input.value.length);
+      var previous = input.value;
+      var caretFromEnd = previous.length - (input.selectionStart || 0);
+      var formatted = formatPhone(previous);
+      if (formatted !== previous) {
+        input.value = formatted;
+        var caret = Math.max(0, formatted.length - caretFromEnd);
+        input.setSelectionRange(caret, caret);
+      }
       setError("");
       updateButton();
     });
@@ -133,6 +146,14 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
         input.focus();
         return;
       }
+      if (DEMO) {
+        form.hidden = true;
+        success.hidden = false;
+        success.focus();
+        var demoTarget = platform() === "android" ? PLAY_STORE_URL : APP_STORE_URL;
+        setTimeout(function () { window.location.href = demoTarget; }, 1600);
+        return;
+      }
       if (!turnstileToken) {
         initTurnstile();
         setError("Verification is getting ready. Try again in a moment.");
@@ -141,7 +162,7 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
 
       submitting = true;
       setError("");
-      submitLabel.textContent = "Saving...";
+      submitLabel.innerHTML = 'Opening Quests<span class="dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>';
       updateButton();
 
       fetch("/api/link-claims/start", {
@@ -201,6 +222,6 @@ export function questPhoneClaimScript({ shareCode, turnstileSiteKey, appHandoff 
     });
 
     updateButton();
-    startTurnstilePolling();
+    if (!DEMO) startTurnstilePolling();
   })();`;
 }

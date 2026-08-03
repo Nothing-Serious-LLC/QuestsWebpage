@@ -167,7 +167,5 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
 
 export function safeTurnstileSiteKey(value) {
   const candidate = boundedText(value, 128);
-  return /^[A-Za-z0-9_-]{10,128}$/.test(candidate)
-    ? candidate
-    : "0x4AAAAAACaMy8ev_fZjSv2s";
+  return /^[A-Za-z0-9_-]{10,128}$/.test(candidate) ? candidate : null;
 }
