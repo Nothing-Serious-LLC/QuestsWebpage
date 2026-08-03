@@ -6,9 +6,9 @@ import {
 } from "./questSharePresentation.js";
 import { questSharePage, questUnavailablePage } from "./questPage.js";
 import {
-  STAGING_QUEST_FIXTURE_OG_PATH,
   STAGING_QUEST_FIXTURE_TOKEN,
   stagingQuestFixtureForRequest,
+  stagingQuestFixtureOgPathForCode,
 } from "./stagingQuestFixture.js";
 
 const EDGE_TIMEOUT_MS = 4_000;
@@ -43,7 +43,7 @@ function appHandoffFromEnv(env) {
   };
 }
 
-async function legacyQuestPage(context) {
+async function legacyQuestPage(context, { transientFailure = false } = {}) {
   const url = new URL(context.request.url);
   url.pathname = "/q/";
   const assetResponse = await context.env.ASSETS.fetch(
@@ -51,7 +51,10 @@ async function legacyQuestPage(context) {
   );
 
   const response = new Response(assetResponse.body, assetResponse);
-  response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
+  response.headers.set(
+    "Cache-Control",
+    transientFailure ? "no-store" : "public, max-age=300, s-maxage=600",
+  );
   response.headers.set("Vary", "Accept-Encoding");
   return response;
 }
@@ -146,12 +149,13 @@ async function revisionZeroOgFallback(context) {
   );
 }
 
-async function stagingFixtureOg(context) {
-  if (!context.env?.ASSETS?.fetch) {
+async function stagingFixtureOg(context, shareCode) {
+  const fixtureOgPath = stagingQuestFixtureOgPathForCode(shareCode);
+  if (!context.env?.ASSETS?.fetch || !fixtureOgPath) {
     return imageServiceUnavailable(context.request.method);
   }
   const url = new URL(context.request.url);
-  url.pathname = STAGING_QUEST_FIXTURE_OG_PATH;
+  url.pathname = fixtureOgPath;
   url.search = "";
   let assetResponse;
   try {
@@ -229,6 +233,7 @@ async function questArtifactResponse({
     "Content-Type": "image/png",
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
+    "X-Robots-Tag": "noindex, nofollow",
   });
   const contentLength = response.headers.get("Content-Length");
   if (contentLength && /^\d+$/.test(contentLength)) {
@@ -273,7 +278,7 @@ export async function onRequest(context) {
   });
   if (stagingFixture) {
     if (artifact === "og") {
-      return stagingFixtureOg(context);
+      return stagingFixtureOg(context, shareCode);
     }
     if (artifact === "story") {
       return imageNotFound(context.request.method);
@@ -286,7 +291,7 @@ export async function onRequest(context) {
         appScheme: "quests-staging",
         androidPackage: "info.nothingserious.quests.staging",
       },
-      interactionMode: "staging-app-only",
+      interactionMode: "phone-demo",
       previewQuery: `preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
       requestMethod: context.request.method,
     });
@@ -330,7 +335,9 @@ export async function onRequest(context) {
       appHandoff: appHandoffFromEnv(context.env),
     });
   }
-  if (status !== 200 || !response) return legacyQuestPage(context);
+  if (status !== 200 || !response) {
+    return legacyQuestPage(context, { transientFailure: true });
+  }
 
   let rawPresentation;
   try {
@@ -355,12 +362,20 @@ export async function onRequest(context) {
     });
   }
 
+  const turnstileSiteKey = safeTurnstileSiteKey(context.env.TURNSTILE_SITE_KEY);
+  if (!turnstileSiteKey) {
+    console.error(
+      "TURNSTILE_SITE_KEY missing or malformed; rendering app-only join panel",
+    );
+  }
+
   return questSharePage({
     origin: url.origin,
     shareCode,
     presentation,
-    turnstileSiteKey: safeTurnstileSiteKey(context.env.TURNSTILE_SITE_KEY),
+    turnstileSiteKey,
     appHandoff: appHandoffFromEnv(context.env),
+    interactionMode: turnstileSiteKey ? "phone" : "app-only",
     requestMethod: context.request.method,
   });
 }

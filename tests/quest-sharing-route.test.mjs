@@ -9,6 +9,8 @@ import {
 } from "../functions/q/questSharePresentation.js";
 import { questSharePage } from "../functions/q/questPage.js";
 import {
+  STAGING_QUEST_COMMUNITY_FIXTURE_CODE,
+  STAGING_QUEST_COMMUNITY_FIXTURE_OG_PATH,
   STAGING_QUEST_FIXTURE_CODE,
   STAGING_QUEST_FIXTURE_CUTOFF,
   STAGING_QUEST_FIXTURE_HOST,
@@ -23,6 +25,9 @@ const LEGACY_MARKUP = "<!doctype html><title>Legacy Quest invite</title>";
 const FALLBACK_PNG = await readFile(new URL("quest-share-og-fallback.png", ROOT));
 const STAGING_FIXTURE_PNG = await readFile(
   new URL("quest-share-fixtures/PHLYrwGR-og.png", ROOT),
+);
+const STAGING_COMMUNITY_FIXTURE_PNG = await readFile(
+  new URL("quest-share-fixtures/WkendHke-og.png", ROOT),
 );
 
 async function fixture(name) {
@@ -66,6 +71,18 @@ function context({
               headers: {
                 "Content-Type": "image/png",
                 "Content-Length": String(STAGING_FIXTURE_PNG.length),
+              },
+            });
+          }
+          if (
+            new URL(request.url).pathname ===
+              STAGING_QUEST_COMMUNITY_FIXTURE_OG_PATH
+          ) {
+            return new Response(STAGING_COMMUNITY_FIXTURE_PNG, {
+              status: 200,
+              headers: {
+                "Content-Type": "image/png",
+                "Content-Length": String(STAGING_COMMUNITY_FIXTURE_PNG.length),
               },
             });
           }
@@ -144,13 +161,13 @@ test("dark gate serves the exact legacy asset route", async () => {
   assert.deepEqual(assetCalls, ["https://invite.thequestsapp.com/q/?r=7"]);
 });
 
-test("bundled revision-zero fallback is a compact 1200 by 630 PNG", () => {
+test("bundled revision-zero fallback is a portrait 1080 by 1350 PNG", () => {
   assert.deepEqual(
     Array.from(FALLBACK_PNG.subarray(0, 8)),
     [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
   );
-  assert.equal(FALLBACK_PNG.readUInt32BE(16), 1200);
-  assert.equal(FALLBACK_PNG.readUInt32BE(20), 630);
+  assert.equal(FALLBACK_PNG.readUInt32BE(16), 1080);
+  assert.equal(FALLBACK_PNG.readUInt32BE(20), 1350);
   assert.ok(FALLBACK_PNG.length <= 300 * 1024);
 });
 
@@ -169,16 +186,16 @@ test("sealed staging fixture serves rich HTML only on its exact host, code, and 
   const html = await response.text();
   assert.equal(response.status, 200);
   assert.equal(edgeCalled, false);
-  assert.match(html, /\[DEV STACK TEST\] Creativity 1/);
-  assert.match(html, /Quests Test Account/);
-  assert.match(html, /1 participant/);
-  assert.match(html, /Open Quests \[Staging\]/);
-  assert.match(html, /href="quests-staging:\/\/q\/PHLYrwGR"/);
+  assert.match(html, /Daily Reading/);
+  assert.match(html, /Elliott/);
+  assert.match(html, /&amp; 1 Quester/);
+  assert.match(html, /Open in Quests/);
+  assert.match(html, /id="phone-claim-form"/);
+  assert.match(html, /var DEMO = true/);
   assert.match(
     html,
-    /property="og:image" content="https:\/\/quest-sharing-staging\.quests-invite\.pages\.dev\/q\/PHLYrwGR\/og\.png\?preview=20260801-1"/,
+    /property="og:image" content="https:\/\/quest-sharing-staging\.quests-invite\.pages\.dev\/q\/PHLYrwGR\/og\.png\?preview=20260801-2"/,
   );
-  assert.doesNotMatch(html, /phone-claim-form/);
   assert.doesNotMatch(html, /challenges\.cloudflare\.com\/turnstile/);
   assert.doesNotMatch(html, /apple-itunes-app/);
   assert.doesNotMatch(html, /Delete with --cleanup/);
@@ -204,8 +221,8 @@ test("sealed staging fixture serves its exact compact PNG contract", async () =>
       assert.equal(bytes.length, 0);
     } else {
       assert.deepEqual(bytes, STAGING_FIXTURE_PNG);
-      assert.equal(bytes.readUInt32BE(16), 1200);
-      assert.equal(bytes.readUInt32BE(20), 630);
+      assert.equal(bytes.readUInt32BE(16), 1080);
+      assert.equal(bytes.readUInt32BE(20), 1350);
       assert.ok(bytes.length <= 300 * 1024);
     }
   }
@@ -217,6 +234,40 @@ test("sealed staging fixture serves its exact compact PNG contract", async () =>
     enabled: false,
   }));
   assert.equal(story.status, 404);
+});
+
+test("sealed community fixture serves the cover card and its portrait PNG", async () => {
+  const response = await onRequest(context({
+    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+    path: [STAGING_QUEST_COMMUNITY_FIXTURE_CODE],
+    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+    enabled: false,
+  }));
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /Weekend Morning Hikes/);
+  assert.match(html, /quest-share-fixtures\/WkendHke-cover\.jpg/);
+  assert.match(html, />Public</);
+  assert.match(html, /&amp; 12 Questers/);
+  assert.match(html, /Check in every week/);
+  assert.match(html, /id="phone-claim-form"/);
+  assert.match(html, /var DEMO = true/);
+  assert.match(
+    html,
+    /property="og:image" content="https:\/\/quest-sharing-staging\.quests-invite\.pages\.dev\/q\/WkendHke\/og\.png\?preview=20260801-2"/,
+  );
+
+  const image = await onRequest(context({
+    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+    path: [STAGING_QUEST_COMMUNITY_FIXTURE_CODE, "og.png"],
+    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+    enabled: false,
+  }));
+  assert.equal(image.status, 200);
+  assert.equal(image.headers.get("Content-Type"), "image/png");
+  const bytes = Buffer.from(await image.arrayBuffer());
+  assert.deepEqual(bytes, STAGING_COMMUNITY_FIXTURE_PNG);
 });
 
 test("production, nonfixture, wrong-token, and expired fixture requests stay legacy", async () => {
@@ -264,18 +315,19 @@ test("server HTML contains complete first-response Quest metadata", async () => 
   assert.equal(edgeRequest.init.headers["x-quest-share-secret"], "web-secret");
   assert.deepEqual(edgeRequest.body, { action: "metadata", shareCode: "AbCd2345" });
   assert.match(html, /<title>Join Morning Momentum on Quests<\/title>/);
-  assert.match(html, /property="og:title" content="You've been invited to a Quest"/);
+  assert.match(html, /property="og:title" content="You’ve been invited to a Quest"/);
   assert.match(html, /\/q\/AbCd2345\/og\.png\?r=3/);
-  assert.match(html, /property="og:image:width" content="1200"/);
-  assert.match(html, /property="og:image:height" content="630"/);
+  assert.match(html, /property="og:image:width" content="1080"/);
+  assert.match(html, /property="og:image:height" content="1350"/);
   assert.match(html, /Morning Momentum/);
   assert.match(html, /Maya Chen/);
   assert.match(html, /30 days/);
   assert.match(html, />Private</);
-  assert.match(html, />Productivity</);
-  assert.match(html, /Check in daily/);
-  assert.match(html, /4 participants/);
+  assert.match(html, />Productive</);
+  assert.match(html, /Check in every day/);
+  assert.match(html, /4 Questers/);
   assert.match(html, /fetch\("\/api\/link-claims\/start"/);
+  assert.match(html, /replace\(\/\\D\/g, ""\)/);
   assert.equal(presentation.availability, "joinable");
   assert.equal(typeof presentation.revision, "number");
   assert.doesNotMatch(html, /rel="alternate"[^>]+story\.png/);
@@ -326,6 +378,22 @@ test("first link keeps rich HTML and phone claim available while artwork warms",
     /property="og:image" content="https:\/\/invite\.thequestsapp\.com\/q\/AbCd2345\/og\.png"/,
   );
   assert.doesNotMatch(html, /\?r=0/);
+});
+
+test("missing Turnstile site key renders the app-only join panel", async () => {
+  const presentation = await fixture("quest-share-upcoming.json");
+  const response = await withFetch(
+    async () => Response.json(presentation, { status: 200 }),
+    () => onRequest(context({ envOverrides: { TURNSTILE_SITE_KEY: "" } })),
+  );
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /Morning Momentum/);
+  assert.match(html, /Join this Quest/);
+  assert.doesNotMatch(html, /id="phone-claim-form"/);
+  assert.doesNotMatch(html, /challenges\.cloudflare\.com\/turnstile/);
+  assert.doesNotMatch(html, /0x4AAAAAACaMy8ev_fZjSv2s/);
 });
 
 test("environment app handoff bindings flow into installed-build targets", async () => {
@@ -505,9 +573,9 @@ test("Community presentation maps public, category, duration, and cadence card s
   const html = await response.text();
   assert.match(html, />Public</);
   assert.match(html, />12 weeks</);
-  assert.match(html, />Social &amp; Lifestyle</);
+  assert.match(html, />Social</);
   assert.match(html, /Check in every weekend/);
-  assert.match(html, /128 participants/);
+  assert.match(html, /128 Questers/);
   assert.doesNotMatch(html, /class="quest-cover"/);
 });
 
@@ -734,6 +802,7 @@ test("upstream failure preserves the legacy Quest experience", async () => {
   );
   assert.equal(await response.text(), LEGACY_MARKUP);
   assert.deepEqual(assetCalls, ["https://invite.thequestsapp.com/q/"]);
+  assert.equal(response.headers.get("Cache-Control"), "no-store");
 });
 
 test("HEAD and unsupported methods follow HTTP contracts", async () => {
