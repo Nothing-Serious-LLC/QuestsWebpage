@@ -83,6 +83,7 @@ function pillMarkup(presentation) {
   const pills = [];
   if (presentation.privacyLevel === "PRIVATE") pills.push("Private");
   if (presentation.privacyLevel === "PUBLIC") pills.push("Public");
+  if (presentation.privacyLevel === "COMMUNITY") pills.push("Community");
   if (presentation.duration) pills.push(presentation.duration);
   const categoryLabels = {
     recharge_move: "Healthy",
