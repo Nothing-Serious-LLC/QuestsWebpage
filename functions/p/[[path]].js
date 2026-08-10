@@ -92,12 +92,16 @@ function iconFieldMarkup() {
   }).join('\n      ');
 }
 
-function avatarMarkup({ avatarUrl, ringImageUrl, ringColors, displayName }) {
+const RING_DATA_URL_PATTERN = /^data:image\/png;base64,[A-Za-z0-9+/=]+$/;
+
+function avatarMarkup({ avatarUrl, ringImageDataUrl, ringImageUrl, ringColors, displayName }) {
   const photo = avatarUrl
     ? `<img class="avatar-photo" src="${escapeHtml(avatarUrl)}" alt="" />`
     : `<span class="avatar-photo avatar-initials">${escapeHtml(displayInitials(displayName))}</span>`;
   let ring = '';
-  if (ringImageUrl) {
+  if (typeof ringImageDataUrl === 'string' && RING_DATA_URL_PATTERN.test(ringImageDataUrl)) {
+    ring = `<img class="avatar-ring" src="${ringImageDataUrl}" alt="" />`;
+  } else if (ringImageUrl) {
     ring = `<img class="avatar-ring" src="${escapeHtml(ringImageUrl)}" alt="" />`;
   } else if (Array.isArray(ringColors) && ringColors.length > 0) {
     const stops = ringColors.length > 1
