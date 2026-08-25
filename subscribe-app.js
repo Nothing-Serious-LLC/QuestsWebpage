@@ -11,7 +11,7 @@
 //   We pass htmlTarget: #rc-checkout to purchase(), so RC mounts the Stripe
 //   checkout form INLINE into our own full-viewport container instead of its
 //   default centered modal window. Combined with a solid-WHITE body
-//   (.checkout-open) and hiding the navy .page, the result reads as one
+//   (.checkout-open) and hiding the cream .page, the result reads as one
 //   continuous full-screen checkout, not a card floating on a blue page. There
 //   is still NO RevenueCat package-selection/intro step, because we hand the
 //   SDK the single package the user already chose in the app.
@@ -48,26 +48,96 @@ const successMark = document.getElementById("success-mark");
 const primaryBtn = document.getElementById("primary-btn");
 const secondaryBtn = document.getElementById("secondary-btn");
 
-const NAVY = "#04102a";
+// RevenueCat renders the verified product title inline after purchase() starts.
+// Keep its real text node aligned with the concise checkout hierarchy so the
+// visual label and accessible label stay identical across SDK rerenders.
+function applyProductHeading() {
+  if (!mount) return;
+  const cadence = cfg && cfg.plan === "yearly" ? "Yearly" : "Monthly";
+  const productHeading = "Pro Subscription (" + cadence + ")";
+  const heading = mount.querySelector(
+    ".rcb-product-title > .rcb-typography"
+  );
+  const titleTextNode = heading
+    ? Array.from(heading.childNodes).find(
+        (node) =>
+          node.nodeType === Node.TEXT_NODE && node.nodeValue.trim().length > 0
+      )
+    : null;
+  if (titleTextNode && titleTextNode.nodeValue !== productHeading) {
+    titleTextNode.nodeValue = productHeading;
+  }
+}
+
+const CATEGORY_LOADER_KEYS = [
+  "mindfulness",
+  "recharge",
+  "creativity",
+  "growth",
+  "social",
+];
+
+function createCategoryLoader() {
+  const loader = document.createElement("span");
+  loader.className = "cat-loader";
+  loader.setAttribute("aria-hidden", "true");
+
+  CATEGORY_LOADER_KEYS.forEach((category) => {
+    const icon = document.createElement("span");
+    icon.className =
+      "cat-loader__icon cat-loader__icon--" + category;
+    loader.appendChild(icon);
+  });
+
+  return loader;
+}
+
+// RevenueCat creates its payment loader after the form mounts. Replace the
+// rotating SDK glyph with the same opacity-only category fade used by the app.
+function applyRevenueCatLoader() {
+  if (!mount) return;
+  const loaderHost = mount.querySelector(
+    ".rc-loading .rcb-modal-loader > .rcb-ui-asset-icon"
+  );
+  if (!loaderHost || loaderHost.classList.contains("quests-category-loader")) {
+    return;
+  }
+  loaderHost.classList.add("quests-category-loader");
+  loaderHost.appendChild(createCategoryLoader());
+}
+
+if (mount) {
+  const checkoutObserver = new MutationObserver(() => {
+    applyProductHeading();
+    applyRevenueCatLoader();
+  });
+  checkoutObserver.observe(mount, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
+}
+
+// V2 brand page background (sand/cream, matches css/site.css --page and the
+// theme-color meta the server emits). Restored when checkout chrome exits.
+const CREAM = "#F3F1E7";
+const GRAPHITE = "#191919";
 const WHITE = "#ffffff";
 
-// Switch the page to the full-screen WHITE checkout surface: solid-white body,
-// hide the navy .page, flip iOS browser-chrome theme-color to white. Called as
-// soon as the SDK is configured (before offerings load) so there's no navy
-// flash, and stays in effect through purchase().
+// Hide the page and match iOS browser chrome to the graphite offerings loader.
 function enterCheckoutChrome() {
   document.body.classList.add("checkout-open");
   if (pageEl) pageEl.hidden = true;
-  if (themeColorMeta) themeColorMeta.setAttribute("content", WHITE);
+  if (themeColorMeta) themeColorMeta.setAttribute("content", GRAPHITE);
 }
 
-// Restore the navy page chrome so the success/error notice renders on brand.
+// Restore the cream page chrome so the success/error notice renders on brand.
 function exitCheckoutChrome() {
   document.body.classList.remove("checkout-open");
   if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
   if (mount) mount.classList.remove("is-open");
   if (pageEl) pageEl.hidden = false;
-  if (themeColorMeta) themeColorMeta.setAttribute("content", NAVY);
+  if (themeColorMeta) themeColorMeta.setAttribute("content", CREAM);
 }
 
 function readConfig() {
@@ -126,7 +196,7 @@ function hideLoading() {
 // secondary that routes the app Home.
 function showError(title, text) {
   hideLoading();
-  // Restore the navy page so the error notice renders on brand (also clears the
+  // Restore the cream page so the error notice renders on brand (also clears the
   // white body + white loader + checkout surface and resets theme-color).
   exitCheckoutChrome();
   if (mount) mount.replaceChildren();
@@ -160,7 +230,7 @@ function showError(title, text) {
 // offers a tap-to-open custom-scheme button + store fallback.
 function showSuccess() {
   hideLoading();
-  // Restore the navy page so the success notice renders on brand (also clears
+  // Restore the cream page so the success notice renders on brand (also clears
   // the white body + white loader + checkout surface and resets theme-color).
   exitCheckoutChrome();
   if (mount) mount.replaceChildren();
@@ -271,7 +341,7 @@ async function run() {
     purchases = Purchases.configure({ apiKey: cfg.apiKey, appUserId: cfg.uid });
     dbg("configured OK");
     // Whiten NOW (before the up-to-20s offerings fetch) so the user never sees a
-    // navy spinner flash right before the white checkout opens: hide the navy
+    // cream spinner flash right before the white checkout opens: hide the cream
     // loader/.page and show the WHITE loader. enterCheckoutChrome() also flips
     // the body white + theme-color white. showError/showSuccess undo all of it.
     if (loadingEl) loadingEl.hidden = true;
@@ -337,6 +407,7 @@ async function run() {
     // container is sized, so the inline form renders correctly.
     if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
     if (mount) mount.classList.add("is-open");
+    if (themeColorMeta) themeColorMeta.setAttribute("content", WHITE);
     await purchases.purchase({
       rcPackage: pkg,
       htmlTarget: mount,
