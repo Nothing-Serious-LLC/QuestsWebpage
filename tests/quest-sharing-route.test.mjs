@@ -117,6 +117,25 @@ async function withSuppressedConsoleError(run) {
   }
 }
 
+async function withFrozenDate(value, run) {
+  const RealDate = globalThis.Date;
+  const frozenTime = new RealDate(value).getTime();
+  globalThis.Date = class FrozenDate extends RealDate {
+    constructor(...args) {
+      super(...(args.length === 0 ? [frozenTime] : args));
+    }
+
+    static now() {
+      return frozenTime;
+    }
+  };
+  try {
+    return await run();
+  } finally {
+    globalThis.Date = RealDate;
+  }
+}
+
 function phoneClaimContext(bodyOverrides = {}) {
   return {
     request: new Request("https://invite.thequestsapp.com/api/link-claims/start", {
@@ -173,15 +192,17 @@ test("bundled revision-zero fallback is a portrait 1080 by 1350 PNG", () => {
 
 test("sealed staging fixture serves rich HTML only on its exact host, code, and token", async () => {
   let edgeCalled = false;
-  const response = await withFetch(async () => {
-    edgeCalled = true;
-    return Response.json({ code: "unexpected" }, { status: 500 });
-  }, () => onRequest(context({
-    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
-    path: [STAGING_QUEST_FIXTURE_CODE],
-    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
-    enabled: false,
-  })));
+  const response = await withFrozenDate("2026-08-07T12:00:00.000Z", () =>
+    withFetch(async () => {
+      edgeCalled = true;
+      return Response.json({ code: "unexpected" }, { status: 500 });
+    }, () => onRequest(context({
+      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+      path: [STAGING_QUEST_FIXTURE_CODE],
+      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+      enabled: false,
+    }))),
+  );
 
   const html = await response.text();
   assert.equal(response.status, 200);
@@ -205,13 +226,15 @@ test("sealed staging fixture serves rich HTML only on its exact host, code, and 
 
 test("sealed staging fixture serves its exact compact PNG contract", async () => {
   for (const method of ["GET", "HEAD"]) {
-    const response = await onRequest(context({
-      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
-      path: [STAGING_QUEST_FIXTURE_CODE, "og.png"],
-      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
-      enabled: false,
-      method,
-    }));
+    const response = await withFrozenDate("2026-08-07T12:00:00.000Z", () =>
+      onRequest(context({
+        origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+        path: [STAGING_QUEST_FIXTURE_CODE, "og.png"],
+        search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+        enabled: false,
+        method,
+      })),
+    );
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Content-Type"), "image/png");
     assert.equal(response.headers.get("Content-Length"), String(STAGING_FIXTURE_PNG.length));
@@ -227,22 +250,26 @@ test("sealed staging fixture serves its exact compact PNG contract", async () =>
     }
   }
 
-  const story = await onRequest(context({
-    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
-    path: [STAGING_QUEST_FIXTURE_CODE, "story.png"],
-    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
-    enabled: false,
-  }));
+  const story = await withFrozenDate("2026-08-07T12:00:00.000Z", () =>
+    onRequest(context({
+      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+      path: [STAGING_QUEST_FIXTURE_CODE, "story.png"],
+      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+      enabled: false,
+    })),
+  );
   assert.equal(story.status, 404);
 });
 
 test("sealed community fixture serves the cover card and its portrait PNG", async () => {
-  const response = await onRequest(context({
-    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
-    path: [STAGING_QUEST_COMMUNITY_FIXTURE_CODE],
-    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
-    enabled: false,
-  }));
+  const response = await withFrozenDate("2026-08-07T12:00:00.000Z", () =>
+    onRequest(context({
+      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+      path: [STAGING_QUEST_COMMUNITY_FIXTURE_CODE],
+      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+      enabled: false,
+    })),
+  );
 
   const html = await response.text();
   assert.equal(response.status, 200);
@@ -258,12 +285,14 @@ test("sealed community fixture serves the cover card and its portrait PNG", asyn
     /property="og:image" content="https:\/\/quest-sharing-staging\.quests-invite\.pages\.dev\/q\/WkendHke\/og\.png\?preview=20260801-2"/,
   );
 
-  const image = await onRequest(context({
-    origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
-    path: [STAGING_QUEST_COMMUNITY_FIXTURE_CODE, "og.png"],
-    search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
-    enabled: false,
-  }));
+  const image = await withFrozenDate("2026-08-07T12:00:00.000Z", () =>
+    onRequest(context({
+      origin: `https://${STAGING_QUEST_FIXTURE_HOST}`,
+      path: [STAGING_QUEST_COMMUNITY_FIXTURE_CODE, "og.png"],
+      search: `?preview=${STAGING_QUEST_FIXTURE_TOKEN}`,
+      enabled: false,
+    })),
+  );
   assert.equal(image.status, 200);
   assert.equal(image.headers.get("Content-Type"), "image/png");
   const bytes = Buffer.from(await image.arrayBuffer());
@@ -932,20 +961,25 @@ test("phone claim keeps thrown diagnostics out of anonymous errors", async () =>
   });
 });
 
-test("existing Profile, link claim, association, and route contracts remain present", async () => {
+test("Quest, link claim, association, and route contracts remain present", async () => {
   const routes = JSON.parse(await readFile(new URL("_routes.json", ROOT), "utf8"));
   assert.ok(routes.include.includes("/q/*"));
-  assert.ok(routes.include.includes("/p/*"));
   assert.ok(routes.include.includes("/api/*"));
+  assert.equal(routes.include.includes("/p/*"), false);
 
   const aasa = JSON.parse(await readFile(new URL(".well-known/apple-app-site-association", ROOT), "utf8"));
   const paths = aasa.applinks.details.flatMap((detail) => detail.paths);
   assert.ok(paths.includes("/q/*"));
-  assert.ok(paths.includes("/p/*"));
+  assert.equal(paths.includes("/p/*"), false);
+  assert.deepEqual(
+    aasa.applinks.details.map((detail) => detail.appID),
+    [
+      "YAJG48SHDF.info.nothingserious.quests",
+      "YAJG48SHDF.info.nothingserious.quests.staging",
+    ],
+  );
 
-  const profileRoute = await readFile(new URL("functions/p/[[path]].js", ROOT), "utf8");
   const phoneEndpoint = await readFile(new URL("functions/api/link-claims/start.js", ROOT), "utf8");
-  assert.match(profileRoute, /profile-share-web/);
   assert.match(phoneEndpoint, /start_link_claim/);
   assert.match(phoneEndpoint, /TURNSTILE_SECRET_KEY/);
 });
