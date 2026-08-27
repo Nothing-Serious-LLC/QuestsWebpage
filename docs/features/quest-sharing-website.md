@@ -116,9 +116,10 @@ efficient.
 
 ## Page behavior
 
-The enhanced page reuses the Profile Sharing Foundation background assets and
-wordmark. Its central Quest card follows the `AppQuestHeroCard` information
-hierarchy:
+The enhanced page reuses the Foundation background assets and wordmark from
+the internal `functions/p/pageAssets.js` module. The `/p/*` product route stays
+outside this Quest release. Its central Quest card follows the
+`AppQuestHeroCard` information hierarchy:
 
 - Quest medallion, title, short description, and approved cover
 - Visibility, duration, and humanized category pills
@@ -186,7 +187,7 @@ The local suite covers:
 - Open Graph and Story proxy requests, status codes, content types, and caching
 - Revision-zero fallback dimensions, byte ceiling, GET body, and HEAD headers
 - Independent Story gating
-- Profile routes, association files, Pages routing, and phone endpoint presence
+- Quest-only association files, Pages routing, and phone endpoint presence
 
 Quest-specific PNG rendering and pixel fixtures live in
 `supabase/functions/quest-share-artifact` in the Quests application repository.
@@ -204,8 +205,8 @@ The website has one responsive HTML renderer and two secure image proxies.
 Hosted staging still requires:
 
 1. Configure staging-only bindings and keep both gates false.
-2. Verify the current production `/q/*`, `/p/*`, AASA, assetlinks, and phone
-   claim baselines.
+2. Verify the current production `/q/*`, AASA, assetlinks, and phone claim
+   baselines.
 3. Deploy a branch preview and verify valid, ended, canceled, expired, and
    malformed codes.
 4. Verify first-response metadata with crawler-style requests.

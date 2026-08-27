@@ -2,7 +2,6 @@
   "version": 1,
   "include": [
     "/q/*",
-    "/p/*",
     "/api/*",
     "/subscribe",
     "/subscribe/return"
