@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { onRequest } from "../functions/q/[[path]].js";
+import { onRequest as onProfileRequest } from "../functions/p/[[path]].js";
 import { onRequestPost as startPhoneClaim } from "../functions/api/link-claims/start.js";
 import {
   normalizeQuestSharePresentation,
@@ -980,16 +981,62 @@ test("phone claim keeps thrown diagnostics out of anonymous errors", async () =>
   });
 });
 
-test("Quest, link claim, association, and route contracts remain present", async () => {
+test("Profile Foundation route renders its rich preview and immutable revision", async () => {
+  const profileCode = "0123456789abcdef0123456789abcdef";
+  let edgeRequest;
+  const response = await withFetch(async (url, init) => {
+    edgeRequest = { url, init, body: JSON.parse(init.body) };
+    return Response.json({
+      displayName: "Taylor & Lee",
+      revision: 4,
+      avatarUrl: null,
+      ringImageUrl: null,
+      ringColors: ["#A961CC", "#F2B84B"],
+      pointsTotal: 1234,
+      currentStreak: 17,
+    });
+  }, () => onProfileRequest({
+    request: new Request(
+      `https://invite-staging.thequestsapp.com/p/${profileCode}`,
+    ),
+    params: { path: [profileCode] },
+    env: {
+      PROFILE_SHARE_SUPABASE_URL: SUPABASE_URL,
+      PROFILE_SHARE_WEB_SECRET: "profile-web-secret",
+    },
+  }));
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.equal(
+    edgeRequest.url,
+    `${SUPABASE_URL}/functions/v1/profile-share-web`,
+  );
+  assert.equal(
+    edgeRequest.init.headers["x-profile-share-secret"],
+    "profile-web-secret",
+  );
+  assert.deepEqual(edgeRequest.body, { action: "metadata", shareCode: profileCode });
+  assert.match(html, /<title>Taylor &amp; Lee is on Quests<\/title>/);
+  assert.match(
+    html,
+    new RegExp(`/p/${profileCode}\\?r=4`),
+  );
+  assert.match(html, />1,234</);
+  assert.match(html, />17</);
+  assert.match(html, new RegExp(`info\\.nothingserious\\.quests://p/${profileCode}`));
+});
+
+test("Quest, Profile, link claim, association, and route contracts remain present", async () => {
   const routes = JSON.parse(await readFile(new URL("_routes.json", ROOT), "utf8"));
   assert.ok(routes.include.includes("/q/*"));
+  assert.ok(routes.include.includes("/p/*"));
   assert.ok(routes.include.includes("/api/*"));
-  assert.equal(routes.include.includes("/p/*"), false);
 
   const aasa = JSON.parse(await readFile(new URL(".well-known/apple-app-site-association", ROOT), "utf8"));
   const paths = aasa.applinks.details.flatMap((detail) => detail.paths);
   assert.ok(paths.includes("/q/*"));
-  assert.equal(paths.includes("/p/*"), false);
+  assert.ok(paths.includes("/p/*"));
   assert.deepEqual(
     aasa.applinks.details.map((detail) => detail.appID),
     [
@@ -997,8 +1044,14 @@ test("Quest, link claim, association, and route contracts remain present", async
       "YAJG48SHDF.info.nothingserious.quests.staging",
     ],
   );
+  assert.deepEqual(
+    aasa.applinks.details[1].paths,
+    ["/q/*", "/p/*"],
+  );
 
+  const profileRoute = await readFile(new URL("functions/p/[[path]].js", ROOT), "utf8");
   const phoneEndpoint = await readFile(new URL("functions/api/link-claims/start.js", ROOT), "utf8");
+  assert.match(profileRoute, /profile-share-web/);
   assert.match(phoneEndpoint, /start_link_claim/);
   assert.match(phoneEndpoint, /TURNSTILE_SECRET_KEY/);
 });
