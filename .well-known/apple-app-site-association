@@ -5,6 +5,7 @@
         "appID": "YAJG48SHDF.info.nothingserious.quests",
         "paths": [
           "/q/*",
+          "/p/*",
           "/quest*",
           "/pro/*",
           "/"
@@ -13,7 +14,8 @@
       {
         "appID": "YAJG48SHDF.info.nothingserious.quests.staging",
         "paths": [
-          "/q/*"
+          "/q/*",
+          "/p/*"
         ]
       }
     ]
