@@ -72,9 +72,10 @@ Image request:
 `artifact` is `og` or `story`. The revision field is omitted when the current
 revision should resolve.
 
-The metadata response uses `presentationVersion: 1` and includes sanitized
-Quest identity, host identity, accepted participant count, timing, cadence,
-status, availability, privacy, category, and approved media. Joinable
+The metadata response uses presentation version `1` or `2` and includes
+sanitized Quest identity, host identity, accepted participant count, timing,
+cadence, status, availability, privacy, category, and approved media. Version
+`2` carries the same join-safe fields and refreshes the hosted artwork. Joinable
 presentations carry `availability: "joinable"`. Completed presentations carry
 `availability: "ended"` and render without phone controls.
 

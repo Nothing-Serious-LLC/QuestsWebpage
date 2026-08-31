@@ -1,4 +1,5 @@
-export const QUEST_SHARE_PRESENTATION_VERSION = 1;
+export const QUEST_SHARE_PRESENTATION_VERSION = 2;
+export const QUEST_SHARE_PRESENTATION_VERSIONS = new Set([1, 2]);
 export const QUEST_SHARE_CODE_PATTERN = /^[A-HJ-NP-Za-hj-kmnp-z2-9]{8}$/;
 export const QUEST_SHARE_REVISION_PATTERN = /^[1-9][0-9]{0,9}$/;
 
@@ -71,7 +72,8 @@ function safeSameProjectMediaUrl(value, supabaseUrl, pathPrefixes) {
 
 export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
-  if (Number(raw.presentationVersion) !== QUEST_SHARE_PRESENTATION_VERSION) return null;
+  const presentationVersion = Number(raw.presentationVersion);
+  if (!QUEST_SHARE_PRESENTATION_VERSIONS.has(presentationVersion)) return null;
 
   if (raw.revision == null) return null;
   const revision = positiveInteger(raw.revision, Number.MAX_SAFE_INTEGER);
@@ -133,7 +135,7 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   ) || null;
 
   return Object.freeze({
-    presentationVersion: QUEST_SHARE_PRESENTATION_VERSION,
+    presentationVersion,
     revision,
     title,
     shortDescription,
