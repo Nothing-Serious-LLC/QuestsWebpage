@@ -496,7 +496,7 @@ test("approved same-project avatar and cover paths survive normalization", async
   assert.equal(unapproved.coverImageUrl, null);
 });
 
-test("schema v1 requires the complete join-safe presentation contract", async () => {
+test("supported schemas require the complete join-safe presentation contract", async () => {
   const raw = await fixture("quest-share-upcoming.json");
   const required = [
     "presentationVersion",
@@ -559,6 +559,25 @@ test("schema v1 requires the complete join-safe presentation contract", async ()
   );
   assert.equal(
     normalizeQuestSharePresentation({ ...raw, endDate: "not-a-date" }, { supabaseUrl: SUPABASE_URL }),
+    null,
+  );
+});
+
+test("schema v2 preserves the v1 fields while refreshing hosted artwork", async () => {
+  const raw = await fixture("quest-share-upcoming.json");
+  const presentation = normalizeQuestSharePresentation({
+    ...raw,
+    presentationVersion: 2,
+  }, { supabaseUrl: SUPABASE_URL });
+
+  assert.ok(presentation);
+  assert.equal(presentation.presentationVersion, 2);
+  assert.equal(presentation.title, raw.title);
+  assert.equal(
+    normalizeQuestSharePresentation({
+      ...raw,
+      presentationVersion: 3,
+    }, { supabaseUrl: SUPABASE_URL }),
     null,
   );
 });
