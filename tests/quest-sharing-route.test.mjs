@@ -346,8 +346,8 @@ test("server HTML contains complete first-response Quest metadata", async () => 
   assert.match(html, /<title>Join Morning Momentum on Quests<\/title>/);
   assert.match(html, /property="og:title" content="You’ve been invited to a Quest"/);
   assert.match(html, /\/q\/AbCd2345\/og\.png\?r=3/);
-  assert.match(html, /property="og:image:width" content="1080"/);
-  assert.match(html, /property="og:image:height" content="1350"/);
+  assert.match(html, /property="og:image:width" content="640"/);
+  assert.match(html, /property="og:image:height" content="800"/);
   assert.match(html, /Morning Momentum/);
   assert.match(html, /Maya Chen/);
   assert.match(html, /30 days/);

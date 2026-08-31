@@ -11,6 +11,8 @@ import { questPhoneClaimScript } from "./phoneClaimScript.js";
 const SURFACE = "#f3f1e7";
 const TITLE_INK = "#191919";
 const BODY_INK = "#4f4f4f";
+const QUEST_OG_WIDTH = 640;
+const QUEST_OG_HEIGHT = 800;
 const CATEGORY_VISUALS = Object.freeze({
   recharge_move: Object.freeze({ background: "#ECF0FE", ink: "#889FE9" }),
   social_lifestyle: Object.freeze({ background: "#DFF2E2", ink: "#57A56C" }),
@@ -334,8 +336,8 @@ export function questSharePage({
     <meta property="og:image" content="${escapeHtml(imageUrl)}" />
     <meta property="og:image:secure_url" content="${escapeHtml(imageUrl)}" />
     <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1080" />
-    <meta property="og:image:height" content="1350" />
+    <meta property="og:image:width" content="${QUEST_OG_WIDTH}" />
+    <meta property="og:image:height" content="${QUEST_OG_HEIGHT}" />
     <meta property="og:image:alt" content="Invitation to ${safeTitle}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${shareHeadline}" />
