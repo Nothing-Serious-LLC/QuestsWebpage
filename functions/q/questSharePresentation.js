@@ -1,5 +1,5 @@
-export const QUEST_SHARE_PRESENTATION_VERSION = 2;
-export const QUEST_SHARE_PRESENTATION_VERSIONS = new Set([1, 2]);
+export const QUEST_SHARE_PRESENTATION_VERSION = 3;
+export const QUEST_SHARE_PRESENTATION_VERSIONS = new Set([1, 2, 3]);
 export const QUEST_SHARE_CODE_PATTERN = /^[A-HJ-NP-Za-hj-kmnp-z2-9]{8}$/;
 export const QUEST_SHARE_REVISION_PATTERN = /^[1-9][0-9]{0,9}$/;
 
@@ -13,7 +13,7 @@ const QUEST_CATEGORIES = new Set([
   "creativity",
   "productivity",
 ]);
-const ICON_PATTERN = /^[a-z0-9-]{1,64}$/;
+const ICON_PATTERN = /^(?:[a-z0-9][a-z0-9-]{0,63}|(?:plump-v1|plump-figma-v1):[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*|quests-line-v1:[a-z0-9][a-z0-9-]*)$/;
 const QUEST_TITLE_LIMIT = 80;
 const QUEST_DESCRIPTION_LIMIT = 200;
 const QUEST_HOST_LIMIT = 120;
@@ -25,6 +25,8 @@ const AVATAR_PATH_PREFIXES = [
   "/storage/v1/render/image/public/avatars/",
 ];
 const COVER_PATH_PREFIXES = [
+  "/storage/v1/object/public/quest-covers/",
+  "/storage/v1/render/image/public/quest-covers/",
   "/storage/v1/object/public/standard-quest-backgrounds/",
   "/storage/v1/render/image/public/standard-quest-backgrounds/",
 ];
@@ -89,7 +91,7 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
     return null;
   }
 
-  const iconCandidate = boundedText(raw.icon, 64).toLowerCase();
+  const iconCandidate = boundedText(raw.icon, 96).toLowerCase();
   const icon = ICON_PATTERN.test(iconCandidate) ? iconCandidate : null;
   const iconColorCandidate = boundedText(raw.iconColor, 7);
   const iconColor = /^#[0-9a-f]{6}$/i.test(iconColorCandidate)

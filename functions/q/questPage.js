@@ -6,6 +6,11 @@ import {
   ICON_SOCIAL,
   WORDMARK,
 } from "../p/pageAssets.js";
+import {
+  QUEST_ICON_CANONICAL_ALIASES,
+  QUEST_ICON_SVG_TEMPLATES,
+} from "./questIconSvgTemplates.js";
+import { QUEST_ICON_PATHS } from "./questIconPaths.js";
 import { questPhoneClaimScript } from "./phoneClaimScript.js";
 
 const SURFACE = "#f3f1e7";
@@ -135,10 +140,23 @@ function participantLabel(count) {
 }
 
 function questIconMarkup(presentation) {
-  if (!presentation.icon) {
-    return `<span class="quest-icon-fallback" aria-hidden="true">Q</span>`;
+  const canonicalKey = presentation.icon
+    ? QUEST_ICON_CANONICAL_ALIASES[presentation.icon] ??
+      (QUEST_ICON_SVG_TEMPLATES[presentation.icon] ? presentation.icon : null)
+    : null;
+  const template = canonicalKey
+    ? QUEST_ICON_SVG_TEMPLATES[canonicalKey] ?? null
+    : null;
+  if (template) {
+    return `<span class="quest-icon-svg" aria-hidden="true">${template}</span>`;
   }
-  return `<span class="mdi mdi-${presentation.icon}" aria-hidden="true"></span>`;
+  const legacyPath = presentation.icon
+    ? QUEST_ICON_PATHS[presentation.icon] ?? null
+    : null;
+  if (legacyPath) {
+    return `<span class="quest-icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="${legacyPath}" fill="currentColor" /></svg></span>`;
+  }
+  return `<span class="quest-icon-svg quest-icon-fallback" aria-hidden="true"><svg viewBox="0 0 29 25" fill="none"><path d="M27.8637 16.6699C28.2771 17.2106 28.5 17.7857 28.5 18.3822C28.5 21.5452 22.232 24.1094 14.5 24.1094C6.76801 24.1094 0.5 21.5452 0.5 18.3822C0.5 17.7857 0.722856 17.2106 1.13633 16.6699" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M21.5001 10.9733C21.5001 6.5236 17.9126 2.78451 15.8741 1.01902C15.0751 0.326993 13.925 0.326993 13.126 1.01902C11.0874 2.78451 7.5 6.5236 7.5 10.9733C7.5 15.0927 10.634 17.7467 14.5 17.7467C18.366 17.7467 21.5001 15.0927 21.5001 10.9733Z" stroke="currentColor" stroke-linejoin="round"/><path d="M9.92532 4.45411C7.67222 3.74008 5.31777 3.69398 3.76286 3.77677C2.68876 3.83399 1.8608 4.66196 1.80364 5.73606C1.66871 8.26968 1.87593 12.9262 4.75786 15.8081C6.79173 17.8419 9.41565 18.2071 11.658 17.2225C9.20856 16.2568 7.50067 14.0143 7.50067 10.9735C7.50067 8.51155 8.59887 6.26716 9.92532 4.45411Z" stroke="currentColor" stroke-linejoin="round"/><path d="M19.0745 4.45411C20.4009 6.26716 21.4991 8.51155 21.4991 10.9733C21.4991 14.0143 19.7912 16.2568 17.3418 17.2225C19.5842 18.2071 22.2081 17.8419 24.2419 15.8081C27.1239 12.9262 27.3311 8.26968 27.1962 5.73612C27.139 4.66196 26.311 3.83399 25.2369 3.77677C23.682 3.69398 21.3276 3.74008 19.0745 4.45411Z" stroke="currentColor" stroke-linejoin="round"/></svg></span>`;
 }
 
 function coverMarkup(presentation) {
@@ -264,7 +282,7 @@ export function questSharePage({
   const categoryVisual = presentation.category
     ? CATEGORY_VISUALS[presentation.category] ?? DEFAULT_CATEGORY_VISUAL
     : DEFAULT_CATEGORY_VISUAL;
-  const accent = categoryVisual.ink;
+  const accent = presentation.iconColor ?? categoryVisual.ink;
   const categoryBackground = categoryVisual.background;
   const socialProof = escapeHtml(participantLabel(presentation.participantCount));
   const isEnded = presentation.availability === "ended";
@@ -393,9 +411,11 @@ export function questSharePage({
       .quest-content { display: flex; flex-direction: column; align-items: center; padding: 32px 24px; }
       .quest-cover + .quest-content { padding-top: 0; }
       .medallion { width: 58px; height: 58px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%;
-        background: #ffffff; border: 2px solid var(--category-bg); color: var(--accent); font-size: 30px; }
+        background: #ffffff; border: 2px solid var(--accent); color: var(--accent); font-size: 30px; overflow: hidden; }
       .quest-cover + .quest-content .medallion { margin-top: -29px; }
-      .quest-icon-fallback { font-size: 24px; font-weight: 700; }
+      .quest-icon-svg { display: grid; width: 31px; height: 31px; place-items: center; }
+      .quest-icon-svg svg { display: block; width: 100%; height: 100%; }
+      .quest-icon-fallback { color: #A961CC; }
       .quest-title { margin-top: 20px; max-width: 314px; font-family: "Instrument Serif", Georgia, serif;
         font-size: 32px; line-height: 40px; font-weight: 400; letter-spacing: .8px; overflow-wrap: anywhere; }
       .quest-description { margin-top: 12px; max-width: 314px; color: #696969; font-size: 17px; line-height: 24px; font-weight: 400; }
