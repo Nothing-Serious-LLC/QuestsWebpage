@@ -10,6 +10,11 @@ import {
 } from "../functions/q/questSharePresentation.js";
 import { questSharePage } from "../functions/q/questPage.js";
 import {
+  QUEST_ICON_CANONICAL_ALIASES,
+  QUEST_ICON_SVG_TEMPLATES,
+} from "../functions/q/questIconSvgTemplates.js";
+import { QUEST_ICON_PATHS } from "../functions/q/questIconPaths.js";
+import {
   STAGING_QUEST_COMMUNITY_FIXTURE_CODE,
   STAGING_QUEST_COMMUNITY_FIXTURE_OG_PATH,
   STAGING_QUEST_FIXTURE_CODE,
@@ -481,6 +486,7 @@ test("presentation mapper escapes copy at render time and validates media origin
 test("approved same-project avatar and cover paths survive normalization", async () => {
   const raw = await fixture("quest-share-community.json");
   const standardArtwork = `${SUPABASE_URL}/storage/v1/object/public/standard-quest-backgrounds/social/default.png`;
+  const communityArtwork = `${SUPABASE_URL}/storage/v1/object/public/quest-covers/host-id/community.webp`;
   const presentation = normalizeQuestSharePresentation({
     ...raw,
     coverImageUrl: standardArtwork,
@@ -488,6 +494,14 @@ test("approved same-project avatar and cover paths survive normalization", async
   assert.ok(presentation);
   assert.equal(presentation.hostAvatarUrl, raw.hostAvatarUrl);
   assert.equal(presentation.coverImageUrl, standardArtwork);
+
+  const communityPresentation = normalizeQuestSharePresentation({
+    ...raw,
+    presentationVersion: 3,
+    coverImageUrl: communityArtwork,
+  }, { supabaseUrl: SUPABASE_URL });
+  assert.ok(communityPresentation);
+  assert.equal(communityPresentation.coverImageUrl, communityArtwork);
 
   const unapproved = normalizeQuestSharePresentation({
     ...raw,
@@ -564,20 +578,77 @@ test("supported schemas require the complete join-safe presentation contract", a
   );
 });
 
-test("schema v2 preserves the v1 fields while refreshing hosted artwork", async () => {
+test("schemas v2 and v3 preserve the v1 contract and v3 custom icon metadata", async () => {
   const raw = await fixture("quest-share-upcoming.json");
-  const presentation = normalizeQuestSharePresentation({
+  const v2 = normalizeQuestSharePresentation({
     ...raw,
     presentationVersion: 2,
   }, { supabaseUrl: SUPABASE_URL });
 
-  assert.ok(presentation);
-  assert.equal(presentation.presentationVersion, 2);
-  assert.equal(presentation.title, raw.title);
+  assert.ok(v2);
+  assert.equal(v2.presentationVersion, 2);
+  assert.equal(v2.title, raw.title);
+
+  const v3 = normalizeQuestSharePresentation({
+    ...raw,
+    presentationVersion: 3,
+    icon: "plump-v1:color/paint-palette",
+    iconColor: "#f0925b",
+  }, { supabaseUrl: SUPABASE_URL });
+  assert.ok(v3);
+  assert.equal(v3.presentationVersion, 3);
+  assert.equal(v3.icon, "plump-v1:color/paint-palette");
+  assert.equal(v3.iconColor, "#F0925B");
+
+  const response = questSharePage({
+    origin: "https://invite.thequestsapp.com",
+    shareCode: "AbCd2345",
+    presentation: v3,
+    turnstileSiteKey: "0x4AAAAAACaMy8ev_fZjSv2s",
+  });
+  const html = await response.text();
+  assert.match(html, /--accent: #F0925B/);
+  assert.match(html, /class="quest-icon-svg"/);
+  assert.match(html, /viewBox="-0\.5 -0\.5 24 24"/);
+  assert.doesNotMatch(html, /mdi-plump-v1:color\/paint-palette/);
+
+  const legacyAlias = "quests-line-v1:run";
+  const canonicalAlias = QUEST_ICON_CANONICAL_ALIASES[legacyAlias];
+  const aliasedResponse = questSharePage({
+    origin: "https://invite.thequestsapp.com",
+    shareCode: "AbCd2345",
+    presentation: { ...v3, icon: legacyAlias },
+    turnstileSiteKey: "0x4AAAAAACaMy8ev_fZjSv2s",
+  });
+  const aliasedHtml = await aliasedResponse.text();
+  assert.ok(canonicalAlias);
+  assert.ok(aliasedHtml.includes(QUEST_ICON_SVG_TEMPLATES[canonicalAlias]));
+  assert.ok(!aliasedHtml.includes(QUEST_ICON_SVG_TEMPLATES[legacyAlias]));
+
+  const legacyMdiKey = "weather-sunset-up";
+  const legacyMdiResponse = questSharePage({
+    origin: "https://invite.thequestsapp.com",
+    shareCode: "AbCd2345",
+    presentation: { ...v3, icon: legacyMdiKey },
+    turnstileSiteKey: "0x4AAAAAACaMy8ev_fZjSv2s",
+  });
+  const legacyMdiHtml = await legacyMdiResponse.text();
+  assert.ok(legacyMdiHtml.includes(QUEST_ICON_PATHS[legacyMdiKey]));
+
+  const unknownResponse = questSharePage({
+    origin: "https://invite.thequestsapp.com",
+    shareCode: "AbCd2345",
+    presentation: { ...v3, icon: "unknown-private-glyph" },
+    turnstileSiteKey: "0x4AAAAAACaMy8ev_fZjSv2s",
+  });
+  const unknownHtml = await unknownResponse.text();
+  assert.match(unknownHtml, /quest-icon-fallback/);
+  assert.doesNotMatch(unknownHtml, /mdi-unknown-private-glyph/);
+
   assert.equal(
     normalizeQuestSharePresentation({
       ...raw,
-      presentationVersion: 3,
+      presentationVersion: 4,
     }, { supabaseUrl: SUPABASE_URL }),
     null,
   );
@@ -994,6 +1065,8 @@ test("Profile Foundation route renders its rich preview and immutable revision",
       ringColors: ["#A961CC", "#F2B84B"],
       pointsTotal: 1234,
       currentStreak: 17,
+      imageWidth: 640,
+      imageHeight: 800,
     });
   }, () => onProfileRequest({
     request: new Request(
@@ -1017,14 +1090,46 @@ test("Profile Foundation route renders its rich preview and immutable revision",
     "profile-web-secret",
   );
   assert.deepEqual(edgeRequest.body, { action: "metadata", shareCode: profileCode });
-  assert.match(html, /<title>Taylor &amp; Lee is on Quests<\/title>/);
+  assert.match(html, /<title>Taylor &amp; Lee's Quests profile<\/title>/);
+  assert.doesNotMatch(html, /is on Quests/);
   assert.match(
     html,
     new RegExp(`/p/${profileCode}\\?r=4`),
   );
   assert.match(html, />1,234</);
   assert.match(html, />17</);
+  assert.match(html, /property="og:image:width" content="640"/);
+  assert.match(html, /property="og:image:height" content="800"/);
   assert.match(html, new RegExp(`info\\.nothingserious\\.quests://p/${profileCode}`));
+});
+
+test("Profile Foundation route preserves legacy pinned landscape dimensions", async () => {
+  const profileCode = "0123456789abcdef0123456789abcdef";
+  const response = await withFetch(async () => Response.json({
+    displayName: "Legacy Profile",
+    revision: 2,
+    avatarUrl: null,
+    ringImageUrl: null,
+    ringColors: [],
+    pointsTotal: 8,
+    currentStreak: 2,
+    imageWidth: 1200,
+    imageHeight: 630,
+  }), () => onProfileRequest({
+    request: new Request(
+      `https://invite-staging.thequestsapp.com/p/${profileCode}?r=2`,
+    ),
+    params: { path: [profileCode] },
+    env: {
+      PROFILE_SHARE_SUPABASE_URL: SUPABASE_URL,
+      PROFILE_SHARE_WEB_SECRET: "profile-web-secret",
+    },
+  }));
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /property="og:image:width" content="1200"/);
+  assert.match(html, /property="og:image:height" content="630"/);
 });
 
 test("Quest, Profile, link claim, association, and route contracts remain present", async () => {

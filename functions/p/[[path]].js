@@ -3,7 +3,7 @@
  *
  *   GET /p/{code}           -> full-page Foundation Profile experience with
  *                              Open Graph metadata for messaging crawlers
- *   GET /p/{code}/og.png    -> 1200x630 PNG proxied from the Supabase
+ *   GET /p/{code}/og.png    -> 640x800 PNG proxied from the Supabase
  *                              profile-share-web Edge Function
  *
  * The share code is a 32-character lowercase hex string. The optional ?r=
@@ -179,10 +179,18 @@ function profilePage({ origin, shareCode, revision, metadata }) {
   const imageUrl = `${origin}/p/${shareCode}/og.png?r=${revision}`;
   const safeCanonical = escapeHtml(canonicalUrl);
   const safeImage = escapeHtml(imageUrl);
-  const title = `${safeName} is on Quests`;
-  const description = 'Add them on Quests, the social habit tracker.';
+  const title = `${safeName}'s Quests profile`;
+  const description = 'View their profile and add them on Quests.';
   const points = Number(metadata.pointsTotal || 0).toLocaleString('en-US');
   const streak = Number(metadata.currentStreak || 0).toLocaleString('en-US');
+  const imageWidth = Number.isSafeInteger(metadata.imageWidth) &&
+      metadata.imageWidth > 0 && metadata.imageWidth <= 4096
+    ? metadata.imageWidth
+    : 1200;
+  const imageHeight = Number.isSafeInteger(metadata.imageHeight) &&
+      metadata.imageHeight > 0 && metadata.imageHeight <= 4096
+    ? metadata.imageHeight
+    : 630;
 
   return htmlResponse(
     `<!DOCTYPE html>
@@ -202,8 +210,8 @@ function profilePage({ origin, shareCode, revision, metadata }) {
     <meta property="og:site_name" content="Quests" />
     <meta property="og:url" content="${safeCanonical}" />
     <meta property="og:image" content="${safeImage}" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:width" content="${imageWidth}" />
+    <meta property="og:image:height" content="${imageHeight}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${title}" />
     <meta name="twitter:description" content="${description}" />
@@ -248,8 +256,6 @@ function profilePage({ origin, shareCode, revision, metadata }) {
       h1 { margin-top: clamp(16px, 3vh, 26px); font-size: clamp(30px, 6vw, 44px);
            line-height: 1.15; font-weight: 600; letter-spacing: -0.3px; color: ${NAME_INK};
            max-width: min(88vw, 640px); overflow-wrap: anywhere; }
-      .subtitle { margin-top: 6px; font-size: clamp(17px, 2.6vw, 21px); font-weight: 500; color: ${CHIP_INK}; }
-
       .chips { display: flex; gap: 12px; margin-top: clamp(16px, 3vh, 24px); }
       .chip { display: flex; align-items: center; gap: 7px; background: #ffffff;
               border-radius: 999px; padding: 12px 18px;
@@ -265,7 +271,6 @@ function profilePage({ origin, shareCode, revision, metadata }) {
 
       @media (min-width: 900px) {
         .chips { gap: 16px; }
-        .subtitle { display: none; }
       }
     </style>
   </head>
@@ -276,7 +281,6 @@ function profilePage({ origin, shareCode, revision, metadata }) {
       <div class="hero">
         ${avatarMarkup({ ...metadata, displayName: metadata.displayName })}
         <h1>${safeName}</h1>
-        <div class="subtitle">is on Quests</div>
         <div class="chips">
           <span class="chip">${ICON_POINTS_STAR}<span>${points}</span></span>
           <span class="chip">${ICON_STREAK_FIRE}<span>${streak}</span></span>
