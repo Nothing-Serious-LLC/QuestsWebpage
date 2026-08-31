@@ -11,7 +11,7 @@ Function, PNG rendering, native routing, onboarding, and release governance.
 | Route | Enhanced behavior |
 |---|---|
 | `/q/{code}` | Server-rendered Quest invitation with first-response metadata |
-| `/q/{code}/og.png` | Secure proxy for the 1080 x 1350 compact Quest artifact |
+| `/q/{code}/og.png` | Secure proxy for the 640 x 800 compact Quest artifact |
 | `/q/{code}/story.png` | Dark secure proxy for the 1080 x 1920 Story artifact |
 | `/api/link-claims/start` | Existing Turnstile-protected phone claim endpoint |
 
@@ -216,7 +216,7 @@ Hosted staging still requires:
    install.
 6. Verify compiled iOS scheme and Android package values, then exercise both
    installed-app handoffs against the matching staging artifacts.
-7. Verify physical Messages rendering for the 1080 x 1350 published artifact
+7. Verify physical Messages rendering for the 640 x 800 published artifact
    and the revision-zero fallback.
 8. Complete Story renderer capacity and physical Instagram acceptance.
 9. Activate HTML and Open Graph separately from Story through reviewed gates.
