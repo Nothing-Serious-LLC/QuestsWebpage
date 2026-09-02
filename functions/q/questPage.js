@@ -174,10 +174,24 @@ function safeHttpsUrl(value, fallback) {
   }
 }
 
+const APP_SCHEME_PATTERN = /^[A-Za-z][A-Za-z0-9+.-]{0,63}$/;
+
 export function normalizeQuestAppHandoff(value = {}) {
-  const appScheme = /^[A-Za-z][A-Za-z0-9+.-]{0,63}$/.test(String(value.appScheme || ""))
+  const appScheme = APP_SCHEME_PATTERN.test(String(value.appScheme || ""))
     ? String(value.appScheme)
     : DEFAULT_APP_HANDOFF.appScheme;
+  // Extra iOS schemes tried after the primary one (staging host only; see
+  // appHandoffTargets.js). Deduplicated and validated like the primary.
+  const alternateAppSchemes = Array.isArray(value.alternateAppSchemes)
+    ? Array.from(new Set(
+      value.alternateAppSchemes
+        .map((scheme) => String(scheme || ""))
+        .filter((scheme) => APP_SCHEME_PATTERN.test(scheme) && scheme !== appScheme),
+    ))
+    : [];
+  const androidScheme = APP_SCHEME_PATTERN.test(String(value.androidScheme || ""))
+    ? String(value.androidScheme)
+    : appScheme;
   const androidPackage = /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*)+$/.test(
     String(value.androidPackage || ""),
   )
@@ -189,6 +203,8 @@ export function normalizeQuestAppHandoff(value = {}) {
 
   return {
     appScheme,
+    alternateAppSchemes,
+    androidScheme,
     androidPackage,
     appStoreId,
     appStoreUrl: safeHttpsUrl(value.appStoreUrl, DEFAULT_APP_HANDOFF.appStoreUrl),
@@ -271,6 +287,13 @@ export function questSharePage({
       ? `?r=${revision}`
       : "";
   const canonicalUrl = `${origin}/q/${shareCode}${revisionQuery}`;
+  // The https share link is the first "open" offer: iOS routes it to whichever
+  // installed client claims this host, so it never assumes one scheme.
+  const universalLink = `${origin}/q/${shareCode}`;
+  const alternateAppMarkup = handoff.alternateAppSchemes
+    .map((scheme) =>
+      `<p class="alternate-app">Using the staging build? <a href="${escapeHtml(`${scheme}://q/${shareCode}`)}">Open it here</a></p>`)
+    .join("");
   const imageUrl = `${origin}/q/${shareCode}/og.png${revisionQuery}`;
   const pageTitle = presentation.availability === "ended"
     ? `${presentation.title} has ended | Quests`
@@ -310,6 +333,7 @@ export function questSharePage({
     : !usesPhoneClaim
       ? `<section class="join-panel" aria-label="Join this Quest">
         <a class="store-button" href="${escapeHtml(`${handoff.appScheme}://q/${shareCode}`)}">Open Quests</a>
+        ${alternateAppMarkup}
       </section>`
       : `<section class="join-panel" aria-label="Join this Quest">
         <form id="phone-claim-form" novalidate>
@@ -331,8 +355,15 @@ export function questSharePage({
           <h2>Opening Quests<span class="dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></h2>
         </div>
       </section>`;
+  // With alternate schemes in play the control is the universal link itself,
+  // so a long-press (or a tap with scripting off) hands the https URL to the
+  // OS; the click handler then walks the scheme chain. Hosts without
+  // alternates keep the original button markup.
   const openAppSlot = !isEnded && usesPhoneClaim
-    ? `<button id="open-app-link" class="open-app" type="button">Open in Quests</button>`
+    ? handoff.alternateAppSchemes.length > 0
+      ? `<a id="open-app-link" class="open-app" href="${escapeHtml(universalLink)}">Open in Quests</a>
+      ${alternateAppMarkup}`
+      : `<button id="open-app-link" class="open-app" type="button">Open in Quests</button>`
     : "";
 
   return response(`<!DOCTYPE html>
@@ -460,7 +491,10 @@ export function questSharePage({
       @keyframes dot-pulse { 0%, 60%, 100% { opacity: .2; } 30% { opacity: 1; } }
       .success p { margin-top: 5px; color: var(--body); font-size: 15px; }
       .open-app { display: block; margin: 26px auto 0; border: 0; background: transparent; color: #5e5e5a;
-        font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+        font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+        width: fit-content; }
+      .alternate-app { margin: 12px auto 0; text-align: center; color: #777771; font-size: 13px; }
+      .alternate-app a { color: #5e5e5a; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
       .ended-panel { text-align: center; }
       .ended-mark { width: 50px; height: 50px; display: grid; place-items: center; margin: 0 auto 14px; border-radius: 50%;
         background: color-mix(in srgb, var(--accent) 14%, #ffffff); color: var(--accent); font-size: 24px; font-weight: 700; }

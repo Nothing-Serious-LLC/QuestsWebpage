@@ -10,6 +10,7 @@ import {
   stagingQuestFixtureForRequest,
   stagingQuestFixtureOgPathForCode,
 } from "./stagingQuestFixture.js";
+import { appHandoffForHost } from "./appHandoffTargets.js";
 
 const EDGE_TIMEOUT_MS = 4_000;
 const REVISION_ZERO_OG_FALLBACK_PATH = "/quest-share-og-fallback.png";
@@ -33,14 +34,14 @@ function normalizeShareCode(value) {
   return QUEST_SHARE_CODE_PATTERN.test(candidate) ? candidate : null;
 }
 
-function appHandoffFromEnv(env) {
-  return {
+function appHandoffFromEnv(env, url) {
+  return appHandoffForHost(url?.hostname, {
     appScheme: env?.QUEST_SHARE_APP_SCHEME ?? env?.QUEST_SHARE_IOS_SCHEME,
     androidPackage: env?.QUEST_SHARE_ANDROID_PACKAGE,
     appStoreUrl: env?.QUEST_SHARE_IOS_STORE_URL,
     playStoreUrl: env?.QUEST_SHARE_ANDROID_STORE_URL,
     appStoreId: env?.QUEST_SHARE_IOS_STORE_ID,
-  };
+  });
 }
 
 async function legacyQuestPage(context, { transientFailure = false } = {}) {
@@ -310,7 +311,7 @@ export async function onRequest(context) {
       ? imageNotFound(context.request.method)
       : questUnavailablePage({
         requestMethod: context.request.method,
-        appHandoff: appHandoffFromEnv(context.env),
+        appHandoff: appHandoffFromEnv(context.env, url),
       });
   }
 
@@ -332,7 +333,7 @@ export async function onRequest(context) {
   if (status === 404) {
     return questUnavailablePage({
       requestMethod: context.request.method,
-      appHandoff: appHandoffFromEnv(context.env),
+      appHandoff: appHandoffFromEnv(context.env, url),
     });
   }
   if (status !== 200 || !response) {
@@ -345,7 +346,7 @@ export async function onRequest(context) {
   } catch {
     return questUnavailablePage({
       requestMethod: context.request.method,
-      appHandoff: appHandoffFromEnv(context.env),
+      appHandoff: appHandoffFromEnv(context.env, url),
     });
   }
 
@@ -358,7 +359,7 @@ export async function onRequest(context) {
   ) {
     return questUnavailablePage({
       requestMethod: context.request.method,
-      appHandoff: appHandoffFromEnv(context.env),
+      appHandoff: appHandoffFromEnv(context.env, url),
     });
   }
 
@@ -374,7 +375,7 @@ export async function onRequest(context) {
     shareCode,
     presentation,
     turnstileSiteKey,
-    appHandoff: appHandoffFromEnv(context.env),
+    appHandoff: appHandoffFromEnv(context.env, url),
     interactionMode: turnstileSiteKey ? "phone" : "app-only",
     requestMethod: context.request.method,
   });

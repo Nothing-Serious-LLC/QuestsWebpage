@@ -34,6 +34,15 @@ route is explicitly enabled.
 | `TURNSTILE_SECRET_KEY` | Server-side key paired with the environment widget | Separate staging secret |
 | `TURNSTILE_ALLOWED_HOSTS` | Exact comma-separated hosts accepted by the phone endpoint | Preview and custom staging hosts |
 | `QUEST_SHARE_APP_SCHEME` | Custom scheme for the matching installed iOS and Android build | Value verified from staging build artifacts |
+
+On the staging hosts (`invite-staging.thequestsapp.com` and
+`quests-invite-staging.pages.dev`) the iOS handoff widens past this binding:
+`functions/q/appHandoffTargets.js` tries `info.nothingserious.quests` (the
+TestFlight build on the staging backend and the App Store build share that
+scheme) before `quests-staging` (the pure staging client), and the page adds a
+"Using the staging build? Open it here" link. Android keeps this binding and
+`QUEST_SHARE_ANDROID_PACKAGE` as one pair. Production hosts render exactly the
+configured scheme.
 | `QUEST_SHARE_ANDROID_PACKAGE` | Android package for the installed-app intent | Value verified from the staging build artifact |
 | `QUEST_SHARE_IOS_STORE_URL` | iOS fallback or internal-install destination | Environment-specific HTTPS URL |
 | `QUEST_SHARE_ANDROID_STORE_URL` | Android fallback or internal-install destination | Environment-specific HTTPS URL |

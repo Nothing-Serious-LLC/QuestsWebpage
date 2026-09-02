@@ -10,6 +10,13 @@ import {
 } from "../functions/q/questSharePresentation.js";
 import { questSharePage } from "../functions/q/questPage.js";
 import {
+  PRODUCTION_APP_SCHEME,
+  STAGING_APP_SCHEME,
+  appHandoffForHost,
+  appSchemesForHost,
+  isStagingShareHost,
+} from "../functions/q/appHandoffTargets.js";
+import {
   QUEST_ICON_CANONICAL_ALIASES,
   QUEST_ICON_SVG_TEMPLATES,
 } from "../functions/q/questIconSvgTemplates.js";
@@ -368,7 +375,7 @@ test("server HTML contains complete first-response Quest metadata", async () => 
   assert.doesNotMatch(html, /rel="alternate"[^>]+story\.png/);
   assert.match(html, /var shareCode = "AbCd2345"/);
   assert.match(html, /var APP_SCHEME = "info\.nothingserious\.quests"/);
-  assert.match(html, /APP_SCHEME \+ ":\/\/q\/" \+ shareCode/);
+  assert.match(html, /APP_SCHEMES\[index\] \+ ":\/\/q\/" \+ shareCode/);
   assert.match(html, /window\.location\.href = APP_STORE_URL/);
   assert.match(html, /By continuing, you agree to the/);
   assert.match(html, /class="visually-hidden" for="phone-input"/);
@@ -450,9 +457,11 @@ test("environment app handoff bindings flow into installed-build targets", async
   assert.match(html, /var ANDROID_PACKAGE = "info\.nothingserious\.quests\.preview"/);
   assert.match(html, /var APP_STORE_URL = "https:\/\/install\.example\.com\/quests-ios"/);
   assert.match(html, /var PLAY_STORE_URL = "https:\/\/install\.example\.com\/quests-android"/);
-  assert.match(html, /APP_SCHEME \+ ":\/\/q\/" \+ shareCode/);
+  assert.match(html, /APP_SCHEMES\[index\] \+ ":\/\/q\/" \+ shareCode/);
   assert.match(html, /"intent:\/\/q\/" \+ shareCode/);
-  assert.match(html, /"#Intent;scheme=" \+ APP_SCHEME \+ ";package=" \+ ANDROID_PACKAGE/);
+  assert.match(html, /"#Intent;scheme=" \+ ANDROID_SCHEME \+ ";package=" \+ ANDROID_PACKAGE/);
+  assert.match(html, /var APP_SCHEMES = \["quests-preview"\]/);
+  assert.match(html, /var ANDROID_SCHEME = "quests-preview"/);
 });
 
 test("presentation mapper escapes copy at render time and validates media origins", async () => {
@@ -1159,4 +1168,150 @@ test("Quest, Profile, link claim, association, and route contracts remain presen
   assert.match(profileRoute, /profile-share-web/);
   assert.match(phoneEndpoint, /start_link_claim/);
   assert.match(phoneEndpoint, /TURNSTILE_SECRET_KEY/);
+});
+
+test("staging share hosts are recognised exactly; production hosts keep one scheme", () => {
+  assert.equal(isStagingShareHost("invite-staging.thequestsapp.com"), true);
+  assert.equal(isStagingShareHost("INVITE-STAGING.thequestsapp.com"), true);
+  assert.equal(isStagingShareHost("quests-invite-staging.pages.dev"), true);
+  assert.equal(isStagingShareHost("abc12345.quests-invite-staging.pages.dev"), true);
+  assert.equal(isStagingShareHost("invite.thequestsapp.com"), false);
+  assert.equal(isStagingShareHost("quests-invite.pages.dev"), false);
+  assert.equal(isStagingShareHost("invite-staging.thequestsapp.com.evil.example"), false);
+  assert.equal(isStagingShareHost(""), false);
+  assert.equal(isStagingShareHost(undefined), false);
+
+  assert.deepEqual(appSchemesForHost("invite.thequestsapp.com", "info.nothingserious.quests"), [
+    "info.nothingserious.quests",
+  ]);
+  assert.deepEqual(appSchemesForHost("invite.thequestsapp.com", "quests-preview"), ["quests-preview"]);
+  assert.deepEqual(appSchemesForHost("invite.thequestsapp.com", undefined), []);
+  assert.deepEqual(appSchemesForHost("invite-staging.thequestsapp.com", "quests-staging"), [
+    PRODUCTION_APP_SCHEME,
+    STAGING_APP_SCHEME,
+  ]);
+  assert.deepEqual(appSchemesForHost("invite-staging.thequestsapp.com", "quests-preview"), [
+    PRODUCTION_APP_SCHEME,
+    STAGING_APP_SCHEME,
+    "quests-preview",
+  ]);
+
+  assert.deepEqual(
+    appHandoffForHost("invite.thequestsapp.com", { appScheme: "info.nothingserious.quests", androidPackage: "info.nothingserious.quests" }),
+    {
+      appScheme: "info.nothingserious.quests",
+      alternateAppSchemes: [],
+      androidScheme: "info.nothingserious.quests",
+      androidPackage: "info.nothingserious.quests",
+    },
+  );
+  assert.deepEqual(
+    appHandoffForHost("invite-staging.thequestsapp.com", { appScheme: "quests-staging", androidPackage: "info.nothingserious.quests.staging" }),
+    {
+      appScheme: PRODUCTION_APP_SCHEME,
+      alternateAppSchemes: [STAGING_APP_SCHEME],
+      androidScheme: "quests-staging",
+      androidPackage: "info.nothingserious.quests.staging",
+    },
+  );
+  assert.deepEqual(appHandoffForHost("invite.thequestsapp.com", {}), {});
+});
+
+test("staging host offers the universal link, both iOS schemes, and the staging package on Android", async () => {
+  const presentation = await fixture("quest-share-upcoming.json");
+  const response = await withFetch(
+    async () => Response.json(presentation, { status: 200 }),
+    () => onRequest(context({
+      origin: "https://invite-staging.thequestsapp.com",
+      envOverrides: {
+        QUEST_SHARE_APP_SCHEME: "quests-staging",
+        QUEST_SHARE_ANDROID_PACKAGE: "info.nothingserious.quests.staging",
+      },
+    })),
+  );
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /id="phone-claim-form"/);
+  assert.match(
+    html,
+    /<a id="open-app-link" class="open-app" href="https:\/\/invite-staging\.thequestsapp\.com\/q\/AbCd2345">Open in Quests<\/a>/,
+  );
+  assert.doesNotMatch(html, /<button id="open-app-link"/);
+  assert.match(html, /Using the staging build\? <a href="quests-staging:\/\/q\/AbCd2345">Open it here<\/a>/);
+  assert.match(html, /var APP_SCHEME = "info\.nothingserious\.quests"/);
+  assert.match(html, /var APP_SCHEMES = \["info\.nothingserious\.quests","quests-staging"\]/);
+  assert.match(html, /var ANDROID_SCHEME = "quests-staging"/);
+  assert.match(html, /var ANDROID_PACKAGE = "info\.nothingserious\.quests\.staging"/);
+  assert.match(html, /event\.preventDefault\(\)/);
+  assert.match(html, /openIosChain\(index \+ 1\)/);
+  assert.match(html, /property="og:url" content="https:\/\/invite-staging\.thequestsapp\.com\/q\/AbCd2345(\?r=\d+)?"/);
+});
+
+test("staging host app-only panel offers both schemes without assuming one client", async () => {
+  const presentation = await fixture("quest-share-upcoming.json");
+  const response = await withFetch(
+    async () => Response.json(presentation, { status: 200 }),
+    () => onRequest(context({
+      origin: "https://invite-staging.thequestsapp.com",
+      envOverrides: {
+        TURNSTILE_SITE_KEY: "",
+        QUEST_SHARE_APP_SCHEME: "quests-staging",
+        QUEST_SHARE_ANDROID_PACKAGE: "info.nothingserious.quests.staging",
+      },
+    })),
+  );
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(html, /id="phone-claim-form"/);
+  assert.match(html, /<a class="store-button" href="info\.nothingserious\.quests:\/\/q\/AbCd2345">Open Quests<\/a>/);
+  assert.match(html, /Using the staging build\? <a href="quests-staging:\/\/q\/AbCd2345">Open it here<\/a>/);
+});
+
+test("production host keeps its single-client Open in Quests control", async () => {
+  const presentation = await fixture("quest-share-upcoming.json");
+  const response = await withFetch(
+    async () => Response.json(presentation, { status: 200 }),
+    () => onRequest(context({ origin: "https://invite.thequestsapp.com" })),
+  );
+
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /<button id="open-app-link" class="open-app" type="button">Open in Quests<\/button>/);
+  assert.doesNotMatch(html, /Using the staging build/);
+  assert.doesNotMatch(html, /quests-staging/);
+  assert.match(html, /var APP_SCHEMES = \["info\.nothingserious\.quests"\]/);
+  assert.match(html, /var ANDROID_SCHEME = "info\.nothingserious\.quests"/);
+});
+
+test("Profile route offers the staging scheme only on the staging host", async () => {
+  const profileCode = "0123456789abcdef0123456789abcdef";
+  const metadata = {
+    displayName: "Taylor",
+    revision: 1,
+    avatarUrl: null,
+    ringImageUrl: null,
+    ringColors: [],
+    pointsTotal: 10,
+    currentStreak: 3,
+    imageWidth: 640,
+    imageHeight: 800,
+  };
+  const render = (origin) => withFetch(async () => Response.json(metadata), () => onProfileRequest({
+    request: new Request(`${origin}/p/${profileCode}`),
+    params: { path: [profileCode] },
+    env: {
+      PROFILE_SHARE_SUPABASE_URL: SUPABASE_URL,
+      PROFILE_SHARE_WEB_SECRET: "profile-web-secret",
+    },
+  }));
+
+  const staging = await (await render("https://invite-staging.thequestsapp.com")).text();
+  assert.match(staging, new RegExp(`href="info\\.nothingserious\\.quests://p/${profileCode}">Open in the app`));
+  assert.match(staging, new RegExp(`href="quests-staging://p/${profileCode}">Using the staging build\\? Open it here`));
+
+  const production = await (await render("https://invite.thequestsapp.com")).text();
+  assert.match(production, new RegExp(`href="info\\.nothingserious\\.quests://p/${profileCode}">Open in the app`));
+  assert.doesNotMatch(production, /quests-staging/);
 });
