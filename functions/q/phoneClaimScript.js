@@ -8,6 +8,13 @@ export function questPhoneClaimScript({
   const serializedSiteKey = JSON.stringify(turnstileSiteKey ?? null);
   const serializedDemo = JSON.stringify(Boolean(demoMode));
   const serializedAppScheme = JSON.stringify(appHandoff.appScheme);
+  const serializedAppSchemes = JSON.stringify([
+    appHandoff.appScheme,
+    ...(appHandoff.alternateAppSchemes || []),
+  ]);
+  const serializedAndroidScheme = JSON.stringify(
+    appHandoff.androidScheme || appHandoff.appScheme,
+  );
   const serializedAndroidPackage = JSON.stringify(appHandoff.androidPackage);
   const serializedAppStoreUrl = JSON.stringify(appHandoff.appStoreUrl);
   const serializedPlayStoreUrl = JSON.stringify(appHandoff.playStoreUrl);
@@ -30,7 +37,10 @@ export function questPhoneClaimScript({
     var turnstileWidget = null;
     var submitting = false;
     var APP_SCHEME = ${serializedAppScheme};
+    var APP_SCHEMES = ${serializedAppSchemes};
+    var ANDROID_SCHEME = ${serializedAndroidScheme};
     var ANDROID_PACKAGE = ${serializedAndroidPackage};
+    var SCHEME_FALLBACK_MS = 1400;
     var APP_STORE_URL = ${serializedAppStoreUrl};
     var PLAY_STORE_URL = ${serializedPlayStoreUrl};
 
@@ -199,23 +209,35 @@ export function questPhoneClaimScript({
       });
     });
 
-    openApp.addEventListener("click", function () {
+    // iOS walks the scheme chain: each scheme gets SCHEME_FALLBACK_MS to take
+    // the page away; if the page is still visible the next scheme fires, and
+    // the store is the last stop. A host with one client has a one-item chain.
+    function openIosChain(index) {
+      if (index >= APP_SCHEMES.length) {
+        window.location.href = APP_STORE_URL;
+        return;
+      }
+      var fallbackTimer = setTimeout(function () {
+        if (document.visibilityState === "visible") openIosChain(index + 1);
+      }, SCHEME_FALLBACK_MS);
+      var cancelFallback = function () {
+        if (document.visibilityState === "hidden") clearTimeout(fallbackTimer);
+      };
+      document.addEventListener("visibilitychange", cancelFallback, { once: true });
+      window.addEventListener("pagehide", function () { clearTimeout(fallbackTimer); }, { once: true });
+      window.location.href = APP_SCHEMES[index] + "://q/" + shareCode;
+    }
+
+    openApp.addEventListener("click", function (event) {
+      if (event && typeof event.preventDefault === "function") event.preventDefault();
       if (platform() === "android") {
         window.location.href = "intent://q/" + shareCode +
-          "#Intent;scheme=" + APP_SCHEME + ";package=" + ANDROID_PACKAGE + ";S.browser_fallback_url=" +
+          "#Intent;scheme=" + ANDROID_SCHEME + ";package=" + ANDROID_PACKAGE + ";S.browser_fallback_url=" +
           encodeURIComponent(PLAY_STORE_URL) + ";end";
         return;
       }
       if (platform() === "ios") {
-        var fallbackTimer = setTimeout(function () {
-          if (document.visibilityState === "visible") window.location.href = APP_STORE_URL;
-        }, 1400);
-        var cancelFallback = function () {
-          if (document.visibilityState === "hidden") clearTimeout(fallbackTimer);
-        };
-        document.addEventListener("visibilitychange", cancelFallback, { once: true });
-        window.addEventListener("pagehide", function () { clearTimeout(fallbackTimer); }, { once: true });
-        window.location.href = APP_SCHEME + "://q/" + shareCode;
+        openIosChain(0);
         return;
       }
       window.location.href = APP_STORE_URL;
