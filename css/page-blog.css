@@ -53,3 +53,9 @@
   font-size: 0.8125rem;
   color: var(--ink-2);
 }
+
+/* Whole card is the target: the title link stretches over the card. */
+.blog-card { position: relative; }
+.blog-card__link { color: inherit; text-decoration: none; }
+.blog-card__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.blog-card:focus-within { outline: 2px solid var(--cat-text); outline-offset: 2px; }

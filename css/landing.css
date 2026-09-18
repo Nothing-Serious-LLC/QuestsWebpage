@@ -1,0 +1,691 @@
+/* ==========================================================================
+   Quests homepage
+   Five sections, one tan page, no dividers. Built only from css/tokens.css.
+   Order: reset > layout > backdrop > nav > hero > sections > footer > motion > small screens
+   ========================================================================== */
+
+/* ---- Reset ---------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--q-page);
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  overflow-x: clip;
+}
+
+body {
+  min-width: 320px;
+  background: var(--q-page);
+  color: var(--q-text);
+  font-family: var(--q-font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* clip, not hidden: hidden would make body a scroll container and break
+     position: sticky for the Five ways stage. */
+  overflow-x: clip;
+}
+
+body.is-pending { height: 100svh; overflow: hidden; }
+
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--q-accent); outline-offset: 4px; border-radius: var(--q-r-xs); }
+ol, ul { padding: 0; list-style: none; }
+em { font-style: italic; }
+
+.skip-link {
+  position: absolute; left: var(--q-gutter); top: -100px; z-index: 1001;
+  padding: 10px 16px; border-radius: var(--q-r-full);
+  background: var(--q-action); color: var(--q-on-action); font-weight: 700; font-size: 14px;
+}
+.skip-link:focus { top: 12px; }
+
+/* ---- Layout ----------------------------------------------------------------- */
+.shell {
+  width: min(1120px, 100% - var(--q-gutter) * 2);
+  margin-inline: auto;
+}
+
+.serif {
+  font-family: var(--q-font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--q-text-display);
+}
+
+.lede {
+  color: var(--q-text-2);
+  font-size: clamp(16px, 0.95rem + 0.35vw, 19px);
+  font-weight: 500;
+  line-height: 1.5;
+  max-width: 44ch;
+  text-wrap: balance;
+}
+
+.store-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--q-s-3); }
+.store-row a { display: block; border-radius: var(--q-r-xs); transition: transform var(--q-t-base) var(--q-ease-standard), opacity var(--q-t-base) var(--q-ease-standard); }
+.store-row a:hover { transform: translateY(-2px); }
+.store-row a:active { transform: translateY(0); opacity: 0.85; }
+.store-row img { height: 44px; width: auto; }
+
+.micro {
+  color: var(--q-text-2);
+  font-size: var(--q-body-md);
+  line-height: 20px;
+}
+
+/* ---- Backdrop (Home decorative tail, Figma 23140:48399, rebuilt as gradients) ----
+   Fixed layer. --sy is scrollY in px, set from JS; the glyphs ride it at a
+   fraction so they drift slower than the page. */
+.backdrop {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  --sy: 0px;
+  opacity: 0;
+  transition: opacity var(--q-t-lazy) var(--q-ease-standard) 200ms;
+}
+.is-ready .backdrop, .no-js .backdrop { opacity: 1; }
+
+/* The flat category glyphs, large and washed back so they read as pattern.
+   Sizes in vmin so a phone and a monitor get the same proportion. */
+.glyph {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  width: var(--size); height: var(--size);
+  opacity: var(--o, 0.28);
+  transform: translate3d(0, calc(var(--sy) * var(--speed) * -1), 0) rotate(var(--rot, 0deg));
+  will-change: transform;
+}
+.glyph--1 { --x: 78vw; --y: 6vh;   --size: clamp(120px, 20vmin, 220px); --speed: 0.16; --rot: -12deg; --o: 0.22; }
+.glyph--2 { --x: -4vw; --y: 58vh;  --size: clamp(140px, 24vmin, 260px); --speed: 0.22; --rot: 18deg;  --o: 0.24; }
+.glyph--3 { --x: 70vw; --y: 112vh; --size: clamp(110px, 18vmin, 200px); --speed: 0.30; --rot: 8deg; }
+.glyph--4 { --x: 4vw;  --y: 166vh; --size: clamp(100px, 16vmin, 180px); --speed: 0.36; --rot: -20deg; --o: 0.3; }
+.glyph--5 { --x: 80vw; --y: 220vh; --size: clamp(150px, 26vmin, 280px); --speed: 0.42; --rot: 14deg;  --o: 0.22; }
+.glyph--6 { --x: 8vw;  --y: 286vh; --size: clamp(110px, 18vmin, 200px); --speed: 0.48; --rot: -6deg; }
+.glyph--7 { --x: 74vw; --y: 340vh; --size: clamp(120px, 20vmin, 220px); --speed: 0.54; --rot: 22deg;  --o: 0.24; }
+.glyph--8 { --x: -2vw; --y: 400vh; --size: clamp(140px, 24vmin, 260px); --speed: 0.60; --rot: -14deg; --o: 0.22; }
+
+.nav, main, .footer { position: relative; z-index: 1; }
+
+/* ---- Intro (five glyphs hop in, hold, fade out; the copy follows) -------------- */
+.intro {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  pointer-events: none;
+  background: var(--q-page);
+  transition: opacity var(--q-t-slow) var(--q-ease-standard) 120ms, visibility 0s linear var(--q-t-lazy);
+}
+.is-ready .intro { opacity: 0; }
+.intro__icons {
+  display: flex; align-items: center;
+  gap: clamp(10px, 2vw, 18px);
+  transition: opacity var(--q-t-slow) var(--q-ease-standard), transform var(--q-t-lazy) var(--q-ease-standard), filter var(--q-t-slow) var(--q-ease-standard);
+}
+.intro__icons img {
+  width: clamp(40px, 6vw, 64px); height: auto;
+  animation: intro-hop 560ms var(--q-ease-decelerate) both;
+}
+.intro__icons img:nth-child(2) { animation-delay: 90ms; }
+.intro__icons img:nth-child(3) { animation-delay: 180ms; }
+.intro__icons img:nth-child(4) { animation-delay: 270ms; }
+.intro__icons img:nth-child(5) { animation-delay: 360ms; }
+
+.is-ready .intro__icons { opacity: 0; transform: scale(0.94) translateY(-8px); filter: blur(3px); }
+.is-ready .intro { visibility: hidden; }
+.no-js .intro { display: none; }
+
+@keyframes intro-hop {
+  0%   { opacity: 0; transform: translateY(24px) scale(0.82); }
+  55%  { opacity: 1; transform: translateY(-6px) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---- Nav --------------------------------------------------------------------- */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding-top: max(16px, env(safe-area-inset-top));
+  opacity: 0; transform: translateY(-12px);
+  transition: opacity var(--q-t-lazy) var(--q-ease-decelerate) 200ms, transform var(--q-t-lazy) var(--q-ease-decelerate) 200ms;
+}
+.is-ready .nav, .no-js .nav { opacity: 1; transform: none; }
+
+.nav::before {
+  content: ""; position: absolute; inset: 0 0 -32px; z-index: -1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(243, 241, 231, 0.9) 35%, rgba(243, 241, 231, 0));
+}
+
+.nav__inner { display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+
+.nav__logo, .nav__cta {
+  display: inline-flex; align-items: center;
+  min-height: 44px;
+  border-radius: var(--q-r-full);
+  transition: background var(--q-t-base) var(--q-ease-standard), border-color var(--q-t-base) var(--q-ease-standard), transform var(--q-t-base) var(--q-ease-standard);
+}
+.nav__logo {
+  padding: 0 16px;
+  background: var(--q-glass);
+  border: 1px solid var(--q-border-light);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+.nav__logo img { width: 84px; height: auto; }
+
+.nav__cta {
+  padding: 0 18px;
+  background: var(--q-action);
+  color: var(--q-on-action);
+  font-size: 14px; font-weight: 700; line-height: 20px;
+}
+.nav__cta:hover { background: var(--q-action-pressed); transform: translateY(-1px); }
+
+/* ---- Hero (Welcome screen: glow, title, subtitle, CTA) ------------------------
+   The accent walks the five families in app order: Mindful, Healthy, Creative,
+   Productive, Social. One registered color property drives both the word and
+   the glow so they always agree. */
+@property --hero-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #A961CC;
+}
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid; align-items: start;
+  padding: clamp(120px, 14vh, 168px) 0 clamp(64px, 8vh, 96px);
+  text-align: center;
+  overflow: hidden;
+  --hero-accent: var(--q-mindful);
+  animation: hero-cycle 20s var(--q-ease-standard) infinite;
+}
+.is-pending .hero { animation-play-state: paused; }
+
+@keyframes hero-cycle {
+  0%, 14%   { --hero-accent: #A961CC; }   /* Mindful */
+  20%, 34%  { --hero-accent: #889FE9; }   /* Healthy */
+  40%, 54%  { --hero-accent: #F0925B; }   /* Creative */
+  60%, 74%  { --hero-accent: #DBB66B; }   /* Productive */
+  80%, 94%  { --hero-accent: #A1B717; }   /* Social */
+  100%      { --hero-accent: #A961CC; }
+}
+
+.hero__inner { display: flex; flex-direction: column; align-items: center; }
+.hero__title { position: relative; }
+
+.hero h1 {
+  /* One line always: the title measures 6.32em wide in Instrument Serif. */
+  font-size: min(clamp(52px, 8vw, 112px), calc((100vw - 48px) / 6.5));
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+.hero h1 em { color: var(--hero-accent); }
+
+
+.hero .lede { margin-top: clamp(20px, 3vh, 32px); max-width: none; }
+.hero .store-row { margin-top: var(--q-s-8); justify-content: center; }
+
+/* ---- The app in frames --------------------------------------------------------
+   A CSS iPhone 16 Pro. Everything scales from --phone-w. The screen keeps the
+   1206:2622 capture ratio; corner radii, bezel, island and buttons are all
+   proportions of the device width. The phones lead the hero: the front one
+   centered, the back one peeking out behind it, both fully in view, with the
+   title rising underneath. */
+@property --bob { syntax: "<length>"; inherits: false; initial-value: 0px; }
+.phones {
+  --phone-w: clamp(196px, 15vw, 232px);
+  --tilt-x: 0deg; --tilt-y: 0deg;
+  position: relative;
+  width: var(--phone-w);
+  height: calc(var(--phone-w) * 2.17);
+  margin-bottom: clamp(32px, 4.5vh, 48px);
+  perspective: 1400px; transform-style: preserve-3d;
+}
+@property --bob { syntax: "<length>"; inherits: false; initial-value: 0px; }
+.phone {
+  position: relative; display: block;
+  width: var(--phone-w);
+  padding: calc(var(--phone-w) * 0.028);
+  border-radius: calc(var(--phone-w) * 0.175);
+  background: linear-gradient(160deg, #3d3d40 0%, #1c1c1e 38%, #2a2a2d 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(25, 25, 25, 0.12),
+    0 40px 80px -20px rgba(25, 25, 25, 0.35);
+  transform: translateY(var(--bob)) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+}
+.phone::before, .phone::after {
+  content: ""; position: absolute; width: calc(var(--phone-w) * 0.01); border-radius: 2px;
+  background: #2a2a2d;
+}
+.phone::before { left: calc(var(--phone-w) * -0.009); top: 22%; height: 16%;
+  background: linear-gradient(#2a2a2d 0 38%, transparent 38% 46%, #2a2a2d 46% 100%); }
+.phone::after  { right: calc(var(--phone-w) * -0.009); top: 27%; height: 12%; }
+.phone__screen {
+  position: relative; overflow: hidden;
+  aspect-ratio: 1206 / 2622;
+  border-radius: calc(var(--phone-w) * 0.15);
+  background: var(--q-page);
+}
+.phone__screen picture { position: absolute; inset: 0; opacity: 0; will-change: opacity, transform; animation: hero-screen 20s var(--q-ease-standard) infinite; }
+.phone__screen picture:nth-child(2) { animation-delay: -16s; }
+.phone__screen picture:nth-child(3) { animation-delay: -12s; }
+.phone__screen picture:nth-child(4) { animation-delay: -8s; }
+.phone__screen picture:nth-child(5) { animation-delay: -4s; }
+.is-pending .phone__screen picture { animation-play-state: paused; }
+.phone__screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Same clock as the accent cycle: hold, lift out, rise in from below. */
+@keyframes hero-screen {
+  0%, 14%    { opacity: 1; transform: translateY(0) scale(1); }
+  17%        { opacity: 0; transform: translateY(-4%) scale(0.985); }
+  17.1%, 95% { opacity: 0; transform: translateY(4%) scale(0.985); }
+  100%       { opacity: 1; transform: translateY(0) scale(1); }
+}
+.phone__island {
+  position: absolute; left: 50%; top: calc(var(--phone-w) * 0.028 + var(--phone-w) * 0.03);
+  translate: -50% 0;
+  width: calc(var(--phone-w) * 0.31); height: calc(var(--phone-w) * 0.088);
+  border-radius: var(--q-r-full);
+  background: #050505;
+}
+@keyframes phone-bob { 0%, 100% { --bob: 0px; } 50% { --bob: -7px; } }
+@supports (text-wrap: balance) {
+  .is-ready .phone { animation: phone-bob 6s ease-in-out 1.6s infinite; }
+}
+
+/* Copy stagger, once the intro glyphs have cleared. */
+.hero__inner > * {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity var(--q-t-lazy) var(--q-ease-decelerate), transform var(--q-t-lazy) var(--q-ease-decelerate);
+}
+.is-ready .hero__inner > *, .no-js .hero__inner > * { opacity: 1; transform: none; }
+.hero__inner > .phones { transform: translateY(-40px); transition-duration: 1100ms, 1100ms; }
+.is-ready .hero__inner > .phones, .no-js .hero__inner > .phones { transform: none; transition-delay: 120ms; }
+.is-ready .hero__inner > :nth-child(2) { transition-delay: 420ms; }
+.is-ready .hero__inner > :nth-child(3) { transition-delay: 560ms; }
+.is-ready .hero__inner > :nth-child(4) { transition-delay: 680ms; }
+
+/* ---- Sections ------------------------------------------------------------------ */
+.section { padding-block: clamp(96px, 14vh, 176px); }
+
+.section__head { max-width: 640px; }
+.section__head h2 {
+  font-size: clamp(40px, 2rem + 2.6vw, 64px);
+  line-height: 1;
+  text-wrap: balance;
+}
+.section__head .lede { margin-top: var(--q-s-4); }
+.section__head--center { margin-inline: auto; text-align: center; }
+.section__head--center .lede { margin-inline: auto; }
+
+/* Scroll fade: JS writes --fade (0..1) on each [data-fade] section. */
+[data-fade] > .shell, [data-fade] .fade {
+  opacity: var(--fade, 1);
+  transform: translateY(calc((1 - var(--fade, 1)) * 24px));
+  /* A short ease so a fast wheel or flick glides through the band instead
+     of stepping; slow scrolling is unaffected. */
+  transition: opacity 220ms linear, transform 220ms var(--q-ease-standard);
+  will-change: opacity, transform;
+}
+
+/* ---- Cards ------------------------------------------------------------------------ */
+.card {
+  position: relative;
+  background: var(--q-surface);
+  border: 1px solid var(--q-border-light);
+  border-radius: var(--q-r-card);
+  box-shadow: var(--q-sh-card-deep);
+}
+
+/* The app medallion: 54px face, 2px family ring, 24px glyph. */
+.medallion {
+  flex: none;
+  width: var(--q-medallion); height: var(--q-medallion);
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--face);
+  border: var(--q-medallion-border) solid var(--ring);
+}
+.medallion img { width: var(--q-medallion-icon); height: var(--q-medallion-icon); }
+
+.way--mindful    { --ring: var(--q-mindful-medium);    --face: var(--q-mindful-light);    --ink: var(--q-mindful-deep); }
+.way--healthy    { --ring: var(--q-healthy-medium);    --face: var(--q-healthy-light);    --ink: var(--q-healthy-deep); }
+.way--creative   { --ring: var(--q-creative-medium);   --face: var(--q-creative-light);   --ink: var(--q-creative-deep); }
+.way--productive { --ring: var(--q-productive-medium); --face: var(--q-productive-light); --ink: var(--q-productive-deep); }
+.way--social     { --ring: var(--q-social-medium);     --face: var(--q-social-light);     --ink: var(--q-social-deep); }
+
+/* ---- Five ways: the Home card stack -------------------------------------------
+   Geometry from the app's stackGeometry.ts: back cards peek 24px above the card
+   in front and narrow 38 / 49 / 60px per rank; back cards dim 10% per rank so
+   the front card owns focus. JS writes translate / width / opacity per card as
+   the deck position moves, so this file only shapes the resting card. */
+.ways__inner { display: flex; flex-direction: column; align-items: center; gap: var(--q-s-6); }
+.ways .section__head { text-align: center; }
+.ways__lede { max-width: 420px; margin-inline: auto; text-align: center; margin-top: var(--q-s-3); font-size: 17px; line-height: 26px; }
+.deck__hint { margin-top: var(--q-s-3); color: var(--q-text-2); font-weight: 500; letter-spacing: 0.08em; }
+
+.deck { --card-h: 292px; --peek: 24px; --arc: 56px; width: 100%; max-width: 380px; margin-inline: auto; }
+.deck__stage {
+  position: relative;
+  height: calc(var(--card-h) + var(--peek) * 4 + var(--arc) + 8px);
+  touch-action: pan-y;
+  user-select: none; -webkit-user-select: none;
+  cursor: grab;
+}
+.deck__stage.is-dragging { cursor: grabbing; }
+/* Cards follow the app's width model. Their body is a fixed-width layer
+   centered on the card, and the peek, body and dim are promoted, so a moving
+   deck re-rasters only the card face; the pills inside are never touched. */
+.deck__card {
+  position: absolute; left: 0; bottom: 0;
+  width: 100%; height: var(--card-h);
+  overflow: hidden;
+  border-radius: var(--q-r-card);
+  background: var(--face);
+  border: 1px solid color-mix(in srgb, var(--ring) 40%, transparent);
+  box-shadow: var(--q-sh-card-deep);
+  transform-origin: 50% 100%;
+  will-change: transform, width, opacity;
+}
+.deck__peek, .deck__body, .deck__dim { will-change: opacity; }
+.deck__peek {
+  position: absolute; left: 0; right: 0; top: 0;
+  height: var(--peek); line-height: var(--peek);
+  text-align: center;
+  font-size: 15px; letter-spacing: 0.01em; color: var(--q-text);
+  pointer-events: none;
+}
+.deck__body {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: var(--deck-w, 100%); transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--q-s-4); padding: var(--q-s-6) var(--q-s-5);
+  text-align: center;
+}
+.deck__body h3 { font-family: var(--q-font-serif); font-weight: 400; font-size: 36px; line-height: 1; letter-spacing: -0.02em; color: var(--q-text); }
+.deck__body .medallion { width: 60px; height: 60px; background: var(--q-surface); }
+.deck__body .medallion img { width: 30px; height: 30px; }
+/* Two lanes of Quests flow through the card, one each way, with the icon
+   the app uses for that Quest (MDI paths from the share-page registry). */
+.deck__core { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--q-s-4); }
+.ticker { position: relative; width: calc(100% + var(--q-s-5) * 2); margin-inline: calc(var(--q-s-5) * -1); margin-bottom: calc(var(--q-s-6) * -1 + 14px); display: grid; gap: 8px; }
+.ticker::before, .ticker::after { content: ""; position: absolute; top: 0; bottom: 0; width: 56px; z-index: 1; pointer-events: none; }
+.ticker::before { left: 0; background: linear-gradient(90deg, var(--face), transparent); }
+.ticker::after { right: 0; background: linear-gradient(270deg, var(--face), transparent); }
+.ticker__row { display: flex; overflow: hidden; contain: inline-size; }
+.ticker__lane { display: flex; flex: none; gap: 8px; padding-right: 8px; animation: ticker 64s linear infinite; will-change: transform; }
+.ticker__row:nth-child(2) .ticker__lane { animation-direction: reverse; animation-duration: 76s; }
+@keyframes ticker { to { transform: translate3d(-100%, 0, 0); } }
+/* Quiet pills: the app's plump line icons in the family ink, names in text-2. */
+.tick { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; padding: 5px 11px 5px 8px; border-radius: var(--q-r-full);
+  background: rgba(255, 255, 255, 0.55); border: 1px solid color-mix(in srgb, var(--ring) 32%, transparent);
+  font-size: 13px; font-weight: 500; line-height: 18px; color: var(--q-text-2); }
+.tick svg { width: 16px; height: 16px; flex: none; stroke: var(--ink); stroke-width: 1.7; fill: none; }
+/* Only the card whose face is showing runs its tickers. Idle lanes on the
+   four stacked cards are paused so a drag moves five cards, not twenty lanes. */
+.deck__card:not(.is-live) .ticker__lane { animation-play-state: paused; }
+.deck__dim { position: absolute; inset: 0; background: var(--q-text); opacity: 0; pointer-events: none; }
+
+.deck__controls { display: flex; justify-content: center; gap: var(--q-s-3); margin-top: var(--q-s-5); }
+.deck__arrow {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid var(--q-border-light); background: var(--q-surface);
+  color: var(--q-text); font-size: 16px; cursor: pointer;
+  box-shadow: var(--q-sh-card);
+  transition: transform var(--q-t-fast) var(--q-ease-standard), background var(--q-t-fast);
+}
+.deck__arrow:hover { background: var(--q-surface-2, var(--q-surface)); transform: translateY(-1px); }
+.deck__arrow:active { transform: scale(0.96); }
+
+/* Before JS runs (or without it) the cards stack statically with visible peeks. */
+.no-js .deck__card { position: relative; height: auto; margin-top: var(--q-s-3); }
+.no-js .deck__body { position: static; }
+.no-js .deck__peek, .no-js .deck__controls, .no-js .deck__hint { display: none; }
+
+/* ---- Science: three stat cards -----------------------------------------------------
+   Stat centered in the card, line centered under it, source as a small pill.
+   Three presentations on html[data-facts]:
+     corner  white card, soft family tint in the top corner (default)
+     tint    the whole card in the family's light step
+     ink     the card in the family's deep step, light type */
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--q-s-4); margin-top: clamp(40px, 6vh, 64px); }
+.fact {
+  overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: var(--q-s-7) var(--q-s-6);
+  min-height: 320px;
+}
+.fact::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--face) 70%, transparent), transparent 62%);
+}
+.fact__glyph {
+  position: absolute; right: -10%; bottom: -12%;
+  width: 46%; height: auto;
+  opacity: 0.14; pointer-events: none;
+}
+.fact:nth-child(2) .fact__glyph { right: auto; left: -12%; bottom: auto; top: -14%; width: 42%; rotate: 12deg; }
+.fact:nth-child(3) .fact__glyph { right: -14%; bottom: 10%; width: 46%; rotate: 10deg; }
+.fact__headline { position: relative; font-size: clamp(64px, 3rem + 2.4vw, 88px); line-height: 0.95; letter-spacing: -0.02em; color: var(--ink); }
+.fact__body { position: relative; margin-top: var(--q-s-4); font-size: var(--q-title-md); line-height: 24px; color: var(--q-text); text-wrap: balance; max-width: 30ch; hyphens: manual; }
+.fact__cite {
+  position: relative;
+  margin-top: var(--q-s-5); padding: 4px 10px;
+  border-radius: var(--q-r-full);
+  background: var(--face); color: var(--ink);
+  font-size: var(--q-label-md); font-weight: 600; line-height: 16px;
+}
+.fact--mindful    { --ink: var(--q-mindful-deep);    --face: var(--q-mindful-light);    --mid: var(--q-mindful-medium); }
+.fact--healthy    { --ink: var(--q-healthy-deep);    --face: var(--q-healthy-light);    --mid: var(--q-healthy-medium); }
+.fact--creative   { --ink: var(--q-creative-deep);   --face: var(--q-creative-light);   --mid: var(--q-creative-medium); }
+.fact--productive { --ink: var(--q-productive-deep); --face: var(--q-productive-light); --mid: var(--q-productive-medium); }
+.fact--social     { --ink: var(--q-social-deep);     --face: var(--q-social-light);     --mid: var(--q-social-medium); }
+
+[data-facts="tint"] .fact { background: var(--face); border-color: color-mix(in srgb, var(--mid) 40%, transparent); }
+[data-facts="tint"] .fact::before { display: none; }
+[data-facts="tint"] .fact__cite { background: color-mix(in srgb, var(--mid) 45%, var(--face)); }
+[data-facts="tint"] .fact__glyph { opacity: 0.22; }
+
+[data-facts="ink"] .fact { background: var(--ink); border-color: transparent; }
+[data-facts="ink"] .fact::before { background: radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.14), transparent 62%); }
+[data-facts="ink"] .fact__headline { color: #FDFBF6; }
+[data-facts="ink"] .fact__body { color: rgba(253, 251, 246, 0.86); }
+[data-facts="ink"] .fact__cite { background: rgba(255, 255, 255, 0.16); color: #FDFBF6; }
+[data-facts="ink"] .fact__glyph { opacity: 0.18; filter: brightness(4); }
+
+/* Entrance: card fades up, the stat springs in a beat later, the line and
+   source follow, the watermark drifts in from the corner. Cards land one after
+   another (data-stagger on the list) so the row reads as a sequence. */
+.fact .fact__headline {
+  opacity: 0; transform: translateY(16px) scale(0.86);
+  transition: opacity var(--q-t-slow) var(--q-ease-decelerate) calc(var(--delay, 0ms) + 120ms),
+              transform 800ms var(--q-ease-spring) calc(var(--delay, 0ms) + 120ms);
+}
+.fact .fact__body, .fact .fact__cite {
+  opacity: 0; transform: translateY(10px);
+  transition: opacity var(--q-t-lazy) var(--q-ease-decelerate) calc(var(--delay, 0ms) + 260ms),
+              transform var(--q-t-lazy) var(--q-ease-decelerate) calc(var(--delay, 0ms) + 260ms);
+}
+.fact .fact__cite { transition-delay: calc(var(--delay, 0ms) + 360ms); }
+.fact .fact__glyph {
+  opacity: 0; transform: translate(12%, 12%) scale(0.9);
+  transition: opacity 900ms var(--q-ease-decelerate) calc(var(--delay, 0ms) + 200ms), transform 1000ms var(--q-ease-decelerate) calc(var(--delay, 0ms) + 200ms);
+}
+.fact.is-visible .fact__headline, .fact.is-visible .fact__body, .fact.is-visible .fact__cite,
+.no-js .fact .fact__headline, .no-js .fact .fact__body, .no-js .fact .fact__cite { opacity: 1; transform: none; }
+.fact.is-visible .fact__glyph, .no-js .fact .fact__glyph { opacity: 0.14; transform: none; }
+[data-facts="tint"] .fact.is-visible .fact__glyph { opacity: 0.22; }
+[data-facts="ink"] .fact.is-visible .fact__glyph { opacity: 0.18; }
+
+/* Rating: one big number, the stars under it, one quiet line. */
+.rating { text-align: center; }
+.rating__num { font-size: clamp(112px, 6rem + 8vw, 200px); line-height: 0.85; letter-spacing: -0.04em; }
+.stars { margin-top: var(--q-s-4); color: var(--q-gold); font-size: clamp(22px, 1rem + 1vw, 28px); letter-spacing: 0.16em; line-height: 1; }
+.rating .micro { margin-top: var(--q-s-3); font-weight: 400; }
+
+/* Quotes: a marquee of cards drifting left across the full width. JS clones
+   the track once so the loop is seamless and it never stops. Fades at
+   both edges so cards dissolve in and out instead of clipping. The block has
+   breathing room above and below so shadows never get cut. */
+.marquee {
+  --marquee-gap: var(--q-s-4);
+  margin-top: clamp(24px, 4vh, 40px);
+  padding-block: 32px;
+  overflow: hidden;
+  display: flex; gap: var(--marquee-gap);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.marquee__track {
+  flex: none;
+  display: flex; gap: var(--marquee-gap);
+  animation: marquee 90s linear infinite;
+  will-change: transform; backface-visibility: hidden;
+}
+@keyframes marquee { to { transform: translate3d(calc(-100% - var(--marquee-gap)), 0, 0); } }
+.no-js .marquee { overflow-x: auto; }
+.no-js .marquee__track { animation: none; }
+
+.quote {
+  flex: 0 0 clamp(320px, 30vw, 440px);
+  height: 212px;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--q-s-5) var(--q-s-6) 52px;
+}
+.quote__text { font-size: clamp(19px, 1rem + 0.45vw, 22px); line-height: 1.2; text-wrap: pretty; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+.quote__by { position: absolute; right: var(--q-s-6); bottom: var(--q-s-5); display: flex; align-items: center; gap: 8px; color: var(--q-text-2); font-size: var(--q-body-md); line-height: 20px; }
+.quote__face { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--q-surface); box-shadow: 0 1px 3px rgba(25,25,25,0.12); }
+
+/* CTA */
+.cta { text-align: center; padding-bottom: clamp(64px, 10vh, 120px); }
+.cta__inner { display: flex; flex-direction: column; align-items: center; }
+.cta__icon { width: 72px; height: 72px; border-radius: var(--q-r-md); box-shadow: var(--q-sh-card-deep-strong); margin-bottom: var(--q-s-7); }
+.cta h2 { font-size: clamp(56px, 3rem + 5vw, 128px); line-height: 0.9; letter-spacing: -0.035em; }
+.cta h2 em { color: var(--q-accent); }
+.cta .store-row { justify-content: center; margin-top: var(--q-s-8); }
+.cta .micro { margin-top: var(--q-s-5); }
+
+/* ---- Footer -------------------------------------------------------------------- */
+.footer { padding: var(--q-s-10) 0 calc(var(--q-s-10) + env(safe-area-inset-bottom)); }
+.footer__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--q-s-6); }
+.footer__top img { width: 84px; height: auto; }
+.footer__links { display: flex; flex-wrap: wrap; gap: var(--q-s-4) var(--q-s-6); }
+.footer__links a { font-size: var(--q-label-lg); font-weight: 600; line-height: 20px; color: var(--q-text); }
+.footer__links a:hover { color: var(--q-text-2); }
+.footer__legal { margin-top: var(--q-s-6); color: var(--q-text-2); font-size: var(--q-body-sm); line-height: 16px; }
+
+/* ---- Item reveal ------------------------------------------------------------------
+   Reversible and direction-aware. JS sets --delay from the item's position
+   in its list and toggles .is-visible / .is-above as the item crosses the
+   viewport, so content enters from below on the way down and from above on
+   the way back up, every time. */
+[data-reveal] {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity var(--q-t-lazy) var(--q-ease-decelerate) var(--delay, 0ms), transform var(--q-t-lazy) var(--q-ease-decelerate) var(--delay, 0ms);
+}
+[data-reveal].is-above { transform: translateY(-18px); transition-delay: 0ms; }
+[data-reveal].is-visible, .no-js [data-reveal] { opacity: 1; transform: none; }
+.card[data-reveal] { transform: translateY(28px) scale(0.98); }
+.card[data-reveal].is-above { transform: translateY(-28px) scale(0.98); }
+.card[data-reveal].is-visible { transform: none; }
+
+/* Section heads: the title rises, the lede follows a beat later. */
+.section__head[data-reveal] { transform: none; opacity: 1; }
+.section__head[data-reveal] > * {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity var(--q-t-lazy) var(--q-ease-decelerate), transform 800ms var(--q-ease-decelerate);
+}
+.section__head[data-reveal] > .lede { transition-delay: 140ms; }
+.section__head.is-above > * { transform: translateY(-22px); transition-delay: 0ms; }
+.section__head.is-visible > *, .no-js .section__head > * { opacity: 1; transform: none; }
+
+
+/* ---- Small screens ----------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .ways__inner { grid-template-columns: 1fr; gap: 8px; }
+  .ways .section__head { max-width: 560px; margin-inline: auto; text-align: center; }
+  .ways .section__head .lede { margin-inline: auto; }
+  .deck__hint { display: none; }
+  .facts { grid-template-columns: 1fr; max-width: 560px; margin-inline: auto; }
+  .fact { min-height: 0; padding: var(--q-s-6) var(--q-s-5); }
+}
+
+@media (max-width: 600px) {
+  html { scroll-padding-top: 80px; }
+  .nav { padding-top: max(10px, env(safe-area-inset-top)); }
+  .nav__logo { padding: 0 14px; }
+  .nav__logo img { width: 76px; }
+  .nav__cta { padding: 0 16px; }
+
+  /* Budget for one phone screen under Safari's bars (about 660px of page):
+     nav 104 + phone 350 + title 46 + lede 58 + badges 58 + gaps. The phone
+     leads; the title steps down so the device reads as the hero. */
+  .hero { padding: 104px 0 24px; min-height: auto; }
+  .hero h1 { font-size: min(clamp(34px, 10.5vw, 44px), calc((100vw - 40px) / 6.5)); }
+  .phones { --phone-w: min(41vw, 162px); margin-bottom: 22px; }
+  .hero .lede br { display: none; }
+  .hero .lede { font-size: 16px; line-height: 22px; margin-top: 14px; }
+  .hero .store-row { margin-top: 18px; }
+  .store-row img { height: 40px; }
+
+  .section { padding-block: 88px; }
+  .section__head h2 { font-size: 40px; }
+
+  /* Five ways must fit one phone screen: head, then the deck right under it. */
+  .ways.section { padding-block: 48px 56px; }
+  .deck { --card-h: 248px; --peek: 20px; --arc: 36px; }
+  .ways__inner { gap: var(--q-s-4); }
+  .ways__lede { font-size: 15px; line-height: 22px; max-width: 300px; margin-top: 8px; }
+  .deck__body { gap: 10px; padding: var(--q-s-5) var(--q-s-4); }
+  .deck__body .medallion { width: 52px; height: 52px; }
+  .deck__body .medallion img { width: 26px; height: 26px; }
+  .deck__body h3 { font-size: 30px; }
+  .tick { font-size: 12px; padding: 4px 10px 4px 7px; }
+  .tick svg { width: 14px; height: 14px; }
+  .deck__controls { margin-top: var(--q-s-3); }
+  /* A 30px blur re-rasters on every frame of a drag; a tight shadow reads the same on a phone. */
+  .deck__card { box-shadow: 0 2px 8px rgba(25, 25, 25, 0.06); }
+  /* Slow enough to read four lines as a card crosses a phone. */
+  .marquee { mask-image: none; -webkit-mask-image: none; }
+  .marquee__track { animation-duration: 150s; }
+  /* Cheaper raster for 18 moving cards on a 3x phone: flat cards, no blur. */
+  .quote { box-shadow: 0 1px 2px rgba(25, 25, 25, 0.06); }
+  .quote__face { box-shadow: none; }
+  .facts { grid-template-columns: 1fr; }
+  .fact { min-height: 0; padding: var(--q-s-5); }
+  .fact__headline { font-size: 64px; }
+  .rating__num { font-size: 120px; }
+  .quote { flex-basis: min(82vw, 340px); height: 216px; padding: var(--q-s-5) var(--q-s-5) 48px; }
+  .quote__by { right: var(--q-s-5); bottom: var(--q-s-4); }
+  .quote__text { font-size: 19px; }
+
+  .cta h2 { font-size: clamp(48px, 16vw, 76px); }
+  .footer__top { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---- Reduced motion --------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .intro { display: none; }
+  .hero { animation: none; }
+  .marquee { overflow-x: auto; mask-image: none; -webkit-mask-image: none; }
+  .marquee__track { animation: none; }
+  .fact .fact__glyph { opacity: 0.16 !important; }
+  .nav, .backdrop, .hero__inner > *, [data-reveal], [data-reveal] * { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .hero__inner > .phones { transform: none !important; }
+  .phone { animation: none !important; transform: none; }
+  .phone__screen picture { animation: none; }
+  .phone__screen picture:first-child { opacity: 1; }
+  .ticker__lane { animation: none; }
+  .ticker__row { overflow-x: auto; }
+  [data-fade] > .shell, [data-fade] .fade { opacity: 1 !important; transform: none !important; }
+  .glyph { transform: none !important; }
+  .store-row a, .nav__cta { transition: none; }
+}

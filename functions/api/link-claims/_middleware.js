@@ -23,6 +23,7 @@ function securityHeaders() {
     "X-XSS-Protection": "0",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Content-Type": "application/json",
+    "Cache-Control": "no-store",
   };
 }
 

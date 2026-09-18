@@ -1,0 +1,163 @@
+/* ==========================================================================
+   Quests V4, blog article pages (/blog/*.html)
+   Foundation tokens, .page-header, .card, .prose and .blog-card__category come
+   from css/site.css and css/page-blog.css conventions. This file adds the
+   read column, FAQ, sources, the download aside and the "more" list.
+   ========================================================================== */
+
+/* Category chip, shared with the blog index. */
+.blog-card__category {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: var(--cat-soft);
+  color: var(--cat-text);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.article__crumbs {
+  font-size: var(--fs-small);
+  color: var(--text-2);
+  margin-bottom: var(--s-16);
+}
+.article__crumbs a { color: var(--text-2); text-decoration: none; }
+.article__crumbs a:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+.article__title { max-width: 22ch; text-wrap: balance; }
+
+.article__meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-12);
+  margin-top: var(--s-20);
+  font-size: var(--fs-small);
+  color: var(--text-2);
+}
+.article__meta .blog-card__category { margin-bottom: 0; }
+
+.article {
+  padding: clamp(28px, 4vw, 48px);
+}
+.article__body {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+.article__body h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 1.2rem + 1.4vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  scroll-margin-top: calc(var(--nav-h) + var(--s-16));
+}
+.article__body h3 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 1.125rem;
+  line-height: 1.3;
+  margin-top: 1.4em;
+}
+.article__body ul, .article__body ol { padding-left: 1.25em; }
+.article__body li + li { margin-top: 0.4em; }
+.article__body strong { color: var(--text); }
+.article__body a { overflow-wrap: anywhere; }
+
+/* FAQ: native disclosure, styled as hairline rows. */
+.faq {
+  margin-top: clamp(40px, 5vw, 56px);
+  padding-top: var(--s-32);
+  border-top: 1px solid var(--hairline);
+}
+.faq h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.75rem;
+  line-height: 1.1;
+  margin-bottom: var(--s-16);
+}
+.faq__item { border-bottom: 1px solid var(--hairline); }
+.faq__item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--s-16) 0;
+  font-weight: 700;
+  display: flex; justify-content: space-between; align-items: center; gap: var(--s-16);
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary::after {
+  content: "+";
+  flex: none;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--cat-soft); color: var(--cat-text);
+  font-weight: 700; line-height: 1;
+  transition: transform var(--t-mid) var(--ease);
+}
+.faq__item[open] summary::after { content: "\2013"; }
+.faq__item p { padding: 0 0 var(--s-20); color: var(--text-2); line-height: 1.6; }
+
+/* Sources: quiet, numbered. */
+.sources {
+  margin-top: var(--s-32);
+  padding-top: var(--s-24);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--fs-small);
+  color: var(--text-2);
+}
+.sources h2 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--fs-small);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--s-12);
+}
+.sources ol { padding-left: 1.25em; }
+.sources li + li { margin-top: 0.5em; }
+.sources a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.sources a:hover { color: var(--text); }
+
+/* Download aside under the article. */
+.article-cta {
+  margin-top: var(--s-24);
+  padding: clamp(24px, 3vw, 32px);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-16) var(--s-20);
+  align-items: center;
+  background: var(--cat-soft);
+  border-color: var(--cat-soft-line);
+}
+.article-cta img[width="56"] { width: 56px; height: 56px; border-radius: 14px; box-shadow: 0 8px 20px -8px rgba(25,25,25,.35); }
+.article-cta h2 { font-size: 1.5rem; line-height: 1.1; }
+.article-cta p { margin-top: var(--s-8); color: var(--text-2); font-size: 0.9375rem; }
+.article-cta__stores { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--s-12); }
+.article-cta__stores img { display: block; height: 40px; width: auto; }
+
+/* More posts: title rows with the category chip. */
+.more { margin-top: clamp(40px, 5vw, 56px); }
+.more h2 { font-size: 1.75rem; line-height: 1.1; margin-bottom: var(--s-16); }
+.more__list { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-12); }
+.more__link {
+  display: flex; align-items: center; gap: var(--s-16);
+  padding: var(--s-16) var(--s-20);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card, 20px);
+  background: var(--surface, #FDFBF6);
+  color: var(--text); text-decoration: none;
+  transition: transform var(--t-mid) var(--ease), border-color var(--t-mid) var(--ease);
+}
+.more__link:hover { transform: translateY(-2px); border-color: var(--cat-soft-line); }
+.more__link .blog-card__category { margin-bottom: 0; flex: none; }
+.more__title { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.2; }
+
+@media (max-width: 600px) {
+  .article { padding: 22px 18px; }
+  .article__body { font-size: 1rem; }
+  .article-cta { grid-template-columns: 1fr; }
+  .more__link { flex-direction: column; align-items: flex-start; gap: var(--s-8); }
+}

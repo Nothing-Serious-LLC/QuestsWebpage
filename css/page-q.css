@@ -31,7 +31,7 @@
   /* Names the surviving markup and scripts still reference. Fixed, not mode
      tokens: every one of them lands on the cream card face. */
   --accent-light: #9354B3;    /* purple-deep, 4.85:1 on the cream card face */
-  --accent-warning: #8A6716;  /* growth ink, 5.0:1 on the cream card face */
+  --accent-warning: #7E5E12;  /* growth ink, 5.3:1 on the cream card face */
   --text-soft: #696969;       /* the app's own card secondary, 5.6:1 on cream */
 
   /* Page local */

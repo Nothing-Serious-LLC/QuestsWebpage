@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact | Quests</title>
+<title>Contact Quests: Support, Feedback, Press and Account Deletion</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta name="description" content="Questions, feedback, or press for Quests? Email the team at Nothing Serious LLC and we'll get back to you.">
 <link rel="canonical" href="https://thequestsapp.com/contact.html">
 
-<meta property="og:title" content="Contact | Quests">
+<meta property="og:title" content="Contact Quests: Support, Feedback, Press and Account Deletion">
 <meta property="og:description" content="Questions, feedback, or press for Quests? Email the team at Nothing Serious LLC and we'll get back to you.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thequestsapp.com/contact.html">
-<meta property="og:image" content="https://thequestsapp.com/og-image-v2.png">
+<meta property="og:image" content="https://thequestsapp.com/og-image.png">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Contact | Quests">
+<meta name="twitter:title" content="Contact Quests: Support, Feedback, Press and Account Deletion">
 <meta name="twitter:description" content="Questions, feedback, or press for Quests? Email the team at Nothing Serious LLC and we'll get back to you.">
-<meta name="twitter:image" content="https://thequestsapp.com/og-image-v2.png">
-
-<link rel="icon" type="image/png" href="/assets/img/app-icon.png">
-<link rel="apple-touch-icon" href="/assets/img/app-icon.png">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+<meta name="twitter:image" content="https://thequestsapp.com/og-image.png">
+<link rel="preload" href="/assets/fonts/woff2/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/fonts.css">
 <link rel="stylesheet" href="/css/site.css">
-<link rel="stylesheet" href="/css/page-contact.css">
+<link rel="stylesheet" href="/css/page-contact.css?v=2">
 <noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}.site-nav{background:rgba(243,241,231,.86);border-bottom-color:rgba(25,25,25,.07)}.site-nav .site-nav__logo img{filter:none}.site-nav .btn-outline-white{background:#191919;color:#FDFBF6;box-shadow:none}</style></noscript>
 <script src="/js/site.js" defer></script>
 
@@ -43,7 +43,7 @@
     "sameAs": [
       "https://instagram.com/quests.app",
       "https://tiktok.com/@quests.app",
-      "https://x.com/Quests_app_"
+      "https://www.youtube.com/@questsapp"
     ]
   }
 }
@@ -87,6 +87,7 @@
           <h2 class="card__title" style="font-size:var(--fs-h3);margin-top:var(--s-12)">Say hello</h2>
           <p class="card__text">For support, feedback, or press, reach the team at Nothing Serious LLC.</p>
           <a class="btn btn-ghost btn-block" style="margin-top:var(--s-24)" href="mailto:hello@thequestsapp.com">hello@thequestsapp.com</a>
+          <p class="card__text field-note" id="deletion-note">To delete your account, choose "Account deletion" in the form or email us with "Deletion" in the subject from the address on your account. We remove the account and its associated data.</p>
         </div>
 
         <div class="card reveal" data-reveal-delay="100" id="contact-form-card">
@@ -105,11 +106,21 @@
             </div>
 
             <div class="field">
+              <label for="topic">Reason</label>
+              <select id="topic" name="_subject" required>
+                <option value="Quests contact: Support">Support</option>
+                <option value="Quests contact: Feedback">Feedback</option>
+                <option value="Quests contact: Press">Press</option>
+                <option value="Quests contact: Account deletion">Account deletion</option>
+              </select>
+            </div>
+
+            <div class="field">
               <label for="message">Message</label>
               <textarea id="message" name="message" rows="5" required></textarea>
             </div>
 
-            <input type="text" name="_gotcha" class="u-sr-only" tabindex="-1" autocomplete="off">
+            <input type="text" name="_gotcha" class="u-sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this field empty">
 
             <button type="submit" class="btn btn-block">Send message</button>
           </form>
@@ -135,7 +146,7 @@
         <div class="site-footer__social">
           <a href="https://instagram.com/quests.app" target="_blank" rel="noopener" aria-label="Quests on Instagram">Instagram</a>
           <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener" aria-label="Quests on TikTok">TikTok</a>
-          <a href="https://x.com/Quests_app_" target="_blank" rel="noopener" aria-label="Quests on X">X</a>
+          <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener" aria-label="Quests on YouTube">YouTube</a>
         </div>
       </div>
 
@@ -153,6 +164,7 @@
         <ul>
           <li><a href="/privacy.html">Privacy</a></li>
           <li><a href="/terms.html">Terms</a></li>
+          <li><a href="/health-privacy.html">Health Data Privacy</a></li>
         </ul>
       </nav>
     </div>

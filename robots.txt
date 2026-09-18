@@ -7,3 +7,5 @@ Sitemap: https://thequestsapp.com/sitemap.xml
 Disallow: /get-card.html
 Disallow: /share.html
 Disallow: /QuestCard.pkpass
+Disallow: /success.html
+Disallow: /pro/success.html
