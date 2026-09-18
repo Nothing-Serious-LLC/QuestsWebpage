@@ -609,15 +609,44 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
 .quote__face { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--q-surface); box-shadow: 0 1px 3px rgba(25,25,25,0.12); }
 
 /* CTA */
+/* ---- Closing CTA -------------------------------------------------------------------
+   A ring of friends, the big line, one sentence, one button. A soft warm glow
+   sits behind the headline so the page ends on the app icon's sunset rather
+   than on flat tan. */
 .cta { text-align: center; padding-bottom: clamp(64px, 10vh, 120px); }
-.cta__inner { display: flex; flex-direction: column; align-items: center; }
-.cta__icon-link { display: block; margin-bottom: var(--q-s-7); border-radius: var(--q-r-md); -webkit-tap-highlight-color: transparent; transition: transform 160ms var(--q-ease-standard); }
-.cta__icon-link:active { transform: scale(0.94); }
-.cta__icon { display: block; width: 72px; height: 72px; border-radius: var(--q-r-md); box-shadow: var(--q-sh-card-deep-strong); }
+.cta__inner { position: relative; display: flex; flex-direction: column; align-items: center; }
+.cta__inner::before {
+  content: ""; position: absolute; left: 50%; top: 42%; z-index: -1;
+  width: min(120vw, 820px); aspect-ratio: 1.6; translate: -50% -50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--q-creative-light) 85%, transparent), color-mix(in srgb, var(--q-social-light) 55%, transparent) 55%, transparent 100%);
+  pointer-events: none;
+}
+.cta__friends { display: flex; margin-bottom: var(--q-s-6); }
+.cta__friends img {
+  width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--q-page); box-shadow: var(--q-sh-card-deep);
+  background: var(--q-surface);
+}
+.cta__friends img + img { margin-left: -12px; }
 .cta h2 { font-size: clamp(56px, 3rem + 5vw, 128px); line-height: 0.9; letter-spacing: -0.035em; }
 .cta h2 em { color: var(--q-accent); }
+.cta__lede { margin-top: var(--q-s-5); max-width: 30ch; text-align: center; }
+.cta__button {
+  display: inline-flex; align-items: center; gap: 12px;
+  margin-top: var(--q-s-8); padding: 0 26px 0 10px; min-height: 60px;
+  border-radius: var(--q-r-full);
+  background: var(--q-action); color: var(--q-on-action);
+  font-size: 17px; font-weight: 700; line-height: 20px; letter-spacing: -0.01em;
+  box-shadow: 0 12px 32px rgba(25, 25, 25, 0.18);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--q-t-base) var(--q-ease-standard), box-shadow var(--q-t-base) var(--q-ease-standard), background var(--q-t-base) var(--q-ease-standard);
+}
+.cta__button img { width: 40px; height: 40px; border-radius: 11px; }
+.cta__button-note { font-weight: 500; opacity: 0.6; }
+.cta__button:hover { background: var(--q-action-pressed); transform: translateY(-2px); box-shadow: 0 16px 36px rgba(25, 25, 25, 0.22); }
+.cta__button:active { transform: scale(0.97); box-shadow: 0 8px 20px rgba(25, 25, 25, 0.16); }
+.cta__micro { margin-top: var(--q-s-5); }
 .cta .store-row { justify-content: center; margin-top: var(--q-s-8); }
-.cta .micro { margin-top: var(--q-s-5); }
 
 /* ---- Footer -------------------------------------------------------------------- */
 .footer { padding: var(--q-s-10) 0 calc(var(--q-s-10) + env(safe-area-inset-bottom)); }
@@ -740,16 +769,15 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
      what is left. The science cards shrink so all three sit on one screen. */
   [data-snap] .hero, [data-snap] .section, [data-snap] .ways.section { padding-block: 84px 12px; }
 
-  /* Phone entrances are two beats, never a trickle. Hero: the phones settle,
-     then the title, line and badges arrive together as one block. Choose your
-     Quest: title and line together, the deck follows. Each piece keeps its own
-     layer so nothing is rasterised on the frame it starts moving. */
+  /* Phone entrances are one beat. Hero: the phones drop in while the title,
+     line and badges rise to meet them, same duration, same moment. Choose
+     your Quest: head and deck arrive together. Each piece keeps its own layer
+     so nothing is rasterised on the frame it starts moving. */
   .hero__inner > * { will-change: opacity, transform; }
-  .is-ready .hero__inner > :nth-child(2), .is-ready .hero__inner > :nth-child(3), .is-ready .hero__inner > :nth-child(4) {
-    transition-duration: 760ms, 760ms; transition-delay: 520ms;
-  }
+  .hero__inner > :nth-child(n + 2) { transform: translateY(28px); }
+  .is-ready .hero__inner > :nth-child(n + 2) { transition-duration: 1100ms, 1100ms; transition-delay: 120ms; }
   .section__head[data-reveal] > .lede { transition-delay: 0ms; }
-  .deck[data-reveal] { transition-delay: 260ms; }
+  .deck[data-reveal] { transition-delay: 0ms; }
   [data-snap] .facts { gap: 10px; margin-top: 18px; grid-auto-rows: 1fr; }
   [data-snap] .fact { padding: 14px 16px 12px; }
   [data-snap] .fact__headline { font-size: 40px; line-height: 1; }
