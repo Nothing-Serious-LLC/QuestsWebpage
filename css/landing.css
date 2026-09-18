@@ -555,32 +555,9 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
 [data-facts="ink"] .fact__cite { background: rgba(255, 255, 255, 0.16); color: #FDFBF6; }
 [data-facts="ink"] .fact__glyph { opacity: 0.18; filter: brightness(4); }
 
-/* Entrance: card fades up, the stat springs in a beat later, the line and
-   source follow, the watermark drifts in from the corner. Cards land one after
-   another (data-stagger on the list) so the row reads as a sequence. */
-.fact .fact__headline {
-  opacity: 0; transform: translateY(12px);
-  transition: opacity 560ms var(--q-ease-decelerate) calc(var(--delay, 0ms) + 120ms),
-              transform 680ms var(--q-ease-decelerate) calc(var(--delay, 0ms) + 120ms);
-}
-/* Each animated part keeps its own layer under the pager, so the stat never
-   has to be rasterised on the frame it starts moving (that was the pop). */
-[data-snap] .fact__headline, [data-snap] .fact__body, [data-snap] .fact__cite, [data-snap] .fact__glyph { will-change: opacity, transform; }
-.fact .fact__body, .fact .fact__cite {
-  opacity: 0; transform: translateY(10px);
-  transition: opacity var(--q-t-lazy) var(--q-ease-decelerate) calc(var(--delay, 0ms) + 260ms),
-              transform var(--q-t-lazy) var(--q-ease-decelerate) calc(var(--delay, 0ms) + 260ms);
-}
-.fact .fact__cite { transition-delay: calc(var(--delay, 0ms) + 360ms); }
-.fact .fact__glyph {
-  opacity: 0; transform: translate(12%, 12%) scale(0.9);
-  transition: opacity 900ms var(--q-ease-decelerate) calc(var(--delay, 0ms) + 200ms), transform 1000ms var(--q-ease-decelerate) calc(var(--delay, 0ms) + 200ms);
-}
-.fact.is-visible .fact__headline, .fact.is-visible .fact__body, .fact.is-visible .fact__cite,
-.no-js .fact .fact__headline, .no-js .fact .fact__body, .no-js .fact .fact__cite { opacity: 1; transform: none; }
-.fact.is-visible .fact__glyph, .no-js .fact .fact__glyph { opacity: 0.14; transform: none; }
-[data-facts="tint"] .fact.is-visible .fact__glyph { opacity: 0.22; }
-[data-facts="ink"] .fact.is-visible .fact__glyph { opacity: 0.18; }
+/* Entrance: each card arrives whole (stat, line, source and watermark move
+   with it) through the generic .card[data-reveal] transition; the three
+   cards land one after another via data-stagger on the list (--delay). */
 
 /* Rating: one big number, the stars under it, one quiet line. */
 .rating { text-align: center; }
