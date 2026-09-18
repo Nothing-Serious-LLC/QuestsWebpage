@@ -150,7 +150,9 @@
         last = 0; frame = window.requestAnimationFrame(tick); return;
       }
       if (last && !dragging) {
-        var dt = Math.min(50, now - last) / 1000;
+        /* Real elapsed time up to 120ms: a dropped frame or two must not
+           slow the ring (capping at one frame made it crawl on a busy phone). */
+        var dt = Math.min(120, now - last) / 1000;
         offset = norm(offset + dt * (speed + inertia));
         inertia *= Math.exp(-dt / INERTIA_TAU);
         if (Math.abs(inertia) < 2) inertia = 0;

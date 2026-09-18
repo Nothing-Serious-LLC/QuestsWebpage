@@ -610,30 +610,45 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
 
 /* CTA */
 /* ---- Closing CTA -------------------------------------------------------------------
-   A ring of friends, the big line, one sentence, one button. A soft warm glow
-   sits behind the headline so the page ends on the app icon's sunset rather
-   than on flat tan. */
+   Friends drift around the app icon like a small galaxy, each wearing one of
+   the app's avatar rings (Pro graphite, the category gradients, chrome,
+   aurora, sunset fire). Under it the big line and one button. A soft warm
+   glow behind the headline ends the page on the icon's sunset. */
 .cta { text-align: center; padding-bottom: clamp(64px, 10vh, 120px); }
 .cta__inner { position: relative; display: flex; flex-direction: column; align-items: center; }
 .cta__inner::before {
-  content: ""; position: absolute; left: 50%; top: 42%; z-index: -1;
+  content: ""; position: absolute; left: 50%; top: 46%; z-index: -1;
   width: min(120vw, 820px); aspect-ratio: 1.6; translate: -50% -50%;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--q-creative-light) 85%, transparent), color-mix(in srgb, var(--q-social-light) 55%, transparent) 55%, transparent 100%);
   pointer-events: none;
 }
-.cta__friends { display: flex; margin-bottom: var(--q-s-6); }
-.cta__friends img {
-  width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
-  border: 3px solid var(--q-page); box-shadow: var(--q-sh-card-deep);
-  background: var(--q-surface);
+.cta__galaxy { --k: 1; position: relative; width: min(100%, 560px); aspect-ratio: 2.15; margin-bottom: var(--q-s-4); }
+.cta__orbit {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  border: 1px solid color-mix(in srgb, var(--q-text) 9%, transparent); border-radius: 50%;
 }
-.cta__friends img + img { margin-left: -12px; }
+.cta__orbit--a { width: 56%; height: 76%; rotate: -7deg; }
+.cta__orbit--b { width: 98%; height: 122%; rotate: 5deg; }
+.cta__star {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  width: calc(56px * var(--k)); height: calc(56px * var(--k)); border-radius: 50%; overflow: hidden;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.6), 0 0 48px 14px color-mix(in srgb, var(--q-creative-light) 95%, transparent);
+}
+.cta__star img { display: block; width: 100%; height: 100%; }
+.cta__friend {
+  position: absolute; left: var(--x); top: var(--y);
+  width: calc(var(--s) * var(--k)); height: calc(var(--s) * var(--k)); translate: -50% -50%;
+  animation: cta-float var(--f, 6.5s) ease-in-out var(--d, 0s) infinite alternate;
+  will-change: transform;
+}
+.cta__face { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; box-shadow: var(--q-sh-card-deep); background: var(--q-surface); }
+.cta__ring { position: absolute; inset: -9%; width: 118%; height: 118%; pointer-events: none; }
+@keyframes cta-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
 .cta h2 { font-size: clamp(56px, 3rem + 5vw, 128px); line-height: 0.9; letter-spacing: -0.035em; }
 .cta h2 em { color: var(--q-accent); }
-.cta__lede { margin-top: var(--q-s-5); max-width: 30ch; text-align: center; }
 .cta__button {
-  display: inline-flex; align-items: center; gap: 12px;
-  margin-top: var(--q-s-8); padding: 0 26px 0 10px; min-height: 60px;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-top: var(--q-s-7); padding: 0 32px; min-height: 58px;
   border-radius: var(--q-r-full);
   background: var(--q-action); color: var(--q-on-action);
   font-size: 17px; font-weight: 700; line-height: 20px; letter-spacing: -0.01em;
@@ -641,11 +656,8 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   -webkit-tap-highlight-color: transparent;
   transition: transform var(--q-t-base) var(--q-ease-standard), box-shadow var(--q-t-base) var(--q-ease-standard), background var(--q-t-base) var(--q-ease-standard);
 }
-.cta__button img { width: 40px; height: 40px; border-radius: 11px; }
-.cta__button-note { font-weight: 500; opacity: 0.6; }
 .cta__button:hover { background: var(--q-action-pressed); transform: translateY(-2px); box-shadow: 0 16px 36px rgba(25, 25, 25, 0.22); }
 .cta__button:active { transform: scale(0.97); box-shadow: 0 8px 20px rgba(25, 25, 25, 0.16); }
-.cta__micro { margin-top: var(--q-s-5); }
 .cta .store-row { justify-content: center; margin-top: var(--q-s-8); }
 
 /* ---- Footer -------------------------------------------------------------------- */
@@ -750,7 +762,7 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   .deck__card { box-shadow: 0 2px 8px rgba(25, 25, 25, 0.06); }
   /* Slow enough to read four lines as a card crosses a phone. */
   .marquee { mask-image: none; -webkit-mask-image: none; }
-  .marquee { --marquee-seconds: 150; }
+  .cta__galaxy { --k: 0.8; width: min(100%, 340px); aspect-ratio: 1.75; }
   /* Cheaper raster for 18 moving cards on a 3x phone: flat cards, no blur. */
   .quote { box-shadow: 0 1px 2px rgba(25, 25, 25, 0.06); }
   .quote__face { box-shadow: none; }
