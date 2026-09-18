@@ -1008,9 +1008,11 @@
      Each friend has a home position (percent of the field's half size) and a
      size, and holds its pattern around the line and the button. A slow,
      small drift keeps the group alive (larger on phones, where nothing else
-     stirs them) and the pointer's position over the field leans every face
-     a little. Meeting a face does more: hovering lifts it and leans it away
-     from the pointer, a click or tap gives it a kick that springs back home.
+     stirs them). The pointer is a soft field: every face inside REACH is
+     pushed straight away from it, the nearer the further, so the group
+     parts around the cursor and closes again behind it. Meeting a face does
+     more: hovering lifts it, a click or tap pops it off in a random direction
+     and it springs back home.
      Everything is one translate3d + scale per face, on the compositor. */
   (function constellation() {
     var root = document.querySelector('[data-galaxy]');
@@ -1034,7 +1036,7 @@
       };
     });
     var W = 0, H = 0, L = 0, T = 0, k = 1, mx = null, my = null, frame = 0;
-    var LEAN = 10, LIFT = 0.12, KICK = 13, PARALLAX = 0.02;
+    var LIFT = 0.12, KICK = 13, REACH = 340, PUSH = 92;
     function measure() {
       k = parseFloat(window.getComputedStyle(field).getPropertyValue('--k')) || 1;
       var r = field.getBoundingClientRect();
@@ -1057,20 +1059,22 @@
         !(screen && document.documentElement.hasAttribute('data-snap') && !screen.classList.contains('is-current'));
       if (!on) { frame = window.requestAnimationFrame(step); return; }
       var cx = L + W / 2, cy = T + H / 2, drift = k < 1 ? 1.5 : 1;
-      var relX = mx === null ? 0 : Math.max(-1, Math.min(1, (mx - cx) / (W / 2)));
-      var relY = my === null ? 0 : Math.max(-1, Math.min(1, (my - cy) / (H / 2)));
       for (var i = 0; i < friends.length; i++) {
         var f = friends[i];
         /* Idle: two slow sines plus a small circle, so each face wanders a
            little loop around home instead of ticking back and forth. */
         var ix = (Math.sin(now * f.wx + f.px) * f.ax + Math.cos(now * f.wo + f.po) * f.ro) * drift;
         var iy = (Math.sin(now * f.wy + f.py) * f.ay + Math.sin(now * f.wo + f.po) * f.ro) * drift;
-        var tx = ix - relX * W * PARALLAX * f.z, ty = iy - relY * H * PARALLAX * f.z, lift = 0;
+        var tx = ix, ty = iy, lift = 0;
         if (mx !== null) {
-          /* Only a pointer over the face itself moves it further. */
-          var fx = cx + home(f, 0) + f.x, fy = cy + home(f, 1) + f.y, rr = f.s * k / 2 + 8;
+          var fx = cx + home(f, 0), fy = cy + home(f, 1), rr = f.s * k / 2 + 8;
           var dx = fx - mx, dy = fy - my, d = Math.sqrt(dx * dx + dy * dy) || 1;
-          if (d < rr) { tx += dx / d * LEAN; ty += dy / d * LEAN; lift = LIFT; }
+          if (d < REACH) {
+            /* Radial push, strongest right at the pointer, gone at REACH. */
+            var g = 1 - d / REACH, p = PUSH * g * g * (0.6 + 0.4 * f.z);
+            tx += dx / d * p; ty += dy / d * p;
+            if (d < rr) lift = LIFT;
+          }
         }
         /* Spring toward the target, with the kick velocity damped out. */
         f.vx = (f.vx + (tx - f.x) * 0.08) * 0.78; f.vy = (f.vy + (ty - f.y) * 0.08) * 0.78;
