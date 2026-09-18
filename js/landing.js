@@ -129,7 +129,7 @@
           x = -(widths[i] + PARK);
         }
         /* The card already sits at lefts[i] in the flex track; translate by the difference. */
-        cards[i].style.transform = 'translate3d(' + (x - lefts[i]).toFixed(2) + 'px,0,0)';
+        cards[i].style.transform = 'translate3d(' + (x - lefts[i]).toFixed(2) + 'px, var(--mq-y, 0px), 0)';
       }
     }
 
@@ -393,7 +393,7 @@
     var screens = Array.prototype.slice.call(document.querySelectorAll('main > .hero, main > .section'));
     var footer = document.querySelector('.footer');
     var phone = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    var MS = phone ? 820 : 900, COOLDOWN = 240, WHEEL_MIN = 6, SWIPE_MIN = 36;
+    var MS = phone ? 820 : 900, COOLDOWN = 60, WHEEL_MIN = 6, SWIPE_MIN = 24;
     var index = 0, active = true, moving = false, quietUntil = 0, wheelAcc = 0, wheelLast = 0, settle = 0;
     html.style.setProperty('--page-ms', MS + 'ms');
 
@@ -427,16 +427,18 @@
 
     /* Re-run the staggered item reveals inside the arriving screen. Items come
        from below when paging down and from above when paging up. */
-    function stage(section, on, dir) {
+    function stage(section, on, dir, primed) {
       var items = Array.prototype.slice.call(section.querySelectorAll('[data-reveal]'));
       if (!on) { items.forEach(function (el) { el.classList.remove('is-visible'); el.classList.remove('is-above'); }); return; }
       items.forEach(function (el) { el.classList.remove('is-visible'); el.classList.toggle('is-above', dir < 0); });
-      window.setTimeout(function () {
-        items.forEach(function (el) { el.classList.add('is-visible'); el.classList.remove('is-above'); });
-      }, 120);
+      var reveal = function () { items.forEach(function (el) { el.classList.add('is-visible'); el.classList.remove('is-above'); }); };
+      /* A finger-driven turn has already shown the user where they are going,
+         so its content starts arriving on the next frame; wheel and key turns
+         keep a short beat so the screen settles before the items rise. */
+      if (primed) window.requestAnimationFrame(reveal); else window.setTimeout(reveal, 120);
     }
 
-    function show(i, dir, instant) {
+    function show(i, dir, instant, primed) {
       i = Math.max(0, Math.min(screens.length - 1, i));
       var changed = i !== index;
       index = i;
@@ -462,7 +464,7 @@
         return;
       }
       if (!changed) return;
-      stage(screens[i], true, dir);
+      stage(screens[i], true, dir, primed);
       moving = true;
       window.clearTimeout(settle);
       settle = window.setTimeout(function () {
@@ -472,11 +474,18 @@
            departing content cut out in Safari. */
         screens.forEach(function (s, k) { if (k !== index) { stage(s, false, dir); setInert(s, true); } });
         if (footer) setInert(footer, index !== screens.length - 1);
+        clearCarry();
       }, MS);
     }
-    function go(dir) {
-      if (!active || moving || performance.now() < quietUntil) return;
-      show(index + dir, dir, false);
+    /* One swipe, one screen. A swipe during a turn is dropped for the first
+       LOCK of it and taken after that (the fade simply retargets), so quick
+       successive swipes still register without stacking up. */
+    var turnAt = 0, LOCK = MS * 0.6;
+    function go(dir, primed) {
+      if (!active) return;
+      if ((moving && performance.now() - turnAt < LOCK) || performance.now() < quietUntil) return;
+      turnAt = performance.now();
+      show(index + dir, dir, false, primed);
     }
 
     /* Native scrolling takes over when a screen cannot fit. */
@@ -519,16 +528,19 @@
        turn. A short flick that lets go before that still turns on release
        (SWIPE_MIN). Anything shorter springs back. Horizontal drags (the card
        deck) pass. */
-    var tx = 0, ty = 0, tracking = false, vertical = null, peeking = false, lastY = 0, lastT = 0, vy = 0;
-    var PEEK_MAX = 64, PEEK_K = 180, PEEK_DIM = 0.4, SPRING_MS = 360, FLICK_VY = 0.45;   /* px per ms */
-    function COMMIT() { return Math.max(48, Math.min(88, vh() * 0.07)); }
+    var tx = 0, ty = 0, tracking = false, vertical = null, peeking = false, lastY = 0, lastT = 0, vy = 0, peekOff = 0, trail = [];
+    var CARRY = 90, CARRY_MS = 720, CARRY_EASE = 'cubic-bezier(0.25, 0.25, 0.2, 1)';   /* hand-off travel; the ease starts at slope 1 and only decelerates */
+    var PEEK_MAX = 150, PEEK_K = 110, PEEK_DIM = 0.55, SPRING_MS = 360, FLICK_VY = 0.3;   /* px per ms */
+    /* vh() is Safari's inner height with its bars showing (about 680px on a
+       6.1in phone), so 16% is roughly 110px of finger travel. */
+    function COMMIT() { return Math.max(110, Math.min(170, vh() * 0.16)); }
     function peekLayers() {
       var s = screens[index];
       var out = [];
       var shell = s.querySelector(':scope > .shell');
       if (shell) out.push({ el: shell, move: true });
       var fade = s.querySelector(':scope > .fade');
-      if (fade) out.push({ el: fade, move: false });   /* marquee: dim only, never move its box */
+      if (fade) out.push({ el: fade, move: false, vary: true });   /* marquee: its cards carry the offset (--mq-y), its box never moves */
       if (footer && index === screens.length - 1) out.push({ el: footer, move: true });
       return out;
     }
@@ -542,10 +554,24 @@
       var t = off / PEEK_MAX;
       peekLayers().forEach(function (l) {
         l.el.style.transition = 'none';
-        if (l.move) l.el.style.transform = 'translateY(' + (dy < 0 ? -off : off).toFixed(2) + 'px)';
+        var y = (dy < 0 ? -off : off);
+        if (l.move) l.el.style.transform = 'translateY(' + y.toFixed(2) + 'px)';
+        if (l.vary) l.el.style.setProperty('--mq-y', y.toFixed(2) + 'px');
         l.el.style.opacity = (1 - PEEK_DIM * t).toFixed(3);
       });
+      peekOff = dy < 0 ? -off : off;
       peeking = true;
+    }
+    /* Ease a --mq-y offset back to zero (the cards read it every frame). */
+    function springVar(el) {
+      var from = parseFloat(el.style.getPropertyValue('--mq-y')) || 0, t0 = performance.now();
+      if (!from) { el.style.removeProperty('--mq-y'); return; }
+      (function step(now) {
+        var k = Math.min(1, (now - t0) / SPRING_MS), e = 1 - Math.pow(1 - k, 3);
+        if (k >= 1 || peeking) { if (!peeking) el.style.removeProperty('--mq-y'); return; }
+        el.style.setProperty('--mq-y', (from * (1 - e)).toFixed(2) + 'px');
+        window.requestAnimationFrame(step);
+      })(t0);
     }
     function unpeek(spring) {
       if (!peeking) return;
@@ -554,17 +580,65 @@
         if (spring) {
           l.el.style.transition = 'transform ' + SPRING_MS + 'ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity ' + SPRING_MS + 'ms ease-out';
           l.el.style.transform = ''; l.el.style.opacity = '';
+          if (l.vary) springVar(l.el);
           window.setTimeout(function () { if (!peeking) l.el.style.transition = ''; }, SPRING_MS + 20);
         } else {
-          /* Hand off: drop the inline transition so the class-driven turn
-             starts from wherever the finger left the layer. */
-          l.el.style.transition = ''; l.el.style.transform = ''; l.el.style.opacity = '';
+          /* Hand off: the outgoing content keeps going the way the finger
+             sent it and fades on the way. The class-driven turn would have
+             pulled it back toward its 40px rest offset, which read as the
+             scroll being reset. CARRY_EASE starts at about finger speed
+             (initial slope 1) and only slows, so there is no kick at the
+             moment of commit. These inline styles win over the class until
+             the turn settles and clearCarry() drops them. */
+          var to = peekOff + (peekOff < 0 ? -CARRY : CARRY);
+          l.el.style.transition = 'transform ' + CARRY_MS + 'ms ' + CARRY_EASE + ', opacity ' + Math.round(CARRY_MS * 0.8) + 'ms cubic-bezier(0.4, 0, 0.6, 1)';
+          if (l.move) l.el.style.transform = 'translateY(' + to.toFixed(2) + 'px)';
+          if (l.vary) glideVar(l.el, to);
+          l.el.style.opacity = '0';
+          carried.push(l.el);
         }
       });
+      if (!spring) primeIncoming(peekOff < 0 ? 1 : -1);
+    }
+    /* The screen about to arrive starts a little further out, in the same
+       direction of travel, and comes in with no delay and the same gentle
+       easing, so the two screens read as one continuous motion and the
+       outgoing fade never leaves a blank beat. */
+    function primeIncoming(dir) {
+      var next = screens[index + dir];
+      if (!next) return;
+      var els = [];
+      var shell = next.querySelector(':scope > .shell'); if (shell) els.push(shell);
+      var fade = next.querySelector(':scope > .fade'); if (fade) els.push(fade);
+      if (footer && index + dir === screens.length - 1) els.push(footer);
+      els.forEach(function (el) {
+        el.style.transition = 'none';
+        if (el !== fade) el.style.transform = 'translateY(' + (dir > 0 ? CARRY : -CARRY) + 'px)';
+        void el.offsetWidth;   /* flush so the transition below starts from here */
+        el.style.transition = 'transform ' + CARRY_MS + 'ms ' + CARRY_EASE + ', opacity ' + Math.round(CARRY_MS * 0.75) + 'ms cubic-bezier(0.4, 0, 0.6, 1)';
+        el.style.transform = '';
+        carried.push(el);
+      });
+    }
+    /* Ease --mq-y from its current value to a target (the cards read it every frame). */
+    function glideVar(el, to) {
+      var from = parseFloat(el.style.getPropertyValue('--mq-y')) || 0, t0 = performance.now();
+      (function step(now) {
+        if (peeking) return;
+        var k = Math.min(1, (now - t0) / CARRY_MS), e = 1 - Math.pow(1 - k, 3);
+        el.style.setProperty('--mq-y', (from + (to - from) * e).toFixed(2) + 'px');
+        if (k < 1) window.requestAnimationFrame(step);
+      })(t0);
+    }
+    var carried = [];
+    function clearCarry() {
+      carried.forEach(function (el) { el.style.transition = ''; el.style.transform = ''; el.style.opacity = ''; el.style.removeProperty('--mq-y'); });
+      carried = [];
     }
     window.addEventListener('touchstart', function (e) {
-      if (!active || e.touches.length !== 1 || moving || performance.now() < quietUntil) { tracking = false; return; }
+      if (!active || e.touches.length !== 1) { tracking = false; return; }
       tracking = true; vertical = null; tx = e.touches[0].clientX; ty = lastY = e.touches[0].clientY; lastT = e.timeStamp; vy = 0;
+      trail.length = 0; trail.push([e.timeStamp, ty]);
     }, { passive: true });
     window.addEventListener('touchmove', function (e) {
       if (!tracking) return;
@@ -573,19 +647,17 @@
       if (vertical === false) return;
       e.preventDefault();
       if (vertical !== true) return;
-      var dt = Math.max(1, e.timeStamp - lastT);
-      /* Smoothed finger speed, for telling a flick from a slow pull on release. */
-      vy = vy * 0.4 + ((e.touches[0].clientY - lastY) / dt) * 0.6;
       lastY = e.touches[0].clientY; lastT = e.timeStamp;
+      trail.push([lastT, lastY]); if (trail.length > 12) trail.shift();
       var dir = dy < 0 ? 1 : -1;
       var canTurn = dir > 0 ? index < screens.length - 1 : index > 0;
       if (canTurn && Math.abs(dy) >= COMMIT()) {
         tracking = false;
         unpeek(false);
-        go(dir);
+        go(dir, true);
         return;
       }
-      peek(dy);
+      if (!moving) peek(dy);
     }, { passive: false });
     function release(e) {
       if (!tracking) return;
@@ -596,8 +668,16 @@
       var canTurn = dir > 0 ? index < screens.length - 1 : index > 0;
       /* A flick (fast, same direction, past the small minimum) turns on
          release; a slow pull that stopped short of COMMIT springs back. */
-      var flick = Math.abs(vy) >= FLICK_VY && (vy < 0) === (dy < 0);
-      if (canTurn && Math.abs(dy) >= SWIPE_MIN && flick) { unpeek(false); go(dir); }
+      /* Flick speed is the finger's travel over its last ~100ms, so one fast
+         final sample cannot fake it, and only counts if the finger was still
+         moving when it lifted. A pull that paused is judged on distance. */
+      var k = trail.length - 1, endT = trail[k][0];
+      while (k > 0 && endT - trail[k - 1][0] < 100) k--;
+      var span = Math.max(1, endT - trail[k][0]);
+      vy = trail.length > 1 ? (trail[trail.length - 1][1] - trail[k][1]) / span : 0;
+      var flick = Math.abs(vy) >= FLICK_VY && (vy < 0) === (dy < 0) && (e.timeStamp - lastT) < 120;
+      var far = Math.abs(dy) >= COMMIT() * 0.6;
+      if (canTurn && ((Math.abs(dy) >= SWIPE_MIN && flick) || far)) { unpeek(false); go(dir, true); }
       else unpeek(true);
     }
     window.addEventListener('touchend', release);
