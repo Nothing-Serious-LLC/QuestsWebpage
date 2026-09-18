@@ -185,17 +185,17 @@ em { font-style: italic; }
 .nav__cta:hover { background: var(--q-action-pressed); transform: translateY(-1px); }
 
 /* ---- Press -----------------------------------------------------------------------
-   Buttons and badges press like the app's: the pointer down squashes them
-   quickly (JS sets .is-down so it works the same for a finger), release
-   pops them past rest and settles. */
-.is-down, .is-down:hover { transform: scale(0.93) !important; transition-duration: 70ms !important; }
-.cta__button.is-down { box-shadow: 0 6px 16px rgba(25, 25, 25, 0.16) !important; }
-.is-released { animation: press-pop 420ms cubic-bezier(0.22, 1.2, 0.36, 1) both; }
-@keyframes press-pop {
-  0% { transform: scale(0.93); }
-  45% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+   Buttons and badges press like the app's: down sinks them in quickly and
+   release lets them back out, no bounce. JS sets .is-down so a finger and a
+   mouse feel the same. Nothing here is selectable, so a press never turns
+   into a text highlight. */
+.nav__cta, .cta__button, .store-row a, .deck__arrow, .cta__friend {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
 }
+.cta { -webkit-user-select: none; user-select: none; }
+.nav__cta, .cta__button, .store-row a, .deck__arrow { transition-property: transform, box-shadow, background, opacity; transition-duration: 180ms; transition-timing-function: var(--q-ease-standard); }
+.is-down, .is-down:hover { transform: scale(0.94) !important; transition-duration: 80ms !important; }
+.cta__button.is-down { box-shadow: 0 6px 16px rgba(25, 25, 25, 0.16) !important; }
 
 /* ---- Hero (Welcome screen: glow, title, subtitle, CTA) ------------------------
    The accent walks the five families in app order: Mindful, Healthy, Creative,
@@ -842,5 +842,4 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   [data-fade] > .shell, [data-fade] .fade { opacity: 1 !important; transform: none !important; }
   .glyph { transform: none !important; }
   .store-row a, .nav__cta { transition: none; }
-  .is-released { animation: none; }
 }

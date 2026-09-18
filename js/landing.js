@@ -1109,27 +1109,25 @@
   }());
 
   /* ---- Press feedback -------------------------------------------------------
-     Pointer down squashes the control, release pops it. Class-driven so a
-     finger on iOS gets the same feel as a mouse (no :active reliance), and
-     the pop finishes even though the link navigates. */
+     Pointer down sinks the control in, release lets it out. Class-driven so
+     a finger on iOS gets the same feel as a mouse, and mousedown's default
+     is stopped so a press or a fast double click never selects text. */
   (function press() {
-    var targets = document.querySelectorAll('.nav__cta, .cta__button, .store-row a, .deck__controls button');
+    var targets = document.querySelectorAll('.nav__cta, .cta__button, .store-row a, .deck__arrow');
     Array.prototype.forEach.call(targets, function (el) {
-      function down() { el.classList.remove('is-released'); el.classList.add('is-down'); }
-      function up() {
-        if (!el.classList.contains('is-down')) return;
-        el.classList.remove('is-down');
-        el.classList.add('is-released');
-        if (navigator.vibrate) { try { navigator.vibrate(8); } catch (e) {} }
-      }
+      function down() { el.classList.add('is-down'); }
+      function up() { el.classList.remove('is-down'); }
+      el.addEventListener('mousedown', function (e) { e.preventDefault(); });
       el.addEventListener('pointerdown', down, { passive: true });
       el.addEventListener('pointerup', up, { passive: true });
-      el.addEventListener('pointercancel', function () { el.classList.remove('is-down'); }, { passive: true });
-      el.addEventListener('pointerleave', function () { el.classList.remove('is-down'); }, { passive: true });
-      el.addEventListener('animationend', function () { el.classList.remove('is-released'); });
+      el.addEventListener('pointercancel', up, { passive: true });
+      el.addEventListener('pointerleave', up, { passive: true });
       el.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') down(); });
-      el.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') up(); });
+      el.addEventListener('keyup', up);
     });
+    /* A press on a face should not start a selection either. */
+    var galaxy = document.querySelector('[data-galaxy]');
+    if (galaxy) galaxy.addEventListener('mousedown', function (e) { if (e.target.closest && e.target.closest('.cta__friend')) e.preventDefault(); });
   }());
 
   var year = document.querySelector('[data-year]');
