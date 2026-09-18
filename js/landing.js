@@ -1007,51 +1007,43 @@
   /* ---- Closing constellation ------------------------------------------------
      Each friend has a home position (percent of the field's half size) and a
      size, and holds its pattern around the line and the button. A slow,
-     small drift keeps the group alive and the pointer's position over the
-     field leans every face a little (a third of the old parallax). Meeting
-     a face does more: hovering lifts it and leans it away from the pointer,
-     a click or tap gives it a kick that springs back home.
-     Everything is one translate3d + scale per face, on the compositor.
-
-     On a phone the group is smaller and quieter: six faces, each joined to
-     the line by a dotted arc, holding still until tapped. */
+     small drift keeps the group alive (larger on phones, where nothing else
+     stirs them) and the pointer's position over the field leans every face
+     a little. Meeting a face does more: hovering lifts it and leans it away
+     from the pointer, a click or tap gives it a kick that springs back home.
+     Everything is one translate3d + scale per face, on the compositor. */
   (function constellation() {
     var root = document.querySelector('[data-galaxy]');
     if (!root) return;
-    var variant = window.matchMedia('(hover: none) and (pointer: coarse)').matches ? 'b' : 'a';
-    if (variant === 'b') document.documentElement.setAttribute('data-cta', 'b');
     var field = root.querySelector('.cta__field');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var screen = root.closest ? root.closest('.section') : null;
     var nodes = Array.prototype.slice.call(root.querySelectorAll('.cta__friend'));
-    nodes.forEach(function (el) {
+    var friends = nodes.map(function (el, i) {
       el.style.setProperty('--s', el.getAttribute('data-s') + 'px');
       var ring = el.getAttribute('data-ring');
       if (ring) el.style.setProperty('--ring', 'url("' + ring + '")');
-    });
-    var friends = nodes.map(function (el, i) {
       return {
         el: el, hx: Number(el.getAttribute('data-x')) / 100, hy: Number(el.getAttribute('data-y')) / 100,
         mx: Number(el.getAttribute('data-mx') || el.getAttribute('data-x')) / 100, my: Number(el.getAttribute('data-my') || el.getAttribute('data-y')) / 100,
-        s: Number(el.getAttribute('data-s')) || 72,
-        ax: 5 + (i % 3) * 1.5, ay: 6 + ((i + 1) % 3) * 1.5, z: Number(el.getAttribute('data-z')) || 0.8,
+        s: Number(el.getAttribute('data-s')) || 72, z: Number(el.getAttribute('data-z')) || 0.8,
+        ax: 5 + (i % 3) * 1.5, ay: 6 + ((i + 1) % 3) * 1.5,
         wx: 0.00038 + i * 0.00005, wy: 0.00046 + i * 0.00004, px: i * 1.7, py: i * 2.3,
-        x: 0, y: 0, vx: 0, vy: 0, k: 1, hot: false
+        ro: 3 + (i % 3), wo: (i % 2 ? -1 : 1) * (0.00029 + i * 0.00003), po: i * 0.9,
+        x: 0, y: 0, vx: 0, vy: 0, k: 1
       };
     });
     var W = 0, H = 0, L = 0, T = 0, k = 1, mx = null, my = null, frame = 0;
     var LEAN = 10, LIFT = 0.12, KICK = 9, PARALLAX = 0.02;
-    var tethers = null;
     function measure() {
       k = parseFloat(window.getComputedStyle(field).getPropertyValue('--k')) || 1;
       var r = field.getBoundingClientRect();
       W = r.width; H = r.height; L = r.left; T = r.top;
-      if (variant === 'b') drawTethers();
     }
-    /* Home position, kept fully inside the field so a face never sits half
-       off a narrow screen. */
+    /* Home position, kept inside the field with room for the drift, so a
+       face never sits half off a narrow screen. */
     function home(f, axis) {
-      var half = (axis ? H : W) / 2, r = f.s * k / 2 + 6;
+      var half = (axis ? H : W) / 2, r = f.s * k / 2 + 6 + (k < 1 ? 14 : 0);
       var v = (k < 1 ? (axis ? f.my : f.mx) : (axis ? f.hy : f.hx)) * half;
       return Math.max(-(half - r), Math.min(half - r, v));
     }
@@ -1059,49 +1051,27 @@
       f.el.style.transform = 'translate3d(' + (home(f, 0) + x).toFixed(2) + 'px,' + (home(f, 1) + y).toFixed(2) + 'px,0) scale(' + s.toFixed(3) + ')';
     }
     function seat() { friends.forEach(function (f) { place(f, 0, 0, 1); }); }
-    /* Variant b: a dotted arc from every face toward the centre of the line. */
-    function drawTethers() {
-      if (!tethers) {
-        tethers = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        tethers.setAttribute('class', 'cta__tethers');
-        field.insertBefore(tethers, field.firstChild);
-      }
-      tethers.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-      var cx = W / 2, cy = H / 2, d = '';
-      friends.forEach(function (f) {
-        if (window.getComputedStyle(f.el).display === 'none') return;
-        var x = cx + home(f, 0), y = cy + home(f, 1);
-        var dx = cx - x, dy = cy - y, len = Math.sqrt(dx * dx + dy * dy) || 1;
-        var r0 = f.s * k / 2 + 10, r1 = Math.min(len - r0 - 8, k < 1 ? 62 : 118);
-        if (r1 < 24) return;
-        var x0 = x + dx / len * r0, y0 = y + dy / len * r0;
-        var x1 = x + dx / len * (r0 + r1), y1 = y + dy / len * (r0 + r1);
-        var bend = (x < cx ? -1 : 1) * (y < cy ? 1 : -1) * 0.22;
-        var qx = (x0 + x1) / 2 + dy / len * bend * r1, qy = (y0 + y1) / 2 - dx / len * bend * r1;
-        d += 'M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + 'Q' + qx.toFixed(1) + ' ' + qy.toFixed(1) + ' ' + x1.toFixed(1) + ' ' + y1.toFixed(1);
-      });
-      tethers.innerHTML = '<path d="' + d + '"/>';
-    }
     function step(now) {
       frame = 0;
       var on = document.visibilityState === 'visible' &&
         !(screen && document.documentElement.hasAttribute('data-snap') && !screen.classList.contains('is-current'));
       if (!on) { frame = window.requestAnimationFrame(step); return; }
-      var cx = L + W / 2, cy = T + H / 2, still = variant === 'b';
+      var cx = L + W / 2, cy = T + H / 2, drift = k < 1 ? 1.5 : 1;
       var relX = mx === null ? 0 : Math.max(-1, Math.min(1, (mx - cx) / (W / 2)));
       var relY = my === null ? 0 : Math.max(-1, Math.min(1, (my - cy) / (H / 2)));
       for (var i = 0; i < friends.length; i++) {
         var f = friends[i];
-        var ix = still ? 0 : Math.sin(now * f.wx + f.px) * f.ax;
-        var iy = still ? 0 : Math.sin(now * f.wy + f.py) * f.ay;
+        /* Idle: two slow sines plus a small circle, so each face wanders a
+           little loop around home instead of ticking back and forth. */
+        var ix = (Math.sin(now * f.wx + f.px) * f.ax + Math.cos(now * f.wo + f.po) * f.ro) * drift;
+        var iy = (Math.sin(now * f.wy + f.py) * f.ay + Math.sin(now * f.wo + f.po) * f.ro) * drift;
         var tx = ix - relX * W * PARALLAX * f.z, ty = iy - relY * H * PARALLAX * f.z, lift = 0;
         if (mx !== null) {
-          /* Only a pointer over the face itself moves it. */
+          /* Only a pointer over the face itself moves it further. */
           var fx = cx + home(f, 0) + f.x, fy = cy + home(f, 1) + f.y, rr = f.s * k / 2 + 8;
           var dx = fx - mx, dy = fy - my, d = Math.sqrt(dx * dx + dy * dy) || 1;
-          if (d < rr) { tx += dx / d * LEAN; ty += dy / d * LEAN; lift = LIFT; f.hot = true; }
-          else f.hot = false;
-        } else f.hot = false;
+          if (d < rr) { tx += dx / d * LEAN; ty += dy / d * LEAN; lift = LIFT; }
+        }
         /* Spring toward the target, with the kick velocity damped out. */
         f.vx = (f.vx + (tx - f.x) * 0.08) * 0.78; f.vy = (f.vy + (ty - f.y) * 0.08) * 0.78;
         f.x += f.vx; f.y += f.vy; f.k += (1 + lift - f.k) * 0.14;
