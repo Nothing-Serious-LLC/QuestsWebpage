@@ -89,30 +89,58 @@
     var track = marquee.querySelector('.marquee__track');
     var cards = Array.prototype.slice.call(track.children);
     if (cards.length < 2) return;
-    var gap = 0, lap = 0, offset = 0, speed = 0, last = 0, frame = 0, visible = false;
-    var rights = [];
+    var gap = 0, lap = 0, offset = 0, speed = 0, last = 0, frame = 0, visible = false, view = 0;
+    var rights = [], lefts = [], widths = [];
+    var PARK = 160;   /* px past either edge where off-screen cards wait */
 
     function measure() {
       var cs = window.getComputedStyle(track);
       gap = parseFloat(cs.columnGap || cs.gap) || 0;
-      lap = track.scrollWidth + gap;                /* one full ring, including the seam gap */
-      rights = cards.map(function (c) { return c.offsetLeft + c.offsetWidth + gap; });
+      lefts = cards.map(function (c) { return c.offsetLeft; });
+      widths = cards.map(function (c) { return c.offsetWidth; });
+      rights = cards.map(function (c, i) { return lefts[i] + widths[i] + gap; });
+      view = marquee.clientWidth;
+      /* One full ring, including the seam gap. From the cards' layout
+         positions, never scrollWidth: that includes the translated cards, so
+         a re-measure mid-loop (Safari fires resize when its toolbar shrinks)
+         read a ring twice as long and opened a hole in it. */
+      lap = rights[rights.length - 1];
       var seconds = parseFloat(window.getComputedStyle(marquee).getPropertyValue('--marquee-seconds')) || 90;
       speed = lap / seconds;                        /* px per second */
-      offset = offset % lap;
+      offset = norm(offset);
     }
 
     function place() {
       for (var i = 0; i < cards.length; i++) {
-        /* A card has left once its right edge (plus the gap) crosses the
-           track's left edge; from then until the offset laps it rides one lap
+        /* Ring position: a card that has fully left on the left rides one lap
            to the right, after the last card. */
-        var wrap = rights[i] - offset <= 0 ? lap : 0;
-        cards[i].style.transform = 'translate3d(' + (wrap - offset).toFixed(2) + 'px,0,0)';
+        var x = lefts[i] - offset;
+        if (x + widths[i] + gap <= 0) x += lap;
+        /* Cards well outside the viewport are parked just past the nearer
+           edge instead of thousands of px away. Safari drops the backing
+           store of a layer that far out and needs a few frames to paint it
+           again when it jumps back, which showed as a hole in the strip on a
+           fast backwards fling. Parked within PARK of the edge they stay
+           painted, and any repositioning happens where it cannot be seen. */
+        if (x > view + PARK) {
+          var offRight = x - view, offLeft = lap - x - widths[i];
+          x = offLeft < offRight ? Math.max(x - lap, -(widths[i] + PARK)) : view + PARK;
+        } else if (x < -(widths[i] + PARK)) {
+          x = -(widths[i] + PARK);
+        }
+        /* The card already sits at lefts[i] in the flex track; translate by the difference. */
+        cards[i].style.transform = 'translate3d(' + (x - lefts[i]).toFixed(2) + 'px,0,0)';
       }
     }
 
     var marqueeScreen = marquee.closest ? marquee.closest('.section') : null;
+    /* Drag to browse. The finger (or mouse) moves the ring directly; on
+       release its speed carries on as inertia that decays back into the
+       drift (about 0.7s to settle), the ring never stops or gaps. A drag can
+       go either way; the ring is continuous in both directions. */
+    var dragging = false, decided = false, dragX = 0, dragY = 0, dragLastX = 0, dragLastT = 0, dragV = 0, inertia = 0;
+    var INERTIA_TAU = 0.45;        /* seconds, exponential decay of the fling */
+    function norm(x) { return ((x % lap) + lap) % lap; }
     function tick(now) {
       frame = 0;
       if (!visible || document.visibilityState !== 'visible') { last = 0; return; }
@@ -121,12 +149,59 @@
       if (marqueeScreen && document.documentElement.hasAttribute('data-snap') && !marqueeScreen.classList.contains('is-current')) {
         last = 0; frame = window.requestAnimationFrame(tick); return;
       }
-      if (last) offset = (offset + Math.min(50, now - last) / 1000 * speed) % lap;
+      if (last && !dragging) {
+        var dt = Math.min(50, now - last) / 1000;
+        offset = norm(offset + dt * (speed + inertia));
+        inertia *= Math.exp(-dt / INERTIA_TAU);
+        if (Math.abs(inertia) < 2) inertia = 0;
+      }
       last = now;
       place();
       frame = window.requestAnimationFrame(tick);
     }
     function run() { if (!frame) frame = window.requestAnimationFrame(tick); }
+
+    marquee.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      dragging = false; decided = false;
+      dragX = dragLastX = e.clientX; dragY = e.clientY; dragLastT = e.timeStamp; dragV = 0;
+      marquee.setAttribute('data-pressed', '');
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!marquee.hasAttribute('data-pressed')) return;
+      var dx = e.clientX - dragX, dy = e.clientY - dragY;
+      if (!decided) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        decided = true;
+        /* A mostly vertical move belongs to the pager; let go of it. */
+        if (Math.abs(dy) > Math.abs(dx)) { marquee.removeAttribute('data-pressed'); return; }
+        dragging = true; inertia = 0; marquee.classList.add('is-dragging');
+        try { marquee.setPointerCapture(e.pointerId); } catch (err) {}
+        dragLastX = e.clientX; dragLastT = e.timeStamp;
+        return;
+      }
+      if (!dragging) return;
+      var step = e.clientX - dragLastX, dt = Math.max(1, e.timeStamp - dragLastT);
+      dragV = dragV * 0.3 + (-step / dt * 1000) * 0.7;    /* px per second, leftward positive */
+      dragLastX = e.clientX; dragLastT = e.timeStamp;
+      offset = norm(offset - step);
+      place();
+    });
+    function dragEnd(e) {
+      if (!marquee.hasAttribute('data-pressed')) return;
+      marquee.removeAttribute('data-pressed');
+      if (!dragging) return;
+      dragging = false; marquee.classList.remove('is-dragging');
+      try { marquee.releasePointerCapture(e.pointerId); } catch (err) {}
+      /* The fling keeps the finger's direction and speed (capped), then eases
+         back into the drift. */
+      inertia = Math.max(-2400, Math.min(2400, dragV)) - speed;
+      last = 0;
+    }
+    window.addEventListener('pointerup', dragEnd);
+    window.addEventListener('pointercancel', dragEnd);
+    /* A drag must not read as a click on whatever card it ended on. */
+    marquee.addEventListener('click', function (e) { if (decided && Math.abs(e.clientX - dragX) > 8) { e.preventDefault(); e.stopPropagation(); } }, true);
 
     measure(); place();
     if ('IntersectionObserver' in window) {
@@ -436,26 +511,97 @@
       if (Math.abs(wheelAcc) >= WHEEL_MIN) { var dir = wheelAcc > 0 ? 1 : -1; wheelAcc = 0; go(dir); }
     }, { passive: false });
 
-    /* Touch: the finger never scrolls the page; the swipe direction turns
-       the page on release. Horizontal drags (the card deck) pass. */
-    var tx = 0, ty = 0, tracking = false, vertical = null;
+    /* Touch: the finger never scrolls the page. While it is down, the current
+       screen's content follows it a little (damped, so it reads as a peek
+       rather than a scroll, the way Swiper's followFinger and fullPage's
+       drag-and-move do it). Once the finger has travelled COMMIT the page
+       turns at once, mid-gesture, and the drag hands off into the normal
+       turn. A short flick that lets go before that still turns on release
+       (SWIPE_MIN). Anything shorter springs back. Horizontal drags (the card
+       deck) pass. */
+    var tx = 0, ty = 0, tracking = false, vertical = null, peeking = false, lastY = 0, lastT = 0, vy = 0;
+    var PEEK_MAX = 64, PEEK_K = 180, PEEK_DIM = 0.4, SPRING_MS = 360, FLICK_VY = 0.45;   /* px per ms */
+    function COMMIT() { return Math.max(48, Math.min(88, vh() * 0.07)); }
+    function peekLayers() {
+      var s = screens[index];
+      var out = [];
+      var shell = s.querySelector(':scope > .shell');
+      if (shell) out.push({ el: shell, move: true });
+      var fade = s.querySelector(':scope > .fade');
+      if (fade) out.push({ el: fade, move: false });   /* marquee: dim only, never move its box */
+      if (footer && index === screens.length - 1) out.push({ el: footer, move: true });
+      return out;
+    }
+    function peek(dy) {
+      /* dy < 0 is a pull upward (toward the next screen). Damped hyperbolic
+         offset with a hard ceiling; smaller at the ends of the deck so the
+         edge reads as a stop. */
+      var edge = (dy < 0 && index === screens.length - 1) || (dy > 0 && index === 0);
+      var max = edge ? PEEK_MAX * 0.45 : PEEK_MAX;
+      var d = Math.abs(dy), off = max * d / (d + PEEK_K);
+      var t = off / PEEK_MAX;
+      peekLayers().forEach(function (l) {
+        l.el.style.transition = 'none';
+        if (l.move) l.el.style.transform = 'translateY(' + (dy < 0 ? -off : off).toFixed(2) + 'px)';
+        l.el.style.opacity = (1 - PEEK_DIM * t).toFixed(3);
+      });
+      peeking = true;
+    }
+    function unpeek(spring) {
+      if (!peeking) return;
+      peeking = false;
+      peekLayers().forEach(function (l) {
+        if (spring) {
+          l.el.style.transition = 'transform ' + SPRING_MS + 'ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity ' + SPRING_MS + 'ms ease-out';
+          l.el.style.transform = ''; l.el.style.opacity = '';
+          window.setTimeout(function () { if (!peeking) l.el.style.transition = ''; }, SPRING_MS + 20);
+        } else {
+          /* Hand off: drop the inline transition so the class-driven turn
+             starts from wherever the finger left the layer. */
+          l.el.style.transition = ''; l.el.style.transform = ''; l.el.style.opacity = '';
+        }
+      });
+    }
     window.addEventListener('touchstart', function (e) {
-      if (!active || e.touches.length !== 1) { tracking = false; return; }
-      tracking = true; vertical = null; tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+      if (!active || e.touches.length !== 1 || moving || performance.now() < quietUntil) { tracking = false; return; }
+      tracking = true; vertical = null; tx = e.touches[0].clientX; ty = lastY = e.touches[0].clientY; lastT = e.timeStamp; vy = 0;
     }, { passive: true });
     window.addEventListener('touchmove', function (e) {
       if (!tracking) return;
       var dx = e.touches[0].clientX - tx, dy = e.touches[0].clientY - ty;
       if (vertical === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) vertical = Math.abs(dy) >= Math.abs(dx);
-      if (vertical !== false) e.preventDefault();
+      if (vertical === false) return;
+      e.preventDefault();
+      if (vertical !== true) return;
+      var dt = Math.max(1, e.timeStamp - lastT);
+      /* Smoothed finger speed, for telling a flick from a slow pull on release. */
+      vy = vy * 0.4 + ((e.touches[0].clientY - lastY) / dt) * 0.6;
+      lastY = e.touches[0].clientY; lastT = e.timeStamp;
+      var dir = dy < 0 ? 1 : -1;
+      var canTurn = dir > 0 ? index < screens.length - 1 : index > 0;
+      if (canTurn && Math.abs(dy) >= COMMIT()) {
+        tracking = false;
+        unpeek(false);
+        go(dir);
+        return;
+      }
+      peek(dy);
     }, { passive: false });
-    window.addEventListener('touchend', function (e) {
+    function release(e) {
       if (!tracking) return;
       tracking = false;
-      if (vertical !== true) return;
-      var dy = e.changedTouches[0].clientY - ty;
-      if (Math.abs(dy) >= SWIPE_MIN) go(dy < 0 ? 1 : -1);
-    });
+      if (vertical !== true) { unpeek(true); return; }
+      var dy = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY - ty : 0;
+      var dir = dy < 0 ? 1 : -1;
+      var canTurn = dir > 0 ? index < screens.length - 1 : index > 0;
+      /* A flick (fast, same direction, past the small minimum) turns on
+         release; a slow pull that stopped short of COMMIT springs back. */
+      var flick = Math.abs(vy) >= FLICK_VY && (vy < 0) === (dy < 0);
+      if (canTurn && Math.abs(dy) >= SWIPE_MIN && flick) { unpeek(false); go(dir); }
+      else unpeek(true);
+    }
+    window.addEventListener('touchend', release);
+    window.addEventListener('touchcancel', release);
 
     window.addEventListener('keydown', function (e) {
       if (!active || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
