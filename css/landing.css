@@ -72,7 +72,6 @@ em { font-style: italic; }
 .store-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--q-s-3); }
 .store-row a { display: block; border-radius: var(--q-r-xs); transition: transform var(--q-t-base) var(--q-ease-standard), opacity var(--q-t-base) var(--q-ease-standard); }
 .store-row a:hover { transform: translateY(-2px); }
-.store-row a:active { transform: translateY(0); opacity: 0.85; }
 .store-row img { height: 44px; width: auto; }
 
 .micro {
@@ -184,6 +183,19 @@ em { font-style: italic; }
   font-size: 14px; font-weight: 700; line-height: 20px;
 }
 .nav__cta:hover { background: var(--q-action-pressed); transform: translateY(-1px); }
+
+/* ---- Press -----------------------------------------------------------------------
+   Buttons and badges press like the app's: the pointer down squashes them
+   quickly (JS sets .is-down so it works the same for a finger), release
+   pops them past rest and settles. */
+.is-down, .is-down:hover { transform: scale(0.93) !important; transition-duration: 70ms !important; }
+.cta__button.is-down { box-shadow: 0 6px 16px rgba(25, 25, 25, 0.16) !important; }
+.is-released { animation: press-pop 420ms cubic-bezier(0.22, 1.2, 0.36, 1) both; }
+@keyframes press-pop {
+  0% { transform: scale(0.93); }
+  45% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
 
 /* ---- Hero (Welcome screen: glow, title, subtitle, CTA) ------------------------
    The accent walks the five families in app order: Mindful, Healthy, Creative,
@@ -657,7 +669,6 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   transition: transform var(--q-t-base) var(--q-ease-standard), box-shadow var(--q-t-base) var(--q-ease-standard), background var(--q-t-base) var(--q-ease-standard);
 }
 .cta__button:hover { background: var(--q-action-pressed); transform: translateY(-2px); box-shadow: 0 16px 36px rgba(25, 25, 25, 0.22); }
-.cta__button:active { transform: scale(0.97); box-shadow: 0 8px 20px rgba(25, 25, 25, 0.16); }
 .cta .store-row { justify-content: center; margin-top: var(--q-s-8); }
 /* ---- Footer -------------------------------------------------------------------- */
 .footer { padding: var(--q-s-10) 0 calc(var(--q-s-10) + env(safe-area-inset-bottom)); }
@@ -831,4 +842,5 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   [data-fade] > .shell, [data-fade] .fade { opacity: 1 !important; transform: none !important; }
   .glyph { transform: none !important; }
   .store-row a, .nav__cta { transition: none; }
+  .is-released { animation: none; }
 }
