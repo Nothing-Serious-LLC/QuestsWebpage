@@ -1034,7 +1034,7 @@
       };
     });
     var W = 0, H = 0, L = 0, T = 0, k = 1, mx = null, my = null, frame = 0;
-    var LEAN = 10, LIFT = 0.12, KICK = 9, PARALLAX = 0.02;
+    var LEAN = 10, LIFT = 0.12, KICK = 13, PARALLAX = 0.02;
     function measure() {
       k = parseFloat(window.getComputedStyle(field).getPropertyValue('--k')) || 1;
       var r = field.getBoundingClientRect();
@@ -1086,9 +1086,9 @@
       if (!el) return;
       var f = friends.filter(function (f) { return f.el === el; })[0];
       if (!f) return;
-      var fx = L + W / 2 + home(f, 0) + f.x, fy = T + H / 2 + home(f, 1) + f.y;
-      var dx = fx - e.clientX, dy = fy - e.clientY, d = Math.sqrt(dx * dx + dy * dy) || 1;
-      f.vx += dx / d * KICK; f.vy += dy / d * KICK; f.k = 1.22;
+      /* Pop and dart off in a random direction, then spring home. */
+      var a = Math.random() * Math.PI * 2;
+      f.vx += Math.cos(a) * KICK; f.vy += Math.sin(a) * KICK; f.k = 1.38;
     }
     measure(); seat();
     if (reduce) { window.addEventListener('resize', function () { measure(); seat(); }); return; }

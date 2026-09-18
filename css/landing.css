@@ -770,7 +770,7 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
     display: flex; flex-direction: column; justify-content: flex-end;
     padding: 84px 0 calc(28px + env(safe-area-inset-bottom));
   }
-  [data-snap] .footer.is-screen > .shell { width: 100%; }
+  [data-snap] .footer.is-screen > .shell { width: calc(100% - var(--q-gutter) * 2); }
   [data-snap] .footer.is-screen .footer__top { gap: var(--q-s-7); }
   [data-snap] .footer.is-screen .footer__links { display: grid; grid-template-columns: 1fr 1fr; gap: var(--q-s-4) var(--q-s-6); width: 100%; }
   [data-snap] .footer.is-screen .footer__links a { font-size: 17px; line-height: 24px; }
