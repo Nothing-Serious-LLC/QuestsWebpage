@@ -393,9 +393,10 @@
     var screens = Array.prototype.slice.call(document.querySelectorAll('main > .hero, main > .section'));
     var footer = document.querySelector('.footer');
     var phone = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    var MS = phone ? 820 : 900, COOLDOWN = 60, WHEEL_MIN = 6, SWIPE_MIN = 24;
+    var MS = phone ? 820 : 900, OUT_MS = 260, COOLDOWN = 60, WHEEL_MIN = 6, SWIPE_MIN = 24;   /* OUT_MS: the leaving screen is fully gone before the next one starts */
     var index = 0, active = true, moving = false, quietUntil = 0, wheelAcc = 0, wheelLast = 0, settle = 0;
     html.style.setProperty('--page-ms', MS + 'ms');
+    html.style.setProperty('--out-ms', OUT_MS + 'ms');
 
     function fitFooter() {
       if (footer) html.style.setProperty('--footer-h', footer.getBoundingClientRect().height + 'px');
@@ -427,18 +428,18 @@
 
     /* Re-run the staggered item reveals inside the arriving screen. Items come
        from below when paging down and from above when paging up. */
-    function stage(section, on, dir, primed) {
+    function stage(section, on, dir) {
       var items = Array.prototype.slice.call(section.querySelectorAll('[data-reveal]'));
       if (!on) { items.forEach(function (el) { el.classList.remove('is-visible'); el.classList.remove('is-above'); }); return; }
       items.forEach(function (el) { el.classList.remove('is-visible'); el.classList.toggle('is-above', dir < 0); });
-      var reveal = function () { items.forEach(function (el) { el.classList.add('is-visible'); el.classList.remove('is-above'); }); };
-      /* A finger-driven turn has already shown the user where they are going,
-         so its content starts arriving on the next frame; wheel and key turns
-         keep a short beat so the screen settles before the items rise. */
-      if (primed) window.requestAnimationFrame(reveal); else window.setTimeout(reveal, 120);
+      /* Items start rising only once the leaving screen has fully faded, so
+         two screens are never on stage at the same time. */
+      window.setTimeout(function () {
+        items.forEach(function (el) { el.classList.add('is-visible'); el.classList.remove('is-above'); });
+      }, OUT_MS + 40);
     }
 
-    function show(i, dir, instant, primed) {
+    function show(i, dir, instant) {
       i = Math.max(0, Math.min(screens.length - 1, i));
       var changed = i !== index;
       index = i;
@@ -464,7 +465,7 @@
         return;
       }
       if (!changed) return;
-      stage(screens[i], true, dir, primed);
+      stage(screens[i], true, dir);
       moving = true;
       window.clearTimeout(settle);
       settle = window.setTimeout(function () {
@@ -481,11 +482,17 @@
        LOCK of it and taken after that (the fade simply retargets), so quick
        successive swipes still register without stacking up. */
     var turnAt = 0, LOCK = MS * 0.6;
-    function go(dir, primed) {
-      if (!active) return;
-      if ((moving && performance.now() - turnAt < LOCK) || performance.now() < quietUntil) return;
+    function canGo(dir) {
+      if (!active) return false;
+      if ((moving && performance.now() - turnAt < LOCK) || performance.now() < quietUntil) return false;
+      var i = index + dir;
+      return i >= 0 && i < screens.length;
+    }
+    function go(dir) {
+      if (!canGo(dir)) return false;
       turnAt = performance.now();
-      show(index + dir, dir, false, primed);
+      show(index + dir, dir, false);
+      return true;
     }
 
     /* Native scrolling takes over when a screen cannot fit. */
@@ -591,7 +598,7 @@
              moment of commit. These inline styles win over the class until
              the turn settles and clearCarry() drops them. */
           var to = peekOff + (peekOff < 0 ? -CARRY : CARRY);
-          l.el.style.transition = 'transform ' + CARRY_MS + 'ms ' + CARRY_EASE + ', opacity ' + Math.round(CARRY_MS * 0.8) + 'ms cubic-bezier(0.4, 0, 0.6, 1)';
+          l.el.style.transition = 'transform ' + CARRY_MS + 'ms ' + CARRY_EASE + ', opacity ' + OUT_MS + 'ms cubic-bezier(0.4, 0, 0.8, 1)';
           if (l.move) l.el.style.transform = 'translateY(' + to.toFixed(2) + 'px)';
           if (l.vary) glideVar(l.el, to);
           l.el.style.opacity = '0';
@@ -601,9 +608,9 @@
       if (!spring) primeIncoming(peekOff < 0 ? 1 : -1);
     }
     /* The screen about to arrive starts a little further out, in the same
-       direction of travel, and comes in with no delay and the same gentle
-       easing, so the two screens read as one continuous motion and the
-       outgoing fade never leaves a blank beat. */
+       direction of travel, and comes in once the leaving screen has fully
+       faded (OUT_MS), so the two never overlap and the motion still reads as
+       one continuous direction of travel. */
     function primeIncoming(dir) {
       var next = screens[index + dir];
       if (!next) return;
@@ -615,7 +622,7 @@
         el.style.transition = 'none';
         if (el !== fade) el.style.transform = 'translateY(' + (dir > 0 ? CARRY : -CARRY) + 'px)';
         void el.offsetWidth;   /* flush so the transition below starts from here */
-        el.style.transition = 'transform ' + CARRY_MS + 'ms ' + CARRY_EASE + ', opacity ' + Math.round(CARRY_MS * 0.75) + 'ms cubic-bezier(0.4, 0, 0.6, 1)';
+        el.style.transition = 'transform 640ms cubic-bezier(0.2, 0.7, 0.2, 1) ' + OUT_MS + 'ms, opacity 440ms cubic-bezier(0.2, 0.7, 0.2, 1) ' + OUT_MS + 'ms';
         el.style.transform = '';
         carried.push(el);
       });
@@ -653,8 +660,9 @@
       var canTurn = dir > 0 ? index < screens.length - 1 : index > 0;
       if (canTurn && Math.abs(dy) >= COMMIT()) {
         tracking = false;
-        unpeek(false);
-        go(dir, true);
+        /* Hand off only if the turn will happen; otherwise spring back, so
+           the content is never faded out with nothing arriving behind it. */
+        if (canGo(dir)) { unpeek(false); go(dir); } else unpeek(true);
         return;
       }
       if (!moving) peek(dy);
@@ -677,7 +685,7 @@
       vy = trail.length > 1 ? (trail[trail.length - 1][1] - trail[k][1]) / span : 0;
       var flick = Math.abs(vy) >= FLICK_VY && (vy < 0) === (dy < 0) && (e.timeStamp - lastT) < 120;
       var far = Math.abs(dy) >= COMMIT() * 0.6;
-      if (canTurn && ((Math.abs(dy) >= SWIPE_MIN && flick) || far)) { unpeek(false); go(dir, true); }
+      if (canTurn && ((Math.abs(dy) >= SWIPE_MIN && flick) || far) && canGo(dir)) { unpeek(false); go(dir); }
       else unpeek(true);
     }
     window.addEventListener('touchend', release);
