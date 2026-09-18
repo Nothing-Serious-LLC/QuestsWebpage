@@ -739,7 +739,17 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   /* Pager on a phone: every screen is nav-clear at the top and centered in
      what is left. The science cards shrink so all three sit on one screen. */
   [data-snap] .hero, [data-snap] .section, [data-snap] .ways.section { padding-block: 84px 12px; }
-  [data-snap] .science .section__head h2 { font-size: 34px; }
+
+  /* Phone entrances are two beats, never a trickle. Hero: the phones settle,
+     then the title, line and badges arrive together as one block. Choose your
+     Quest: title and line together, the deck follows. Each piece keeps its own
+     layer so nothing is rasterised on the frame it starts moving. */
+  .hero__inner > * { will-change: opacity, transform; }
+  .is-ready .hero__inner > :nth-child(2), .is-ready .hero__inner > :nth-child(3), .is-ready .hero__inner > :nth-child(4) {
+    transition-duration: 760ms, 760ms; transition-delay: 520ms;
+  }
+  .section__head[data-reveal] > .lede { transition-delay: 0ms; }
+  .deck[data-reveal] { transition-delay: 260ms; }
   [data-snap] .facts { gap: 10px; margin-top: 18px; grid-auto-rows: 1fr; }
   [data-snap] .fact { padding: 14px 16px 12px; }
   [data-snap] .fact__headline { font-size: 40px; line-height: 1; }
