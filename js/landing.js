@@ -395,6 +395,15 @@
     var screens = Array.prototype.slice.call(document.querySelectorAll('main > .hero, main > .section'));
     var footer = document.querySelector('.footer');
     var phone = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    /* On a phone the footer is its own screen (one more swipe past Start
+       together) instead of sharing the last screen; on desktop it stays
+       pinned under the CTA. */
+    if (footer && (window.innerWidth || 0) <= 600) {
+      footer.classList.add('is-screen');
+      html.classList.add('footer-screen');
+      screens.push(footer);
+      footer = null;
+    }
     var MS = phone ? 820 : 900, OUT_MS = 260, COOLDOWN = 60, WHEEL_MIN = 6, SWIPE_MIN = 24;   /* OUT_MS: the leaving screen is fully gone before the next one starts */
     var index = 0, active = true, moving = false, quietUntil = 0, wheelAcc = 0, wheelLast = 0, settle = 0;
     html.style.setProperty('--page-ms', MS + 'ms');
@@ -993,6 +1002,112 @@
     measure();
     /* Review hook: deck.__set(p) parks the deck at any position. */
     deckRoot.__set = function (p) { if (anim) { window.cancelAnimationFrame(anim); anim = null; } P = target = p; lastUser = Date.now(); render(); };
+  }());
+
+  /* ---- Closing constellation ------------------------------------------------
+     Each friend has a home position (percent of the field's half size), a
+     depth for parallax and a size. Every frame: a slow idle drift on two
+     incommensurate sines, a parallax shift from the pointer's position over
+     the field (deeper faces move more), a soft push away from the pointer
+     inside REACH, and a scale lift when it is close. Everything is one
+     translate3d + scale per face, so it stays on the compositor. */
+  (function constellation() {
+    var root = document.querySelector('[data-galaxy]');
+    if (!root) return;
+    var field = root.querySelector('.cta__field');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var screen = root.closest ? root.closest('.section') : null;
+    var nodes = Array.prototype.slice.call(root.querySelectorAll('.cta__friend'));
+    var friends = nodes.map(function (el, i) {
+      el.style.setProperty('--s', el.getAttribute('data-s') + 'px');
+      var ring = el.getAttribute('data-ring');
+      if (ring) el.style.setProperty('--ring', 'url("' + ring + '")');
+      return {
+        el: el, hx: Number(el.getAttribute('data-x')) / 100, hy: Number(el.getAttribute('data-y')) / 100,
+        mx: Number(el.getAttribute('data-mx') || el.getAttribute('data-x')) / 100, my: Number(el.getAttribute('data-my') || el.getAttribute('data-y')) / 100,
+        z: Number(el.getAttribute('data-z')) || 0.8, s: Number(el.getAttribute('data-s')) || 72,
+        ax: 10 + (i % 3) * 5, ay: 12 + ((i + 1) % 3) * 5,
+        wx: 0.00042 + i * 0.00007, wy: 0.00051 + i * 0.00006, px: i * 1.7, py: i * 2.3,
+        ro: 9 + (i % 3) * 4, wo: (i % 2 ? -1 : 1) * (0.00031 + i * 0.00004), po: i * 0.9,
+        x: 0, y: 0, k: 1
+      };
+    });
+    var W = 0, H = 0, L = 0, T = 0, k = 1, mx = null, my = null, frame = 0, seen = false;
+    var REACH = 150, PUSH = 54, PARALLAX = 0.06, LIFT = 0.14;
+    var nav = document.querySelector('.nav'), foot = document.querySelector('.footer');
+    function measure() {
+      k = parseFloat(window.getComputedStyle(field).getPropertyValue('--k')) || 1;
+      /* On a phone under the pager the field is fitted to the real gap between
+         the nav and the footer, so faces never sit over either. */
+      if (k < 1 && document.documentElement.hasAttribute('data-snap') && nav && foot) {
+        var inner = root.getBoundingClientRect();
+        var top = nav.getBoundingClientRect().bottom + 4;
+        var bottom = foot.classList.contains('is-screen') ? window.innerHeight - 12 : foot.getBoundingClientRect().top - 4;
+        if (bottom - top > 120) {
+          field.style.height = (bottom - top) + 'px';
+          field.style.top = (top - inner.top + (bottom - top) / 2) + 'px';
+        }
+      } else { field.style.height = ''; field.style.top = ''; }
+      var r = field.getBoundingClientRect();
+      W = r.width; H = r.height; L = r.left; T = r.top;
+    }
+    function step(now) {
+      frame = 0;
+      var on = document.visibilityState === 'visible' &&
+        !(screen && document.documentElement.hasAttribute('data-snap') && !screen.classList.contains('is-current'));
+      if (!on) { frame = window.requestAnimationFrame(step); return; }
+      var cx = L + W / 2, cy = T + H / 2;
+      var relX = mx === null ? 0 : Math.max(-1, Math.min(1, (mx - cx) / (W / 2)));
+      var relY = my === null ? 0 : Math.max(-1, Math.min(1, (my - cy) / (H / 2)));
+      var phone = k < 1;
+      for (var i = 0; i < friends.length; i++) {
+        var f = friends[i];
+        var homeX = home(f, 0), homeY = home(f, 1);
+        /* Idle: a slow figure on two sines plus a small circle around home,
+           so every face is always travelling somewhere. Bigger on phones,
+           where there is no pointer to stir them. */
+        var drift = phone ? 1.9 : 1;
+        var ix = (Math.sin(now * f.wx + f.px) * f.ax + Math.cos(now * f.wo + f.po) * f.ro) * drift;
+        var iy = (Math.sin(now * f.wy + f.py) * f.ay + Math.sin(now * f.wo + f.po) * f.ro) * drift;
+        var tx = ix - relX * W * PARALLAX * f.z, ty = iy - relY * H * PARALLAX * f.z;
+        var lift = 0;
+        if (mx !== null) {
+          var fx = cx + homeX + f.x, fy = cy + homeY + f.y;
+          var dx = fx - mx, dy = fy - my, d = Math.sqrt(dx * dx + dy * dy) || 1;
+          if (d < REACH) {
+            var g = 1 - d / REACH;
+            tx += dx / d * PUSH * g * g; ty += dy / d * PUSH * g * g;
+            lift = LIFT * Math.min(1, g * 1.6);
+          }
+        }
+        /* Ease toward the target: the pointer never snaps a face, it leans. */
+        f.x += (tx - f.x) * 0.09; f.y += (ty - f.y) * 0.09; f.k += (1 + lift - f.k) * 0.12;
+        f.el.style.transform = 'translate3d(' + (homeX + f.x).toFixed(2) + 'px,' + (homeY + f.y).toFixed(2) + 'px,0) scale(' + f.k.toFixed(3) + ')';
+      }
+      frame = window.requestAnimationFrame(step);
+    }
+    function pointer(e) { mx = e.clientX; my = e.clientY; }
+    function leave() { mx = null; my = null; }
+    /* Home position, kept fully inside the field so a face never sits half
+       off a narrow screen or over the nav and footer. */
+    function home(f, axis) {
+      var half = (axis ? H : W) / 2, r = f.s * k / 2 + 6 + (k < 1 ? 30 : 0);
+      var v = (k < 1 ? (axis ? f.my : f.mx) : (axis ? f.hy : f.hx)) * half;
+      return Math.max(-(half - r), Math.min(half - r, v));
+    }
+    function seat() { friends.forEach(function (f) { f.el.style.transform = 'translate3d(' + home(f, 0).toFixed(2) + 'px,' + home(f, 1).toFixed(2) + 'px,0)'; }); }
+    measure(); seat();
+    if (reduce) { window.addEventListener('resize', function () { measure(); seat(); }); return; }
+    window.addEventListener('pointermove', pointer, { passive: true });
+    window.addEventListener('pointerdown', pointer, { passive: true });
+    window.addEventListener('pointerup', function () { if (window.matchMedia('(hover: none)').matches) leave(); }, { passive: true });
+    window.addEventListener('pointercancel', leave, { passive: true });
+    document.addEventListener('pointerleave', leave);
+    window.addEventListener('resize', measure);
+    window.addEventListener('orientationchange', function () { window.setTimeout(measure, 300); });
+    /* The field's box changes as the section fades in under the pager; re-measure whenever it becomes current. */
+    if (screen) new MutationObserver(function () { window.setTimeout(measure, 50); }).observe(screen, { attributes: true, attributeFilter: ['class'] });
+    frame = window.requestAnimationFrame(step);
   }());
 
   var year = document.querySelector('[data-year]');

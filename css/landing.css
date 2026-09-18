@@ -610,43 +610,43 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
 
 /* CTA */
 /* ---- Closing CTA -------------------------------------------------------------------
-   Friends drift around the app icon like a small galaxy, each wearing one of
-   the app's avatar rings (Pro graphite, the category gradients, chrome,
-   aurora, sunset fire). Under it the big line and one button. A soft warm
-   glow behind the headline ends the page on the icon's sunset. */
+   Friends float around the line and the button like a loose constellation.
+   JS drives them: a slow idle drift, depth parallax and a soft push away from
+   the cursor (or finger). Some wear one of the app's avatar rings, drawn as a
+   ring image with the face set concentrically inside it. */
 .cta { text-align: center; padding-bottom: clamp(64px, 10vh, 120px); }
 .cta__inner { position: relative; display: flex; flex-direction: column; align-items: center; }
 .cta__inner::before {
-  content: ""; position: absolute; left: 50%; top: 46%; z-index: -1;
+  content: ""; position: absolute; left: 50%; top: 50%; z-index: -1;
   width: min(120vw, 820px); aspect-ratio: 1.6; translate: -50% -50%;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--q-creative-light) 85%, transparent), color-mix(in srgb, var(--q-social-light) 55%, transparent) 55%, transparent 100%);
   pointer-events: none;
 }
-.cta__galaxy { --k: 1; position: relative; width: min(100%, 560px); aspect-ratio: 2.15; margin-bottom: var(--q-s-4); }
-.cta__orbit {
+.cta__field {
+  --k: 1;
   position: absolute; left: 50%; top: 50%; translate: -50% -50%;
-  border: 1px solid color-mix(in srgb, var(--q-text) 9%, transparent); border-radius: 50%;
+  width: min(100vw - 16px, 1040px); height: min(64vh, 560px);
+  pointer-events: none;
 }
-.cta__orbit--a { width: 56%; height: 76%; rotate: -7deg; }
-.cta__orbit--b { width: 98%; height: 122%; rotate: 5deg; }
-.cta__star {
-  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
-  width: calc(56px * var(--k)); height: calc(56px * var(--k)); border-radius: 50%; overflow: hidden;
-  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.6), 0 0 48px 14px color-mix(in srgb, var(--q-creative-light) 95%, transparent);
-}
-.cta__star img { display: block; width: 100%; height: 100%; }
 .cta__friend {
-  position: absolute; left: var(--x); top: var(--y);
-  width: calc(var(--s) * var(--k)); height: calc(var(--s) * var(--k)); translate: -50% -50%;
-  animation: cta-float var(--f, 6.5s) ease-in-out var(--d, 0s) infinite alternate;
-  will-change: transform;
+  position: absolute; left: 50%; top: 50%;
+  width: calc(var(--s) * var(--k)); height: calc(var(--s) * var(--k));
+  margin: calc(var(--s) * var(--k) / -2) 0 0 calc(var(--s) * var(--k) / -2);
+  will-change: transform; pointer-events: auto;
 }
-.cta__face { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; box-shadow: var(--q-sh-card-deep); background: var(--q-surface); }
-.cta__ring { position: absolute; inset: -9%; width: 118%; height: 118%; pointer-events: none; }
-@keyframes cta-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
-.cta h2 { font-size: clamp(56px, 3rem + 5vw, 128px); line-height: 0.9; letter-spacing: -0.035em; }
+.cta__face {
+  position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+  background: var(--q-surface); box-shadow: 0 10px 30px rgba(25, 25, 25, 0.14), 0 0 0 3px var(--q-page);
+}
+/* Ringed: the box is the ring image and the face sits concentric inside it
+   at 1/1.14 of the box, the same ratio the app's AvatarRingOverlay uses
+   (ring = avatar x 1.14), so the ring hugs the photo exactly as in the app. */
+.cta__friend--ring { background: var(--ring) center / 100% 100% no-repeat; }
+.cta__friend--ring .cta__face { inset: 6.15%; width: 87.7%; height: 87.7%; box-shadow: 0 10px 30px rgba(25, 25, 25, 0.14); }
+.cta h2 { position: relative; z-index: 1; font-size: clamp(56px, 3rem + 5vw, 128px); line-height: 0.9; letter-spacing: -0.035em; }
 .cta h2 em { color: var(--q-accent); }
 .cta__button {
+  position: relative; z-index: 1;
   display: inline-flex; align-items: center; justify-content: center;
   margin-top: var(--q-s-7); padding: 0 32px; min-height: 58px;
   border-radius: var(--q-r-full);
@@ -762,7 +762,16 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   .deck__card { box-shadow: 0 2px 8px rgba(25, 25, 25, 0.06); }
   /* Slow enough to read four lines as a card crosses a phone. */
   .marquee { mask-image: none; -webkit-mask-image: none; }
-  .cta__galaxy { --k: 0.8; width: min(100%, 340px); aspect-ratio: 1.75; }
+  .cta__field { --k: 0.72; width: calc(100vw - 8px); height: min(58vh, 440px, calc(100svh - 84px - var(--footer-h, 140px) - 28px)); }
+  /* Footer as its own screen on phones. */
+  [data-snap] .footer.is-screen {
+    inset: 0; bottom: auto; height: 100svh; box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 84px 0 calc(24px + env(safe-area-inset-bottom));
+  }
+  [data-snap] .footer.is-screen > .shell { width: 100%; }
+  .footer-screen [data-snap] .section.cta, [data-snap] .footer-screen .section.cta, html.footer-screen[data-snap] .section.cta { padding-bottom: 12px; }
+  html.footer-screen[data-snap] .cta__field { height: min(58vh, 440px, calc(100svh - 84px - 28px)); }
   /* Cheaper raster for 18 moving cards on a 3x phone: flat cards, no blur. */
   .quote { box-shadow: 0 1px 2px rgba(25, 25, 25, 0.06); }
   .quote__face { box-shadow: none; }
