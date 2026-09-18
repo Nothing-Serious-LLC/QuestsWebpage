@@ -52,10 +52,15 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "MobileApplication",
+    "@type": ["MobileApplication", "SoftwareApplication"],
+    "@id": "https://thequestsapp.com/#app",
     "name": "Quests",
-    "alternateName": "Quests: Habits with Friends",
+    "alternateName": ["Quests: Habits with Friends", "Quests app", "Quests habit app", "Quests challenge app"],
     "url": "https://thequestsapp.com/",
+    "sameAs": [
+      "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553",
+      "https://play.google.com/store/apps/details?id=info.nothingserious.quests"
+    ],
     "image": "https://thequestsapp.com/assets/img/app-icon-1024.png",
     "screenshot": [
       "https://thequestsapp.com/assets/img/screen-mindful.jpg",
@@ -81,13 +86,17 @@
     },
     "publisher": {
       "@type": "Organization",
+      "@id": "https://thequestsapp.com/#org",
       "name": "Nothing Serious LLC",
+      "alternateName": "Quests",
       "url": "https://thequestsapp.com/",
       "logo": "https://thequestsapp.com/assets/img/app-icon-1024.png",
       "sameAs": [
         "https://instagram.com/quests.app",
         "https://tiktok.com/@quests.app",
-        "https://www.youtube.com/@questsapp"
+        "https://www.youtube.com/@questsapp",
+        "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553",
+        "https://play.google.com/store/apps/details?id=info.nothingserious.quests"
       ]
     }
   }
@@ -97,8 +106,9 @@
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Quests",
+    "alternateName": ["Quests app", "Quests: Habits with Friends", "thequestsapp"],
     "url": "https://thequestsapp.com/",
-    "publisher": { "@type": "Organization", "name": "Nothing Serious LLC" }
+    "publisher": { "@id": "https://thequestsapp.com/#org" }
   }
   </script>
 </head>
