@@ -1013,16 +1013,13 @@
      a click or tap gives it a kick that springs back home.
      Everything is one translate3d + scale per face, on the compositor.
 
-     Variants for comparison, picked with ?cta=a|b|c:
-       a  constellation (default)
-       b  tethered: six faces, each joined to the line by a dotted arc, still
-       c  cluster: the faces gathered in an overlapping row under the button */
+     On a phone the group is smaller and quieter: six faces, each joined to
+     the line by a dotted arc, holding still until tapped. */
   (function constellation() {
     var root = document.querySelector('[data-galaxy]');
     if (!root) return;
-    var pick = /[?&]cta=([abc])\b/.exec(window.location.search);
-    var variant = pick ? pick[1] : 'a';
-    if (variant !== 'a') document.documentElement.setAttribute('data-cta', variant);
+    var variant = window.matchMedia('(hover: none) and (pointer: coarse)').matches ? 'b' : 'a';
+    if (variant === 'b') document.documentElement.setAttribute('data-cta', 'b');
     var field = root.querySelector('.cta__field');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var screen = root.closest ? root.closest('.section') : null;
@@ -1032,7 +1029,6 @@
       var ring = el.getAttribute('data-ring');
       if (ring) el.style.setProperty('--ring', 'url("' + ring + '")');
     });
-    if (variant === 'c') return;
     var friends = nodes.map(function (el, i) {
       return {
         el: el, hx: Number(el.getAttribute('data-x')) / 100, hy: Number(el.getAttribute('data-y')) / 100,
