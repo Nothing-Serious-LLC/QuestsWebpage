@@ -329,6 +329,10 @@ html[data-snap], html[data-snap] body { height: 100svh; overflow: hidden; oversc
 /* iOS ignores overflow: hidden on the document for touch scrolling; a fixed
    body is the one lock it honours. */
 html[data-snap] body { position: fixed; inset: 0; width: 100%; }
+/* No native pan anywhere under the pager (the deck's pan-y included), so iOS
+   delivers every touchmove at once instead of holding them for a scroll that
+   cannot happen; the finger-following peek in landing.js depends on that. */
+html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
 [data-snap] .pager { position: relative; z-index: 1; height: 100svh; overflow: hidden; }
 [data-snap] main { position: static; }
 [data-snap] .glyph { transition: transform var(--page-ms, 900ms) cubic-bezier(0.6, 0, 0.3, 1); }
@@ -595,6 +599,10 @@ html[data-snap] body { position: fixed; inset: 0; width: 100%; }
    it exceeded the GPU texture limit on a 3x phone. --marquee-seconds is how
    long one full lap of the track takes. */
 .marquee { --marquee-seconds: 90; }
+/* Drag to browse (landing.js): sideways is ours, vertical stays with the page. */
+.marquee { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.marquee.is-dragging { cursor: grabbing; }
+.marquee.is-dragging .quote { pointer-events: none; }
 .marquee__track { display: flex; gap: var(--marquee-gap); width: max-content; }
 .marquee__track > .quote { will-change: transform; backface-visibility: hidden; }
 .no-js .marquee { overflow-x: auto; }
