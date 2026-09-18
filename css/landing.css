@@ -280,11 +280,14 @@ em { font-style: italic; }
 .phone__screen picture:nth-child(5) { animation-delay: -4s; }
 .is-pending .phone__screen picture { animation-play-state: paused; }
 .phone__screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Same clock as the accent cycle: hold, lift out, rise in from below. */
+/* Same clock as the accent cycle. The outgoing screen fades over 15-20% while
+   the next one (delayed -4s, so its 95-100%) fades in on the same interval, a
+   true crossfade with no gap. The move is a nudge only, and the screens scale
+   up (never down) so the frame edge is always covered. */
 @keyframes hero-screen {
-  0%, 14%    { opacity: 1; transform: translateY(0) scale(1); }
-  17%        { opacity: 0; transform: translateY(-4%) scale(0.985); }
-  17.1%, 95% { opacity: 0; transform: translateY(4%) scale(0.985); }
+  0%, 15%    { opacity: 1; transform: translateY(0) scale(1); }
+  20%        { opacity: 0; transform: translateY(-1.5%) scale(1.03); }
+  20.1%, 95% { opacity: 0; transform: translateY(1.5%) scale(1.03); }
   100%       { opacity: 1; transform: translateY(0) scale(1); }
 }
 .phone__island {
