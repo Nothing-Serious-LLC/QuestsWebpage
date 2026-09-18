@@ -1,589 +1,383 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quests - Group Challenges | Build Habits with Friends</title>
-    <meta
-      name="description"
-      content="Build habits with friends. Quests makes self-improvement social, fun, and rewarding. Join friends for daily check-ins, earn badges, and build lasting habits together."
-    />
-    <meta name="keywords" content="habit tracker, social accountability, goal tracking app, 75 hard, dry january, build habits with friends, daily check-ins, streak tracking, habit building app, group challenges" />
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Quests - Group Challenges | Build Habits with Friends" />
-    <meta property="og:description" content="Build habits with friends. Make self-improvement social, fun, and rewarding through daily check-ins and friendly competition." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://thequestsapp.com/" />
-    <meta property="og:image" content="https://thequestsapp.com/og-image.png" />
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Quests - Group Challenges" />
-    <meta name="twitter:description" content="Build habits with friends. Join group challenges and build lasting habits together." />
-    <meta name="twitter:image" content="https://thequestsapp.com/og-image.png" />
-    
-    <!-- Canonical -->
-    <link rel="canonical" href="https://thequestsapp.com/" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="icon.png" />
-    <link rel="apple-touch-icon" href="icon.png" />
-    
-    <!-- Theme color for mobile browsers -->
-    <meta name="theme-color" content="#0d1f3a" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
+<html class="no-js" lang="en" data-theme="light" data-facts="tint">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>document.documentElement.classList.replace("no-js", "js")</script>
+
+  <title>Quests: Habits with Friends | Social Challenge App</title>
+  <meta name="description" content="Quests is the home of the healthy challenge. Pick a 30-day challenge, invite your friends, check in together, and grow better together. Free on iOS and Android.">
+  <meta name="keywords" content="habits with friends, healthy challenges, 30 day challenge app, accountability app, group challenge app, daily check-in app, social habit app, challenge with friends, Quests app">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Nothing Serious LLC">
+  <link rel="canonical" href="https://thequestsapp.com/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Quests">
+  <meta property="og:url" content="https://thequestsapp.com/">
+  <meta property="og:title" content="Quests: Habits with Friends | Social Challenge App">
+  <meta property="og:description" content="Pick a challenge, invite your people, check in once a day, and grow better together. Free on iOS and Android.">
+  <meta property="og:image" content="https://thequestsapp.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Quests: habits with friends">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Quests: Habits with Friends | Social Challenge App">
+  <meta name="twitter:description" content="Pick a challenge, invite your people, check in once a day, and grow better together. Free on iOS and Android.">
+  <meta name="twitter:image" content="https://thequestsapp.com/og-image.png">
+  <meta name="twitter:image:alt" content="Quests: habits with friends">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#F3F1E7">
+  <link rel="preload" href="/assets/fonts/woff2/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/fonts.css">
+  <link rel="preload" as="image" imagesrcset="/assets/img/screen-mindful-480.webp 480w, /assets/img/screen-mindful.webp 720w" imagesizes="(max-width: 600px) min(41vw, 162px), 232px" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="/assets/img/glyph-flat-mindfulness.svg">
+  <link rel="preload" as="image" href="/assets/img/glyph-flat-recharge.svg">
+  <link rel="preload" as="image" href="/assets/img/glyph-flat-creativity.svg">
+  <link rel="preload" as="image" href="/assets/img/glyph-flat-growth.svg">
+  <link rel="preload" as="image" href="/assets/img/glyph-flat-social.svg">
+
+  <link rel="stylesheet" href="/css/tokens.css?v=3">
+  <link rel="stylesheet" href="/css/landing.css?v=26">
+  <script src="/js/landing.js?v=24" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "Quests",
+    "alternateName": "Quests: Habits with Friends",
+    "url": "https://thequestsapp.com/",
+    "image": "https://thequestsapp.com/assets/img/app-icon-1024.png",
+    "screenshot": [
+      "https://thequestsapp.com/assets/img/screen-mindful.jpg",
+      "https://thequestsapp.com/assets/img/screen-healthy.jpg"
+    ],
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "iOS, Android",
+    "description": "Quests is the home of the healthy challenge. Pick a 30-day challenge, invite your friends, check in together, and grow better together.",
+    "keywords": "habits with friends, healthy challenges, 30 day challenge, accountability app, group challenge app",
+    "downloadUrl": "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553",
+    "installUrl": "https://play.google.com/store/apps/details?id=info.nothingserious.quests",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "21",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
       "@type": "Organization",
-      "name": "Quests",
-      "url": "https://thequestsapp.com",
-      "logo": "https://thequestsapp.com/icon.png",
-      "description": "Quests makes self-improvement social, fun, and rewarding. Join friends for daily check-ins, earn badges, and build lasting habits together.",
+      "name": "Nothing Serious LLC",
+      "url": "https://thequestsapp.com/",
+      "logo": "https://thequestsapp.com/assets/img/app-icon-1024.png",
       "sameAs": [
-        "https://www.instagram.com/quests.app/",
-        "https://x.com/Quests_app_",
-        "https://www.tiktok.com/@quests.app"
+        "https://instagram.com/quests.app",
+        "https://tiktok.com/@quests.app",
+        "https://www.youtube.com/@questsapp"
       ]
     }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "MobileApplication",
-      "name": "Quests",
-      "operatingSystem": "iOS, Android",
-      "applicationCategory": "HealthApplication",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "1200"
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "description": "Turn your health goals into a shared Quest. Build lasting habits with friends through daily check-ins, social accountability, and friendly competition. 65% more likely to succeed with a friend."
-    }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Quests",
-      "url": "https://thequestsapp.com",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://thequestsapp.com/?s={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "How does social accountability help build habits?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Studies show that teaming up with others dramatically boosts your chances of forming lasting habits by 65%. Quests is built on this principle of social accountability, allowing you to join friends for daily check-ins and track progress together."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is a Quest?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A Quest is a shared habit-building challenge you can join with friends. Popular quests include 75 Hard, Dry January, reading challenges, and custom habits. Each quest includes daily check-ins, progress tracking, and social features to keep you accountable."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is Quests free to use?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, Quests is free to download and use. Join friends, track habits, and build streaks together at no cost."
-          }
-        }
-      ]
-    }
-    </script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
-    <link rel="stylesheet" href="styles.css?v=37" />
-  </head>
-  <body>
-    <div class="page__background"></div>
-    <div class="page__wrapper">
-      <header class="site-header">
-        <div class="site-header__inner">
-          <a class="brand" href="/" aria-label="Quests home">
-            <span class="brand__glyph" aria-hidden="true"></span>
-            <span class="brand__name">Quests</span>
-          </a>
-          <a class="download-chip" href="/#cta">Download the app</a>
-        </div>
-      </header>
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Quests",
+    "url": "https://thequestsapp.com/",
+    "publisher": { "@type": "Organization", "name": "Nothing Serious LLC" }
+  }
+  </script>
+</head>
+<body class="is-pending">
 
-      <main>
-        <section id="hero" class="hero hero--minimal">
-          <div class="hero__container">
-            <div class="hero__content" style="opacity: 0; transform: translateX(-30px);">
-              <h1 class="hero__title">Habits Made <span class="highlight-text">Social.</span></h1>
-              <p class="hero__subtitle">Build better habits with the people who matter most. Create challenges, track streaks, and earn rewards together.</p>
-              <div id="download" class="hero__cta-group">
-                <a class="hero__app-store" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer" aria-label="Download on the App Store">
-                  <img src="download-on-the-app-store.svg" alt="Download on the App Store">
-                </a>
-                <a class="hero__app-store" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" target="_blank" rel="noreferrer" aria-label="Get Quests on Google Play">
-                  <div class="store-btn">
-                    <i class="mdi mdi-google-play"></i>
-                    <div class="store-btn__text">
-                      <span class="store-btn__sub">Get it on</span>
-                      <span class="store-btn__main">Google Play</span>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
+<a class="skip-link" href="#main">Skip to content</a>
 
-            <div class="hero__phones">
-              <!-- Faint Floating Background Icons -->
-              <div class="hero__floating-icons">
-                <span class="mdi mdi-dumbbell floating-icon icon-1"></span>
-                <span class="mdi mdi-book-open-variant floating-icon icon-2"></span>
-                <span class="mdi mdi-water floating-icon icon-3"></span>
-                <span class="mdi mdi-run floating-icon icon-4"></span>
-                <span class="mdi mdi-meditation floating-icon icon-5"></span>
-                <span class="mdi mdi-bed-empty floating-icon icon-6"></span>
-              </div>
+<!-- Home screen decorative tail: the flat (grain-free) category glyphs,
+     large and sparse, drifting at different speeds with scroll. -->
+<div class="backdrop" aria-hidden="true">
+  <img class="glyph glyph--1" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
+  <img class="glyph glyph--2" src="/assets/img/glyph-flat-social.svg" alt="">
+  <img class="glyph glyph--3" src="/assets/img/glyph-flat-recharge.svg" alt="">
+  <img class="glyph glyph--4" src="/assets/img/glyph-flat-creativity.svg" alt="">
+  <img class="glyph glyph--5" src="/assets/img/glyph-flat-growth.svg" alt="">
+  <img class="glyph glyph--6" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
+  <img class="glyph glyph--7" src="/assets/img/glyph-flat-social.svg" alt="">
+  <img class="glyph glyph--8" src="/assets/img/glyph-flat-recharge.svg" alt="">
+</div>
 
-              <!-- Back Phone -->
-              <div class="hero__phone hero__phone--back" style="opacity: 0; transform: translate3d(0, 0, -100px) scale(0.85) rotate(0deg);">
-                <div class="hero__phone-motion">
-                  <div class="iphone-hardware">
-                    <div class="iphone-hardware__bezel">
-                      <div class="iphone-hardware__screen">
-                        <img src="phone-screen-2.png" alt="Quests Leaderboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
-                      </div>
-                    </div>
-                    <!-- Buttons -->
-                    <div class="iphone-hardware__btn-mute"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
-                    <div class="iphone-hardware__btn-power"></div>
-                  </div>
-                </div>
-              </div>
+<!-- Load: the five glyphs hop in, hold, fade out; then the hero copy fades in. -->
+<div class="intro" aria-hidden="true">
+  <div class="intro__icons">
+    <img src="/assets/img/glyph-flat-mindfulness.svg" alt="" width="64" height="64">
+    <img src="/assets/img/glyph-flat-recharge.svg" alt="" width="64" height="64">
+    <img src="/assets/img/glyph-flat-creativity.svg" alt="" width="64" height="64">
+    <img src="/assets/img/glyph-flat-growth.svg" alt="" width="64" height="64">
+    <img src="/assets/img/glyph-flat-social.svg" alt="" width="64" height="64">
+  </div>
+</div>
 
-              <!-- Front Phone -->
-              <div class="hero__phone hero__phone--front" style="transform: translateY(0); opacity: 1;">
-                <div class="hero__phone-motion">
-                  <div class="iphone-hardware">
-                    <div class="iphone-hardware__bezel">
-                      <div class="iphone-hardware__screen">
-                        <img src="phone-screen-1.png" alt="Quests Dashboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 38px;">
-                      </div>
-                    </div>
-                    <!-- Buttons -->
-                    <div class="iphone-hardware__btn-mute"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--up"></div>
-                    <div class="iphone-hardware__btn-vol iphone-hardware__btn-vol--down"></div>
-                    <div class="iphone-hardware__btn-power"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+<header class="nav">
+  <div class="shell nav__inner">
+    <a class="nav__logo" href="/" aria-label="Quests home">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
+    </a>
+    <a class="nav__cta" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" data-store-link target="_blank" rel="noopener">Download</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- 1. Hero, modeled on the app's Welcome screen: top glow, title, subtitle, CTA.
+       The accent cycles through the five family colors. -->
+  <section class="hero" aria-labelledby="hero-title" data-fade="out">
+    <div class="shell hero__inner">
+      <!-- The app in a CSS iPhone 16 Pro frame. Five Home screens, one per
+           family, rise in on the same 20s clock and with the same motion as
+           the accent color and the glyph after "together". -->
+      <div class="phones" data-tilt>
+        <figure class="phone">
+          <div class="phone__screen">
+              <picture>
+                <source srcset="/assets/img/screen-mindful-480.webp 480w, /assets/img/screen-mindful.webp 720w" sizes="(max-width: 600px) min(41vw, 162px), 232px" type="image/webp">
+                <img src="/assets/img/screen-mindful.jpg" alt="Home in the Mindful family: a Daily Meditation roadmap, day 15 of 30" width="720" height="1565" loading="eager" decoding="async" fetchpriority="high">
+              </picture>
+              <picture>
+                <source srcset="/assets/img/screen-healthy-480.webp 480w, /assets/img/screen-healthy.webp 720w" sizes="(max-width: 600px) min(41vw, 162px), 232px" type="image/webp">
+                <img fetchpriority="low" src="/assets/img/screen-healthy.jpg" alt="A Daily Workout roadmap in the Healthy family with a friend check-in" width="720" height="1565" loading="eager" decoding="async">
+              </picture>
+              <picture>
+                <source srcset="/assets/img/screen-creative-480.webp 480w, /assets/img/screen-creative.webp 720w" sizes="(max-width: 600px) min(41vw, 162px), 232px" type="image/webp">
+                <img fetchpriority="low" src="/assets/img/screen-creative.jpg" alt="Creative badges: the Gold Badge set, with Starting and Bronze badges unlocked" width="720" height="1565" loading="eager" decoding="async">
+              </picture>
+              <picture>
+                <source srcset="/assets/img/screen-productive-480.webp 480w, /assets/img/screen-productive.webp 720w" sizes="(max-width: 600px) min(41vw, 162px), 232px" type="image/webp">
+                <img fetchpriority="low" src="/assets/img/screen-productive.jpg" alt="Friends leaderboard ranked by points" width="720" height="1565" loading="eager" decoding="async">
+              </picture>
+              <picture>
+                <source srcset="/assets/img/screen-social-480.webp 480w, /assets/img/screen-social.webp 720w" sizes="(max-width: 600px) min(41vw, 162px), 232px" type="image/webp">
+                <img fetchpriority="low" src="/assets/img/screen-social.jpg" alt="A profile page: Sienna, 184 Sparks, 7 friends, 1,106 check-ins" width="720" height="1565" loading="eager" decoding="async">
+              </picture>
           </div>
-        </section>
+          <span class="phone__island"></span>
+        </figure>
+      </div>
+      <div class="hero__title">
+        <!-- The glyph is the full stop after "together"; it cycles with the accent. -->
+        <h1 id="hero-title" class="serif">Grow better <em>together</em></h1>
+      </div>
+      <p class="lede">Pick a challenge, invite your people, <br>and enjoy the journey!</p>
+      <div class="store-row">
+        <a href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store"><img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="132" height="44"></a>
+        <a href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play"><img src="/google-play-badge.svg" alt="Get it on Google Play" width="148" height="44"></a>
+      </div>
 
-        <section class="intro">
-          <div class="intro__grid scroll-reveal">
-            <div class="intro__text-block">
-              <h2 class="intro__heading">Grow together</h2>
-              <p class="intro__description">
-                Quests makes habit-building <strong>social</strong> and <strong>rewarding</strong>. Create a Quest, invite your friends in seconds, and stay accountable with daily check-ins that keep everyone engaged.
-              </p>
-            </div>
-            <div class="intro__visual">
-              <div class="intro__day-count" role="status" aria-label="Progress tracker">Day 10 of 30</div>
-              <div class="intro__avatar-group" role="group" aria-label="Friend avatars showing daily check-in status">
-                <div class="intro__avatar intro__avatar--1" role="img" aria-label="Friend 1 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--2" role="img" aria-label="Friend 2 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--3" role="img" aria-label="Friend 3 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--4" role="img" aria-label="Friend 4 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-                <div class="intro__avatar intro__avatar--5" role="img" aria-label="Friend 5 avatar">
-                  <i class="mdi mdi-account" aria-hidden="true"></i>
-                </div>
-              </div>
-              <div class="intro__check-in-count" role="status" aria-live="polite"><span class="check-in-number">0</span>/5 checked in today</div>
-            </div>
-          </div>
-        </section>
-
-        <section id="why" class="why">
-          <div class="why__grid scroll-reveal">
-            <div class="why__visual">
-              <div class="why__stat-display">
-                <p class="why__stat-number"><span class="why__stat-counter">0</span><span class="why__stat-percent">%</span></p>
-                <p class="why__stat-caption">more likely to build a lasting habit with a friend<sup>1</sup></p>
-                <p class="why__mobile-text">Studies show that teaming up with a <strong>friend</strong> increases your chance of forming <strong>lasting habits</strong> by 65%. Quests is built on this principle of <strong>social accountability</strong>.<sup>1</sup></p>
-              </div>
-            </div>
-            <div class="why__text-block">
-              <h2 class="why__heading">Backed&nbsp;by&nbsp;science</h2>
-              <p class="why__description">
-                Studies show that <strong>teaming up with others</strong> dramatically boosts your chances of forming <strong>lasting habits</strong>. Quests is built on this principle of social accountability.
-              </p>
-              <p class="why__footnote"><sup>1</sup> American Society of Training and Development, 2014</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="features" class="features">
-          <div class="features__container">
-            <h2 class="features__heading scroll-reveal">Everything you need to build habits together</h2>
-            <div class="features__list">
-              <article class="feature-card feature-card--slide" data-slide="left">
-                <div class="feature-card__icon" role="img" aria-label="Fire icon representing daily streak tracking">
-                  <i class="mdi mdi-fire" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Daily Check-Ins</h3>
-                  <p class="feature-card__text">
-                    Keep your momentum with gentle reminders and progress updates.
-                  </p>
-                </div>
-              </article>
-              <article class="feature-card feature-card--slide" data-slide="right">
-                <div class="feature-card__icon" role="img" aria-label="Message icon representing instant friend invitations">
-                  <i class="mdi mdi-message-fast" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Instant Invites</h3>
-                  <p class="feature-card__text">
-                    Start a Quest and invite friends in seconds via text.
-                  </p>
-                </div>
-              </article>
-              <article class="feature-card feature-card--slide" data-slide="left">
-                <div class="feature-card__icon" role="img" aria-label="Medal icon representing achievement rewards">
-                  <i class="mdi mdi-medal" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Earn Points & Badges</h3>
-                  <p class="feature-card__text">
-                    Complete Quests to earn points, collect badges, and unlock rewards.
-                  </p>
-                </div>
-              </article>
-              <article class="feature-card feature-card--slide" data-slide="right">
-                <div class="feature-card__icon" role="img" aria-label="Podium icon representing competitive leaderboards">
-                  <i class="mdi mdi-podium" aria-hidden="true"></i>
-                </div>
-                <div class="feature-card__content">
-                  <h3 class="feature-card__title">Climb the Leaderboards</h3>
-                  <p class="feature-card__text">
-                    Compete with friends to see who stays most consistent.
-                  </p>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section id="cta" class="cta">
-          <div class="cta__container scroll-reveal">
-            <div class="cta__logo">
-              <svg class="cta__glyph-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Quests app logo">
-                <title>Quests Logo</title>
-                <defs>
-                  <clipPath id="revealClip">
-                    <rect x="0" y="0" width="100" height="0" id="clipRect" />
-                  </clipPath>
-                </defs>
-                <g clip-path="url(#revealClip)">
-                  <image href="Quests%20Logo.svg" width="100" height="100" alt="Quests logo icon" />
-                </g>
-              </svg>
-            </div>
-            <h2 class="cta__title">Start your first Quest</h2>
-            <div class="hero__cta-group cta__group">
-              <a class="hero__app-store" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" target="_blank" rel="noreferrer" aria-label="Download on the App Store">
-                <img src="download-on-the-app-store.svg" alt="Download on the App Store">
-              </a>
-              <a class="hero__app-store" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" target="_blank" rel="noreferrer" aria-label="Get Quests on Google Play">
-                <div class="store-btn">
-                  <i class="mdi mdi-google-play"></i>
-                  <div class="store-btn__text">
-                    <span class="store-btn__sub">Get it on</span>
-                    <span class="store-btn__main">Google Play</span>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer class="site-footer">
-        <div class="site-footer__content">
-          <div class="site-footer__links">
-            <a href="/contact.html">Contact</a>
-            <a href="/blog.html">Blog</a>
-            <a href="/privacy.html">Privacy</a>
-            <a href="/terms.html">Terms</a>
-          </div>
-          <div class="site-footer__social">
-            <a href="https://www.instagram.com/quests.app/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <i class="mdi mdi-instagram"></i>
-            </a>
-            <a href="https://www.tiktok.com/@quests.app" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-              </svg>
-            </a>
-            <a href="https://x.com/Quests_app_" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-          </div>
-          <p class="site-footer__meta">© 2025 Nothing Serious LLC</p>
-        </div>
-      </footer>
     </div>
+  </section>
 
-    <script>
-      // Check-in animation
-      const avatars = document.querySelectorAll('.intro__avatar');
-      const counter = document.querySelector('.check-in-number');
-      let count = 0;
-      let hasAnimated = false;
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !hasAnimated) {
-            hasAnimated = true;
-            avatars.forEach((avatar, index) => {
-              setTimeout(() => {
-                // Turn blue first
-                avatar.classList.add('intro__avatar--checked');
-                
-                // Add pop animation
-                avatar.classList.add('intro__avatar--pop');
-                setTimeout(() => {
-                  avatar.classList.remove('intro__avatar--pop');
-                }, 300);
-                
-                // Update counter
-                count++;
-                counter.textContent = count;
-                
-                // If last avatar, trigger single dramatic wave
-                if (index === 4) {
-                  setTimeout(() => {
-                    avatars.forEach((av, i) => {
-                      setTimeout(() => {
-                        av.classList.add('intro__avatar--wave-jump');
-                        setTimeout(() => {
-                          av.classList.remove('intro__avatar--wave-jump');
-                        }, 400);
-                      }, i * 120);
-                    });
-                  }, 400);
-                }
-              }, (index + 1) * 600);
-            });
-          }
-        });
-      }, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+  <!-- 2. Five ways to grow: the app's Home card stack, rebuilt for the web.
+       Back cards peek 24px above the front card and narrow with depth; swipe or
+       drag to send the front card to the back along the same arc the app uses. -->
+  <section class="section ways" id="ways" aria-labelledby="ways-title" data-fade>
+    <div class="shell ways__inner">
+      <div class="section__head" data-reveal>
+        <h2 id="ways-title" class="serif">Five ways to grow</h2>
+        <p class="lede ways__lede">Every Quest lives in one of five categories. Each follows a path designed to make the habit stick.</p>
+      </div>
+      <div class="deck" data-deck data-reveal>
+        <ul class="deck__stage" aria-label="Quest categories and popular quests">
+        <li class="deck__card way--mindful" data-deck-card>
+          <p class="deck__peek serif" aria-hidden="true">Mindful</p>
+          <div class="deck__body">
+            <div class="deck__core">
+            <span class="medallion"><img src="/assets/img/glyph-flat-mindfulness.svg" alt="" width="24" height="24"></span>
+            <h3 class="serif">Mindful</h3>
+            </div>
+            <div class="ticker" aria-label="Quests in this category"><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M14.854 4.578a3.354 3.354 0 1 1-6.708 0 3.354 3.354 0 1 1 6.708 0"/><path stroke="currentColor" stroke-linejoin="round" d="M12.59 7.995c1.483.099 2.589.889 3.244 1.98.512.852 1.16 1.662 2.047 2.11 1.6.808 2.567 1.783 2.451 2.629-.157 1.152-1.295 1.718-2.21 1.474a17 17 0 0 1-1.02-.314l.009.079 1.778 1.531c1.664 1.433.685 4.16-1.51 4.202-2.437.048-4.885.09-5.88.09s-3.443-.042-5.88-.09c-2.195-.043-3.173-2.77-1.51-4.202l1.786-1.537.007-.075c-.355.12-.717.234-1.024.316-.915.244-2.053-.322-2.21-1.474-.116-.846.853-1.823 2.455-2.63.888-.449 1.543-1.26 2.075-2.099.68-1.073 1.818-1.897 3.216-1.99a16 16 0 0 1 2.176 0Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.851 15.898c.859-.304 1.14-.426 1.54-.618.485-.213.911-1.08 1.082-1.649m8.779 2.267c-.859-.304-1.14-.426-1.54-.618-.485-.213-.911-1.08-1.082-1.649m-5.761 8.117c2.045 0 4.02 0 4.408-.753.483-.937.37-2.668-.737-3.292-.385-.217-2.356-.234-3.108-.187"/></svg>Daily Meditation</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5.505 1.07v20.86M9.342 5.745h5.755M9.342 9.102h2.877m4.796 11.419c0 .654.347 1.259.987 1.394.364.076.832.136 1.411.136s1.047-.06 1.41-.136c.64-.135.988-.74.988-1.394V9.953a1.44 1.44 0 0 0-.166-.703c-.207-.372-.627-1.022-1.365-1.765a1.22 1.22 0 0 0-1.734 0c-.738.743-1.158 1.393-1.365 1.765a1.43 1.43 0 0 0-.166.703z"/><path d="M14.857 21.942a88 88 0 0 1-4.556.109c-3.058 0-5.237-.128-6.646-.254-1.222-.11-2.137-1.063-2.225-2.286-.116-1.615-.24-4.233-.24-8.011s.124-6.396.24-8.011c.088-1.223 1.004-2.176 2.225-2.286C5.064 1.077 7.243.95 10.3.95c3.059 0 5.237.128 6.647.254 1.22.11 2.136 1.064 2.224 2.287q.034.471.068 1.056m-2.224 14.147s.96.48 2.398.48 2.398-.48 2.398-.48"/></g></svg>30 Days of Journaling</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.05 8.676c0-3.076-2.522-6.047-6.086-6.09-2.84 0-4.464 1.883-4.464 1.883S9.877 2.586 7.036 2.586C3.384 2.586.95 5.6.95 8.676c0 5.076 4.684 8.763 9.19 11.373a2.71 2.71 0 0 0 2.721 0c4.507-2.61 9.19-6.297 9.19-11.373Z"/><path stroke-linecap="round" d="M19.173 8.34a3.69 3.69 0 0 0-2.877-2.877"/></g></svg>Daily Gratitude</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.042 11.5C22.042 5.678 17.322.958 11.5.958S.958 5.678.958 11.5c0 1.908.507 3.698 1.394 5.242-.463 1.21-.9 2.62-1.182 4.024a.865.865 0 0 0 1.055 1.018 33 33 0 0 0 3.916-1.204 10.5 10.5 0 0 0 5.359 1.462c5.822 0 10.542-4.72 10.542-10.542Z"/><path d="M17.49 10.084v2.41h-.011c-.142 2.03-1.641 3.238-3.34 3.761-.24.074-.503.038-.684-.134-.21-.201-.39-.45-.521-.656-.142-.222-.044-.505.187-.634 1.062-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.131-1.132 47 47 0 0 1-.015-1.25c0-.557.007-.992.017-1.327.017-.6.45-1.056 1.05-1.08.333-.015.767-.024 1.329-.024s.996.01 1.329.023c.6.025 1.032.48 1.05 1.08.01.334.016.765.017 1.314Zm-7.188 0v2.41h-.01c-.143 2.03-1.642 3.238-3.34 3.761-.24.074-.504.038-.684-.134-.21-.201-.39-.45-.522-.656-.141-.222-.043-.505.187-.634 1.063-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.13-1.132 47 47 0 0 1-.016-1.25c0-.557.007-.992.017-1.327.018-.6.45-1.056 1.05-1.08.333-.015.768-.024 1.33-.024.56 0 .995.01 1.328.023.6.025 1.033.48 1.05 1.08.01.334.017.765.017 1.314Z"/></g></svg>Daily Affirmations</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16.77 10.781a15.8 15.8 0 0 1-3.02-1.275c-.679-.373-1.054-1.101-1.046-1.875.039-3.695.233-6.673.233-6.673m3.355 12.938c-1.305-.326-3.055-1.475-4.04-2.176a1.3 1.3 0 0 0-1.508 0c-.983.701-2.73 1.85-4.036 2.176m-.397-3.115c1.2-.373 2.23-.875 2.942-1.271.676-.377 1.05-1.105 1.043-1.879-.039-3.693-.233-6.673-.233-6.673"/><path d="M12.938 12.219c0 2.01.124 4.402.247 6.263.124 1.892 1.382 3.472 3.277 3.545q.37.015.788.015c.645 0 1.233-.029 1.753-.072 1.623-.136 2.827-1.344 2.948-2.967.054-.712.09-1.594.09-2.67 0-4.582-.958-9.14-6.075-10.103-1.59-.3-3.148-.002-3.148-.002m-2.756 5.991c0 2.01-.124 4.402-.247 6.263-.124 1.892-1.382 3.472-3.277 3.545q-.37.015-.788.015a21 21 0 0 1-1.753-.072c-1.623-.136-2.827-1.344-2.948-2.967a36 36 0 0 1-.09-2.67c0-4.582.958-9.14 6.075-10.103 1.59-.3 3.148-.002 3.148-.002"/></g></svg>Daily Breathing Exercises</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M14.854 4.578a3.354 3.354 0 1 1-6.708 0 3.354 3.354 0 1 1 6.708 0"/><path stroke="currentColor" stroke-linejoin="round" d="M12.59 7.995c1.483.099 2.589.889 3.244 1.98.512.852 1.16 1.662 2.047 2.11 1.6.808 2.567 1.783 2.451 2.629-.157 1.152-1.295 1.718-2.21 1.474a17 17 0 0 1-1.02-.314l.009.079 1.778 1.531c1.664 1.433.685 4.16-1.51 4.202-2.437.048-4.885.09-5.88.09s-3.443-.042-5.88-.09c-2.195-.043-3.173-2.77-1.51-4.202l1.786-1.537.007-.075c-.355.12-.717.234-1.024.316-.915.244-2.053-.322-2.21-1.474-.116-.846.853-1.823 2.455-2.63.888-.449 1.543-1.26 2.075-2.099.68-1.073 1.818-1.897 3.216-1.99a16 16 0 0 1 2.176 0Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.851 15.898c.859-.304 1.14-.426 1.54-.618.485-.213.911-1.08 1.082-1.649m8.779 2.267c-.859-.304-1.14-.426-1.54-.618-.485-.213-.911-1.08-1.082-1.649m-5.761 8.117c2.045 0 4.02 0 4.408-.753.483-.937.37-2.668-.737-3.292-.385-.217-2.356-.234-3.108-.187"/></svg>Daily Meditation</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5.505 1.07v20.86M9.342 5.745h5.755M9.342 9.102h2.877m4.796 11.419c0 .654.347 1.259.987 1.394.364.076.832.136 1.411.136s1.047-.06 1.41-.136c.64-.135.988-.74.988-1.394V9.953a1.44 1.44 0 0 0-.166-.703c-.207-.372-.627-1.022-1.365-1.765a1.22 1.22 0 0 0-1.734 0c-.738.743-1.158 1.393-1.365 1.765a1.43 1.43 0 0 0-.166.703z"/><path d="M14.857 21.942a88 88 0 0 1-4.556.109c-3.058 0-5.237-.128-6.646-.254-1.222-.11-2.137-1.063-2.225-2.286-.116-1.615-.24-4.233-.24-8.011s.124-6.396.24-8.011c.088-1.223 1.004-2.176 2.225-2.286C5.064 1.077 7.243.95 10.3.95c3.059 0 5.237.128 6.647.254 1.22.11 2.136 1.064 2.224 2.287q.034.471.068 1.056m-2.224 14.147s.96.48 2.398.48 2.398-.48 2.398-.48"/></g></svg>30 Days of Journaling</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.05 8.676c0-3.076-2.522-6.047-6.086-6.09-2.84 0-4.464 1.883-4.464 1.883S9.877 2.586 7.036 2.586C3.384 2.586.95 5.6.95 8.676c0 5.076 4.684 8.763 9.19 11.373a2.71 2.71 0 0 0 2.721 0c4.507-2.61 9.19-6.297 9.19-11.373Z"/><path stroke-linecap="round" d="M19.173 8.34a3.69 3.69 0 0 0-2.877-2.877"/></g></svg>Daily Gratitude</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.042 11.5C22.042 5.678 17.322.958 11.5.958S.958 5.678.958 11.5c0 1.908.507 3.698 1.394 5.242-.463 1.21-.9 2.62-1.182 4.024a.865.865 0 0 0 1.055 1.018 33 33 0 0 0 3.916-1.204 10.5 10.5 0 0 0 5.359 1.462c5.822 0 10.542-4.72 10.542-10.542Z"/><path d="M17.49 10.084v2.41h-.011c-.142 2.03-1.641 3.238-3.34 3.761-.24.074-.503.038-.684-.134-.21-.201-.39-.45-.521-.656-.142-.222-.044-.505.187-.634 1.062-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.131-1.132 47 47 0 0 1-.015-1.25c0-.557.007-.992.017-1.327.017-.6.45-1.056 1.05-1.08.333-.015.767-.024 1.329-.024s.996.01 1.329.023c.6.025 1.032.48 1.05 1.08.01.334.016.765.017 1.314Zm-7.188 0v2.41h-.01c-.143 2.03-1.642 3.238-3.34 3.761-.24.074-.504.038-.684-.134-.21-.201-.39-.45-.522-.656-.141-.222-.043-.505.187-.634 1.063-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.13-1.132 47 47 0 0 1-.016-1.25c0-.557.007-.992.017-1.327.018-.6.45-1.056 1.05-1.08.333-.015.768-.024 1.33-.024.56 0 .995.01 1.328.023.6.025 1.033.48 1.05 1.08.01.334.017.765.017 1.314Z"/></g></svg>Daily Affirmations</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16.77 10.781a15.8 15.8 0 0 1-3.02-1.275c-.679-.373-1.054-1.101-1.046-1.875.039-3.695.233-6.673.233-6.673m3.355 12.938c-1.305-.326-3.055-1.475-4.04-2.176a1.3 1.3 0 0 0-1.508 0c-.983.701-2.73 1.85-4.036 2.176m-.397-3.115c1.2-.373 2.23-.875 2.942-1.271.676-.377 1.05-1.105 1.043-1.879-.039-3.693-.233-6.673-.233-6.673"/><path d="M12.938 12.219c0 2.01.124 4.402.247 6.263.124 1.892 1.382 3.472 3.277 3.545q.37.015.788.015c.645 0 1.233-.029 1.753-.072 1.623-.136 2.827-1.344 2.948-2.967.054-.712.09-1.594.09-2.67 0-4.582-.958-9.14-6.075-10.103-1.59-.3-3.148-.002-3.148-.002m-2.756 5.991c0 2.01-.124 4.402-.247 6.263-.124 1.892-1.382 3.472-3.277 3.545q-.37.015-.788.015a21 21 0 0 1-1.753-.072c-1.623-.136-2.827-1.344-2.948-2.967a36 36 0 0 1-.09-2.67c0-4.582.958-9.14 6.075-10.103 1.59-.3 3.148-.002 3.148-.002"/></g></svg>Daily Breathing Exercises</span></div></div><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M14.854 4.578a3.354 3.354 0 1 1-6.708 0 3.354 3.354 0 1 1 6.708 0"/><path stroke="currentColor" stroke-linejoin="round" d="M12.59 7.995c1.483.099 2.589.889 3.244 1.98.512.852 1.16 1.662 2.047 2.11 1.6.808 2.567 1.783 2.451 2.629-.157 1.152-1.295 1.718-2.21 1.474a17 17 0 0 1-1.02-.314l.009.079 1.778 1.531c1.664 1.433.685 4.16-1.51 4.202-2.437.048-4.885.09-5.88.09s-3.443-.042-5.88-.09c-2.195-.043-3.173-2.77-1.51-4.202l1.786-1.537.007-.075c-.355.12-.717.234-1.024.316-.915.244-2.053-.322-2.21-1.474-.116-.846.853-1.823 2.455-2.63.888-.449 1.543-1.26 2.075-2.099.68-1.073 1.818-1.897 3.216-1.99a16 16 0 0 1 2.176 0Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.851 15.898c.859-.304 1.14-.426 1.54-.618.485-.213.911-1.08 1.082-1.649m8.779 2.267c-.859-.304-1.14-.426-1.54-.618-.485-.213-.911-1.08-1.082-1.649m-5.761 8.117c2.045 0 4.02 0 4.408-.753.483-.937.37-2.668-.737-3.292-.385-.217-2.356-.234-3.108-.187"/></svg>Daily Body Scan</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.781 3.335V6.69m10.392 15.333a22 22 0 0 0 .9-3.384c.229-1.293-.478-2.51-1.695-3.001-2.046-.826-4.086-1.282-4.086-1.282 0-.821-.083-2.55-.152-3.83-.05-.955-.674-1.802-1.625-1.891a7 7 0 0 0-.603-.029 5 5 0 0 0-.735.058c-.908.14-1.437 1.004-1.437 1.923v5.207l-.75.617c-.73.602-1.141 1.532-.963 2.462.281 1.461.726 2.346 1.132 3.15"/><path d="M20.663 12.44c.097-1.131.18-2.655.18-4.553 0-2.417-.134-4.226-.261-5.392A1.693 1.693 0 0 0 18.794.98c-3.156.171-5.238.886-7.55 2.106a.99.99 0 0 1-.926 0C8.006 1.866 5.925 1.151 2.768.98A1.693 1.693 0 0 0 .982 2.495C.854 3.661.719 5.47.719 7.887s.135 4.227.262 5.392c.098.909.876 1.547 1.788 1.597 1.937.105 3.469.415 4.898.92"/></g></svg>Mindful May</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round"><path stroke-linejoin="round" d="M1.064 7.849c.503-2.65 2.77-4.974 5.976-4.974 2.838 0 4.46 1.882 4.46 1.882s1.622-1.882 4.46-1.882c3.561.043 6.082 3.012 6.082 6.085 0 5.072-4.68 8.755-9.183 11.363a2.71 2.71 0 0 1-2.718 0c-2.344-1.357-4.735-3.006-6.49-4.99"/><path d="M1.154 12.673c4.077 0 7.688.254 9.829.446a2.26 2.26 0 0 1 2.049 2.268v.065c0 .993-.805 1.798-1.798 1.798v0a1.8 1.8 0 0 1-1.798-1.798v-.164m-8.423-4.962c6.073.267 9.527.533 12.817.42 1.027-.036 1.817-.901 1.817-1.93v0a1.966 1.966 0 0 0-1.962-1.966v0a1.96 1.96 0 0 0-1.961 1.961v.25"/></g></svg>Nervous-System Reset</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="m19.19 13.598-.145-.116s-1.213-6.058-2.534-10.64c-.232-.804-.876-1.444-1.709-1.513a5 5 0 0 0-.562-.012c-.836.037-1.388.802-1.405 1.639l-.118 5.658a.8.8 0 0 0-.236.067c-.636.258-.981.933-.981 1.62v6.528c0 .722.263 1.436.888 1.796 1.258.724 3.174 1.252 4.216 1.504q.007-.2.067-.4c.418-1.384 1.253-3.872 2.385-5.927q.06-.108.135-.204Z"/><path stroke-linejoin="round" d="m3.81 13.598.145-.116S5.17 7.424 6.49 2.842c.232-.804.876-1.444 1.71-1.513a5 5 0 0 1 .56-.012c.837.037 1.389.802 1.406 1.639l.118 5.658c.052 0 .136.026.237.067.636.258.98.933.98 1.62v6.528c0 .722-.263 1.436-.888 1.796-1.257.724-3.174 1.252-4.216 1.504a1.6 1.6 0 0 0-.067-.4c-.418-1.384-1.252-3.872-2.385-5.927a1.5 1.5 0 0 0-.135-.204Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12.717 8.614c2.635-.487 2.635 3.407 2.635 3.407"/><path d="M21.36 13.498a6 6 0 0 0-.906-.354c-.56-.164-1.117.147-1.398.658-1.132 2.055-1.967 4.543-2.385 5.927-.195.645.033 1.356.659 1.603.45.178.91.281 1.292.341.553.087 1.064-.235 1.29-.746.534-1.212 1.507-3.585 2.09-6.01.138-.572-.11-1.166-.641-1.42Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M10.283 8.614c-2.635-.487-2.635 3.407-2.635 3.407"/><path d="M1.64 13.498c.268-.128.581-.258.906-.354.56-.164 1.117.147 1.398.658 1.132 2.055 1.967 4.543 2.385 5.927.195.645-.033 1.356-.66 1.603a6 6 0 0 1-1.291.341c-.553.087-1.064-.235-1.29-.746-.534-1.212-1.507-3.585-2.09-6.01-.138-.572.11-1.166.641-1.42Z"/></g></svg>30 Days of Prayer</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" d="M11.5 5.031V1.677M6.925 6.013l-1.654-2.89m10.795 2.881 1.663-2.88M3.215 8.742.972 6.484m18.804 2.252 2.252-2.253"/><path d="M1.022 13.625a1.6 1.6 0 0 1 0-.889C2.3 8.292 6.507 5.031 11.5 5.031c4.99 0 9.196 3.257 10.477 7.698a1.6 1.6 0 0 1 0 .889c-1.278 4.444-5.485 7.705-10.479 7.705-4.99 0-9.196-3.257-10.477-7.698Z"/><path stroke-linejoin="round" d="M6.708 13.177a4.792 4.792 0 1 0 9.584 0 4.792 4.792 0 1 0-9.584 0"/></g></svg>Mindfulness in Action</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M14.854 4.578a3.354 3.354 0 1 1-6.708 0 3.354 3.354 0 1 1 6.708 0"/><path stroke="currentColor" stroke-linejoin="round" d="M12.59 7.995c1.483.099 2.589.889 3.244 1.98.512.852 1.16 1.662 2.047 2.11 1.6.808 2.567 1.783 2.451 2.629-.157 1.152-1.295 1.718-2.21 1.474a17 17 0 0 1-1.02-.314l.009.079 1.778 1.531c1.664 1.433.685 4.16-1.51 4.202-2.437.048-4.885.09-5.88.09s-3.443-.042-5.88-.09c-2.195-.043-3.173-2.77-1.51-4.202l1.786-1.537.007-.075c-.355.12-.717.234-1.024.316-.915.244-2.053-.322-2.21-1.474-.116-.846.853-1.823 2.455-2.63.888-.449 1.543-1.26 2.075-2.099.68-1.073 1.818-1.897 3.216-1.99a16 16 0 0 1 2.176 0Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.851 15.898c.859-.304 1.14-.426 1.54-.618.485-.213.911-1.08 1.082-1.649m8.779 2.267c-.859-.304-1.14-.426-1.54-.618-.485-.213-.911-1.08-1.082-1.649m-5.761 8.117c2.045 0 4.02 0 4.408-.753.483-.937.37-2.668-.737-3.292-.385-.217-2.356-.234-3.108-.187"/></svg>Daily Body Scan</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.781 3.335V6.69m10.392 15.333a22 22 0 0 0 .9-3.384c.229-1.293-.478-2.51-1.695-3.001-2.046-.826-4.086-1.282-4.086-1.282 0-.821-.083-2.55-.152-3.83-.05-.955-.674-1.802-1.625-1.891a7 7 0 0 0-.603-.029 5 5 0 0 0-.735.058c-.908.14-1.437 1.004-1.437 1.923v5.207l-.75.617c-.73.602-1.141 1.532-.963 2.462.281 1.461.726 2.346 1.132 3.15"/><path d="M20.663 12.44c.097-1.131.18-2.655.18-4.553 0-2.417-.134-4.226-.261-5.392A1.693 1.693 0 0 0 18.794.98c-3.156.171-5.238.886-7.55 2.106a.99.99 0 0 1-.926 0C8.006 1.866 5.925 1.151 2.768.98A1.693 1.693 0 0 0 .982 2.495C.854 3.661.719 5.47.719 7.887s.135 4.227.262 5.392c.098.909.876 1.547 1.788 1.597 1.937.105 3.469.415 4.898.92"/></g></svg>Mindful May</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round"><path stroke-linejoin="round" d="M1.064 7.849c.503-2.65 2.77-4.974 5.976-4.974 2.838 0 4.46 1.882 4.46 1.882s1.622-1.882 4.46-1.882c3.561.043 6.082 3.012 6.082 6.085 0 5.072-4.68 8.755-9.183 11.363a2.71 2.71 0 0 1-2.718 0c-2.344-1.357-4.735-3.006-6.49-4.99"/><path d="M1.154 12.673c4.077 0 7.688.254 9.829.446a2.26 2.26 0 0 1 2.049 2.268v.065c0 .993-.805 1.798-1.798 1.798v0a1.8 1.8 0 0 1-1.798-1.798v-.164m-8.423-4.962c6.073.267 9.527.533 12.817.42 1.027-.036 1.817-.901 1.817-1.93v0a1.966 1.966 0 0 0-1.962-1.966v0a1.96 1.96 0 0 0-1.961 1.961v.25"/></g></svg>Nervous-System Reset</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="m19.19 13.598-.145-.116s-1.213-6.058-2.534-10.64c-.232-.804-.876-1.444-1.709-1.513a5 5 0 0 0-.562-.012c-.836.037-1.388.802-1.405 1.639l-.118 5.658a.8.8 0 0 0-.236.067c-.636.258-.981.933-.981 1.62v6.528c0 .722.263 1.436.888 1.796 1.258.724 3.174 1.252 4.216 1.504q.007-.2.067-.4c.418-1.384 1.253-3.872 2.385-5.927q.06-.108.135-.204Z"/><path stroke-linejoin="round" d="m3.81 13.598.145-.116S5.17 7.424 6.49 2.842c.232-.804.876-1.444 1.71-1.513a5 5 0 0 1 .56-.012c.837.037 1.389.802 1.406 1.639l.118 5.658c.052 0 .136.026.237.067.636.258.98.933.98 1.62v6.528c0 .722-.263 1.436-.888 1.796-1.257.724-3.174 1.252-4.216 1.504a1.6 1.6 0 0 0-.067-.4c-.418-1.384-1.252-3.872-2.385-5.927a1.5 1.5 0 0 0-.135-.204Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12.717 8.614c2.635-.487 2.635 3.407 2.635 3.407"/><path d="M21.36 13.498a6 6 0 0 0-.906-.354c-.56-.164-1.117.147-1.398.658-1.132 2.055-1.967 4.543-2.385 5.927-.195.645.033 1.356.659 1.603.45.178.91.281 1.292.341.553.087 1.064-.235 1.29-.746.534-1.212 1.507-3.585 2.09-6.01.138-.572-.11-1.166-.641-1.42Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M10.283 8.614c-2.635-.487-2.635 3.407-2.635 3.407"/><path d="M1.64 13.498c.268-.128.581-.258.906-.354.56-.164 1.117.147 1.398.658 1.132 2.055 1.967 4.543 2.385 5.927.195.645-.033 1.356-.66 1.603a6 6 0 0 1-1.291.341c-.553.087-1.064-.235-1.29-.746-.534-1.212-1.507-3.585-2.09-6.01-.138-.572.11-1.166.641-1.42Z"/></g></svg>30 Days of Prayer</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" d="M11.5 5.031V1.677M6.925 6.013l-1.654-2.89m10.795 2.881 1.663-2.88M3.215 8.742.972 6.484m18.804 2.252 2.252-2.253"/><path d="M1.022 13.625a1.6 1.6 0 0 1 0-.889C2.3 8.292 6.507 5.031 11.5 5.031c4.99 0 9.196 3.257 10.477 7.698a1.6 1.6 0 0 1 0 .889c-1.278 4.444-5.485 7.705-10.479 7.705-4.99 0-9.196-3.257-10.477-7.698Z"/><path stroke-linejoin="round" d="M6.708 13.177a4.792 4.792 0 1 0 9.584 0 4.792 4.792 0 1 0-9.584 0"/></g></svg>Mindfulness in Action</span></div></div></div>
+          </div>
+          <span class="deck__dim" aria-hidden="true"></span>
+        </li>
+        <li class="deck__card way--healthy" data-deck-card>
+          <p class="deck__peek serif" aria-hidden="true">Healthy</p>
+          <div class="deck__body">
+            <div class="deck__core">
+            <span class="medallion"><img src="/assets/img/glyph-flat-recharge.svg" alt="" width="24" height="24"></span>
+            <h3 class="serif">Healthy</h3>
+            </div>
+            <div class="ticker" aria-label="Quests in this category"><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path stroke-linecap="round" d="M3.882 6.578c.015-.633.374-1.2 1.003-1.273q.27-.032.625-.034c.355-.002.445.013.626.034.63.073.987.64 1.003 1.273.022.931.048 2.534.048 4.922s-.026 3.99-.048 4.922c-.016.634-.374 1.2-1.003 1.273a5.7 5.7 0 0 1-1.251 0c-.63-.073-.988-.64-1.003-1.273-.022-.931-.049-2.534-.049-4.922s.027-3.99.05-4.922m15.235 0c-.015-.633-.374-1.2-1.003-1.273q-.27-.032-.625-.034c-.355-.002-.445.013-.626.034-.63.073-.987.64-1.003 1.273a208 208 0 0 0-.049 4.922c0 2.388.027 3.99.05 4.922.015.634.373 1.2 1.002 1.273a5.7 5.7 0 0 0 1.251 0c.63-.073.988-.64 1.003-1.273.022-.931.049-2.534.049-4.922s-.027-3.99-.05-4.922M.985 9.01c.017-.714.471-1.317 1.185-1.34a7 7 0 0 1 .452 0c.714.023 1.168.626 1.185 1.34.014.586.026 1.407.026 2.49s-.012 1.904-.026 2.49c-.017.714-.471 1.317-1.185 1.34a7 7 0 0 1-.452 0c-.714-.023-1.168-.626-1.185-1.34-.014-.586-.027-1.407-.027-2.49s.013-1.904.027-2.49m21.03 0c-.017-.714-.471-1.317-1.185-1.34a7 7 0 0 0-.452 0c-.714.023-1.168.626-1.185 1.34-.014.586-.026 1.407-.026 2.49s.012 1.904.026 2.49c.017.714.471 1.317 1.185 1.34a7 7 0 0 0 .452 0c.714-.023 1.168-.626 1.185-1.34.014-.586.027-1.407.027-2.49s-.013-1.904-.027-2.49"/><path d="M7.184 12.926a298 298 0 0 0 0-2.852 598 598 0 0 1 8.631.007 295 295 0 0 0 0 2.838 598 598 0 0 1-8.632.007Z"/></g></svg>Daily Workout</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M7.074 7.78A1.453 1.453 0 0 1 5.75 6.337V5.89c0-.62.474-1.137 1.094-1.168.39-.02.864-.038 1.383-.047 2.141-.037 4.206.781 5.709 2.308q.165.168.318.329c1.056 1.106 2.43 1.929 3.96 1.92.382-.003.74-.014 1.058-.03.713-.032 1.332.529 1.332 1.242v.401c0 .666-.456 1.253-1.114 1.35-1.878.278-3.805.142-5.594-.454l-.368.919a.5.5 0 0 0 .088.505c1.868 2.184 1.65 4.15 1.37 6.65l-.02.18a1.22 1.22 0 0 1-1.206 1.09h-.583a1.145 1.145 0 0 1-1.16-1.197l.006-.105c.094-1.853.185-3.639-1.481-4.889-2.567 1.677-4.37 1.856-7.115 1.535a1.176 1.176 0 0 1-1.031-1.175v-.57c0-.687.578-1.226 1.266-1.233 3.502-.032 4.364-1.296 6.479-4.665a.477.477 0 0 0-.346-.728c-.983-.113-1.968-.209-2.72-.277Z"/><path stroke="currentColor" stroke-linejoin="round" d="M15.813 7.667a2.875 2.875 0 1 0 0-5.75 2.875 2.875 0 0 0 0 5.75Z"/></svg>Daily Run</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path d="M4.333 6.95a2.625 2.625 0 1 0 5.25 0 2.625 2.625 0 0 0-5.25 0Z"/><path stroke-linejoin="round" d="M8.54 9.414c1.619-1.724 2.7-2.956 3.73-4.436.398-.573 1.138-.812 1.783-.545l.237.098c.538.223.858.751.63 1.286-.51 1.189-1.675 2.993-2.658 4.323a49 49 0 0 1 2.088.685 95 95 0 0 0 4.992-2.027c.774-.344 2.282.325 2.472 1.15l.013.058a.94.94 0 0 1-.34.96c-1.538 1.176-3.08 2.098-5.399 3.286-.294 1.678-.682 3.367-1.537 6.211a1.43 1.43 0 0 1-1.37 1.016h-.234c-.703 0-1.23-.515-1.183-1.217.103-1.574.359-4.2.502-5.333-1.45-.42-2.464-.903-3.988-1.95a2 2 0 0 1-.122-.09c-1.6.081-4.388-.059-5.93-.28-.624-.089-.942-.657-.815-1.274l.038-.185c.138-.67.73-1.149 1.415-1.157 2.28-.026 3.814-.173 5.609-.5a1 1 0 0 1 .066-.08Z"/></g></svg>30-Day Plank Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.043 2.041c.119-.4.478-.699.94-.753 1.238-.145 3.75-.33 8.517-.33s7.279.185 8.517.33c.637.075 1.079.615.963 1.246-.654 3.563-4.307 7.756-7.345 9.307-.365.186-.609.558-.59.966l.012.251m-3.15.735-.224 4.711a1.5 1.5 0 0 1-1.02 1.335 40 40 0 0 0-2.54.996.62.62 0 0 0-.373.573c0 .35.284.634.634.634h10.232c.35 0 .634-.284.634-.634a.62.62 0 0 0-.374-.573 39 39 0 0 0-2.539-.996 1.5 1.5 0 0 1-1.02-1.335l-.065-1.367"/><path d="M19.734 5.727a157 157 0 0 0-14.11-.106M.958.958l21.084 21.084"/></g></svg>Dry January</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M14.854 4.578a3.354 3.354 0 1 1-6.708 0 3.354 3.354 0 1 1 6.708 0"/><path stroke="currentColor" stroke-linejoin="round" d="M12.59 7.995c1.483.099 2.589.889 3.244 1.98.512.852 1.16 1.662 2.047 2.11 1.6.808 2.567 1.783 2.451 2.629-.157 1.152-1.295 1.718-2.21 1.474a17 17 0 0 1-1.02-.314l.009.079 1.778 1.531c1.664 1.433.685 4.16-1.51 4.202-2.437.048-4.885.09-5.88.09s-3.443-.042-5.88-.09c-2.195-.043-3.173-2.77-1.51-4.202l1.786-1.537.007-.075c-.355.12-.717.234-1.024.316-.915.244-2.053-.322-2.21-1.474-.116-.846.853-1.823 2.455-2.63.888-.449 1.543-1.26 2.075-2.099.68-1.073 1.818-1.897 3.216-1.99a16 16 0 0 1 2.176 0Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.851 15.898c.859-.304 1.14-.426 1.54-.618.485-.213.911-1.08 1.082-1.649m8.779 2.267c-.859-.304-1.14-.426-1.54-.618-.485-.213-.911-1.08-1.082-1.649m-5.761 8.117c2.045 0 4.02 0 4.408-.753.483-.937.37-2.668-.737-3.292-.385-.217-2.356-.234-3.108-.187"/></svg>30-Day Yoga Journey</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path stroke-linecap="round" d="M3.882 6.578c.015-.633.374-1.2 1.003-1.273q.27-.032.625-.034c.355-.002.445.013.626.034.63.073.987.64 1.003 1.273.022.931.048 2.534.048 4.922s-.026 3.99-.048 4.922c-.016.634-.374 1.2-1.003 1.273a5.7 5.7 0 0 1-1.251 0c-.63-.073-.988-.64-1.003-1.273-.022-.931-.049-2.534-.049-4.922s.027-3.99.05-4.922m15.235 0c-.015-.633-.374-1.2-1.003-1.273q-.27-.032-.625-.034c-.355-.002-.445.013-.626.034-.63.073-.987.64-1.003 1.273a208 208 0 0 0-.049 4.922c0 2.388.027 3.99.05 4.922.015.634.373 1.2 1.002 1.273a5.7 5.7 0 0 0 1.251 0c.63-.073.988-.64 1.003-1.273.022-.931.049-2.534.049-4.922s-.027-3.99-.05-4.922M.985 9.01c.017-.714.471-1.317 1.185-1.34a7 7 0 0 1 .452 0c.714.023 1.168.626 1.185 1.34.014.586.026 1.407.026 2.49s-.012 1.904-.026 2.49c-.017.714-.471 1.317-1.185 1.34a7 7 0 0 1-.452 0c-.714-.023-1.168-.626-1.185-1.34-.014-.586-.027-1.407-.027-2.49s.013-1.904.027-2.49m21.03 0c-.017-.714-.471-1.317-1.185-1.34a7 7 0 0 0-.452 0c-.714.023-1.168.626-1.185 1.34-.014.586-.026 1.407-.026 2.49s.012 1.904.026 2.49c.017.714.471 1.317 1.185 1.34a7 7 0 0 0 .452 0c.714-.023 1.168-.626 1.185-1.34.014-.586.027-1.407.027-2.49s-.013-1.904-.027-2.49"/><path d="M7.184 12.926a298 298 0 0 0 0-2.852 598 598 0 0 1 8.631.007 295 295 0 0 0 0 2.838 598 598 0 0 1-8.632.007Z"/></g></svg>Daily Workout</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M7.074 7.78A1.453 1.453 0 0 1 5.75 6.337V5.89c0-.62.474-1.137 1.094-1.168.39-.02.864-.038 1.383-.047 2.141-.037 4.206.781 5.709 2.308q.165.168.318.329c1.056 1.106 2.43 1.929 3.96 1.92.382-.003.74-.014 1.058-.03.713-.032 1.332.529 1.332 1.242v.401c0 .666-.456 1.253-1.114 1.35-1.878.278-3.805.142-5.594-.454l-.368.919a.5.5 0 0 0 .088.505c1.868 2.184 1.65 4.15 1.37 6.65l-.02.18a1.22 1.22 0 0 1-1.206 1.09h-.583a1.145 1.145 0 0 1-1.16-1.197l.006-.105c.094-1.853.185-3.639-1.481-4.889-2.567 1.677-4.37 1.856-7.115 1.535a1.176 1.176 0 0 1-1.031-1.175v-.57c0-.687.578-1.226 1.266-1.233 3.502-.032 4.364-1.296 6.479-4.665a.477.477 0 0 0-.346-.728c-.983-.113-1.968-.209-2.72-.277Z"/><path stroke="currentColor" stroke-linejoin="round" d="M15.813 7.667a2.875 2.875 0 1 0 0-5.75 2.875 2.875 0 0 0 0 5.75Z"/></svg>Daily Run</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path d="M4.333 6.95a2.625 2.625 0 1 0 5.25 0 2.625 2.625 0 0 0-5.25 0Z"/><path stroke-linejoin="round" d="M8.54 9.414c1.619-1.724 2.7-2.956 3.73-4.436.398-.573 1.138-.812 1.783-.545l.237.098c.538.223.858.751.63 1.286-.51 1.189-1.675 2.993-2.658 4.323a49 49 0 0 1 2.088.685 95 95 0 0 0 4.992-2.027c.774-.344 2.282.325 2.472 1.15l.013.058a.94.94 0 0 1-.34.96c-1.538 1.176-3.08 2.098-5.399 3.286-.294 1.678-.682 3.367-1.537 6.211a1.43 1.43 0 0 1-1.37 1.016h-.234c-.703 0-1.23-.515-1.183-1.217.103-1.574.359-4.2.502-5.333-1.45-.42-2.464-.903-3.988-1.95a2 2 0 0 1-.122-.09c-1.6.081-4.388-.059-5.93-.28-.624-.089-.942-.657-.815-1.274l.038-.185c.138-.67.73-1.149 1.415-1.157 2.28-.026 3.814-.173 5.609-.5a1 1 0 0 1 .066-.08Z"/></g></svg>30-Day Plank Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.043 2.041c.119-.4.478-.699.94-.753 1.238-.145 3.75-.33 8.517-.33s7.279.185 8.517.33c.637.075 1.079.615.963 1.246-.654 3.563-4.307 7.756-7.345 9.307-.365.186-.609.558-.59.966l.012.251m-3.15.735-.224 4.711a1.5 1.5 0 0 1-1.02 1.335 40 40 0 0 0-2.54.996.62.62 0 0 0-.373.573c0 .35.284.634.634.634h10.232c.35 0 .634-.284.634-.634a.62.62 0 0 0-.374-.573 39 39 0 0 0-2.539-.996 1.5 1.5 0 0 1-1.02-1.335l-.065-1.367"/><path d="M19.734 5.727a157 157 0 0 0-14.11-.106M.958.958l21.084 21.084"/></g></svg>Dry January</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M14.854 4.578a3.354 3.354 0 1 1-6.708 0 3.354 3.354 0 1 1 6.708 0"/><path stroke="currentColor" stroke-linejoin="round" d="M12.59 7.995c1.483.099 2.589.889 3.244 1.98.512.852 1.16 1.662 2.047 2.11 1.6.808 2.567 1.783 2.451 2.629-.157 1.152-1.295 1.718-2.21 1.474a17 17 0 0 1-1.02-.314l.009.079 1.778 1.531c1.664 1.433.685 4.16-1.51 4.202-2.437.048-4.885.09-5.88.09s-3.443-.042-5.88-.09c-2.195-.043-3.173-2.77-1.51-4.202l1.786-1.537.007-.075c-.355.12-.717.234-1.024.316-.915.244-2.053-.322-2.21-1.474-.116-.846.853-1.823 2.455-2.63.888-.449 1.543-1.26 2.075-2.099.68-1.073 1.818-1.897 3.216-1.99a16 16 0 0 1 2.176 0Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M5.851 15.898c.859-.304 1.14-.426 1.54-.618.485-.213.911-1.08 1.082-1.649m8.779 2.267c-.859-.304-1.14-.426-1.54-.618-.485-.213-.911-1.08-1.082-1.649m-5.761 8.117c2.045 0 4.02 0 4.408-.753.483-.937.37-2.668-.737-3.292-.385-.217-2.356-.234-3.108-.187"/></svg>30-Day Yoga Journey</span></div></div><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="m11.5 2.105-.64-.78a1.08 1.08 0 0 0-1.53-.139l-.635.538a1.08 1.08 0 0 0-.137 1.507l1.458 1.776v3.88l-3.308-1.94L5.929 4.8a1.08 1.08 0 0 0-1.39-.643l-.768.286a1.08 1.08 0 0 0-.636 1.377l.356.984-.997.175a1.08 1.08 0 0 0-.876 1.242l.144.847c.1.59.66.984 1.249.881l2.212-.388L8.53 11.5l-3.308 1.94-2.212-.388a1.08 1.08 0 0 0-1.249.88l-.144.847c-.1.585.292 1.14.877 1.243l.997.175-.356.983c-.202.556.082 1.17.636 1.377l.767.287a1.08 1.08 0 0 0 1.39-.643l.779-2.149 3.308-1.94v3.88L8.558 19.77a1.08 1.08 0 0 0 .137 1.506l.636.538c.46.39 1.148.327 1.53-.139l.64-.78.639.78c.382.466 1.07.528 1.53.14l.635-.539c.45-.38.51-1.05.137-1.506l-1.457-1.777v-3.88l3.308 1.94.778 2.15c.204.563.829.852 1.39.642l.768-.287c.553-.206.837-.82.636-1.377l-.356-.983.997-.175c.584-.102.976-.658.876-1.243l-.144-.846c-.1-.59-.66-.985-1.249-.881l-2.212.388-3.307-1.94 3.308-1.94 2.212.388a1.08 1.08 0 0 0 1.249-.88l.144-.848c.1-.585-.292-1.14-.876-1.242l-.997-.175.355-.984a1.08 1.08 0 0 0-.636-1.377l-.767-.286a1.08 1.08 0 0 0-1.39.643l-.779 2.148-3.308 1.94v-3.88l1.457-1.776a1.08 1.08 0 0 0-.137-1.507l-.635-.538a1.08 1.08 0 0 0-1.53.14z"/></svg>Cold Shower Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M15.523 5.428c.843-.838 1.442-1.432 1.638-1.62a1.697 1.697 0 1 1 2.922-.89 1.697 1.697 0 1 1-.89 2.922c-.2.206-.848.86-1.76 1.777m-9.88 9.88c-.883.878-1.512 1.501-1.714 1.696a1.697 1.697 0 1 1-2.922.89q-.128.02-.262.02a1.697 1.697 0 1 1 1.152-2.942 384 384 0 0 1 2.426-2.446m10.528-.005a386 386 0 0 1 2.432 2.451 1.697 1.697 0 1 1 .89 2.922q.02.128.02.262a1.697 1.697 0 1 1-2.942-1.152 272 272 0 0 1-1.716-1.698M5.57 7.619a263 263 0 0 1-1.762-1.78 1.697 1.697 0 1 1-.89-2.922 1.697 1.697 0 1 1 2.922.89c.196.189.794.78 1.635 1.618"/><path d="M7.495 16.234a.72.72 0 0 0-.272-.535c-1.485-1.2-2.431-3.011-2.431-5.039 0-3.612 3.003-6.54 6.708-6.54s6.708 2.928 6.708 6.54c0 2.028-.946 3.84-2.431 5.04a.72.72 0 0 0-.272.534c-.016.569-.04 1.002-.064 1.33-.044.572-.413 1.024-.98 1.12-.588.1-1.525.194-2.961.194s-2.373-.095-2.961-.194c-.567-.096-.936-.548-.98-1.12a28 28 0 0 1-.064-1.33Z"/><path d="M14.183 12.505c-.74 0-1.341-.75-1.341-1.677 0-.926.6-1.677 1.341-1.677s1.342.75 1.342 1.677c0 .926-.6 1.677-1.342 1.677Zm-4.025-1.677c0 .926-.6 1.677-1.342 1.677s-1.341-.75-1.341-1.677c0-.926.6-1.677 1.341-1.677s1.342.75 1.342 1.677Z"/><path stroke-linecap="round" d="M10.158 16.866v1.98m2.684-1.98v1.98"/></g></svg>75 Hard</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.043 2.041c.119-.4.478-.699.94-.753 1.238-.145 3.75-.33 8.517-.33s7.279.185 8.517.33c.637.075 1.079.615.963 1.246-.654 3.563-4.307 7.756-7.345 9.307-.365.186-.609.558-.59.966l.012.251m-3.15.735-.224 4.711a1.5 1.5 0 0 1-1.02 1.335 40 40 0 0 0-2.54.996.62.62 0 0 0-.373.573c0 .35.284.634.634.634h10.232c.35 0 .634-.284.634-.634a.62.62 0 0 0-.374-.573 39 39 0 0 0-2.539-.996 1.5 1.5 0 0 1-1.02-1.335l-.065-1.367"/><path d="M19.734 5.727a157 157 0 0 0-14.11-.106M.958.958l21.084 21.084"/></g></svg>Sober October</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M13.215 9.785c1.88-1.86 4.76-2.23 6.869-.739 1.309-2.035 2.756-6.21 1.418-7.548-1.34-1.338-5.514.11-7.549 1.419 1.49 2.107 1.121 4.987-.738 6.866zM.965 22.035l12.74-12.74m-9.31 9.309-1.631-2.097c-1.16-1.491-1.77-3.377-1.153-5.162a15.6 15.6 0 0 1 2.616-4.696c.596-.736 1.693-.732 2.32-.022a41 41 0 0 1 1.462 1.764c1.707 2.172 1.364 5.235-.59 7.188zm0 .001 2.097 1.631c1.491 1.16 3.377 1.77 5.162 1.153a15.6 15.6 0 0 0 4.696-2.616c.736-.596.732-1.693.022-2.32a41 41 0 0 0-1.764-1.463c-2.172-1.706-5.235-1.363-7.188.59z"/><path d="m8.316 14.683 4.878-4.877M8.87 13.175l-.555 1.508 4.878-4.877c2-2.001 2.298-5.155.444-7.292a43 43 0 0 0-.709-.798 1.6 1.6 0 0 0-2.369-.001 41 41 0 0 0-2.342 2.804 6.1 6.1 0 0 0-1.174 2.684c.335.396.659.796.967 1.188 1.102 1.403 1.349 3.177.86 4.784m-.555 1.508 4.878-4.877m1.415 5.184c.391.308.79.631 1.187.966a6.1 6.1 0 0 0 2.686-1.175 41 41 0 0 0 2.804-2.342 1.6 1.6 0 0 0-.001-2.369 44 44 0 0 0-.798-.709c-2.137-1.854-5.291-1.556-7.292.445l-4.878 4.877 1.51-.554c1.606-.488 3.38-.24 4.782.861"/></g></svg>30 Days Gluten-Free</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round"><path stroke-linejoin="round" d="M2.965 2.835a.93.93 0 0 1 .824-1.023 77 77 0 0 1 7.71-.375c3.543 0 6.344.234 7.711.375.513.053.876.51.825 1.023a303 303 0 0 1-2.108 16.376c-.195 1.242-1.19 2.184-2.445 2.252-.984.054-2.31.1-3.982.1-1.671 0-2.999-.046-3.982-.1-1.256-.068-2.25-1.01-2.445-2.252-.486-3.09-1.4-9.292-2.108-16.376"/><path d="M3.833 8.146s3.355-.24 7.667-.24 7.667.24 7.667.24"/></g></svg>3-Day Water Fast</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="m11.5 2.105-.64-.78a1.08 1.08 0 0 0-1.53-.139l-.635.538a1.08 1.08 0 0 0-.137 1.507l1.458 1.776v3.88l-3.308-1.94L5.929 4.8a1.08 1.08 0 0 0-1.39-.643l-.768.286a1.08 1.08 0 0 0-.636 1.377l.356.984-.997.175a1.08 1.08 0 0 0-.876 1.242l.144.847c.1.59.66.984 1.249.881l2.212-.388L8.53 11.5l-3.308 1.94-2.212-.388a1.08 1.08 0 0 0-1.249.88l-.144.847c-.1.585.292 1.14.877 1.243l.997.175-.356.983c-.202.556.082 1.17.636 1.377l.767.287a1.08 1.08 0 0 0 1.39-.643l.779-2.149 3.308-1.94v3.88L8.558 19.77a1.08 1.08 0 0 0 .137 1.506l.636.538c.46.39 1.148.327 1.53-.139l.64-.78.639.78c.382.466 1.07.528 1.53.14l.635-.539c.45-.38.51-1.05.137-1.506l-1.457-1.777v-3.88l3.308 1.94.778 2.15c.204.563.829.852 1.39.642l.768-.287c.553-.206.837-.82.636-1.377l-.356-.983.997-.175c.584-.102.976-.658.876-1.243l-.144-.846c-.1-.59-.66-.985-1.249-.881l-2.212.388-3.307-1.94 3.308-1.94 2.212.388a1.08 1.08 0 0 0 1.249-.88l.144-.848c.1-.585-.292-1.14-.876-1.242l-.997-.175.355-.984a1.08 1.08 0 0 0-.636-1.377l-.767-.286a1.08 1.08 0 0 0-1.39.643l-.779 2.148-3.308 1.94v-3.88l1.457-1.776a1.08 1.08 0 0 0-.137-1.507l-.635-.538a1.08 1.08 0 0 0-1.53.14z"/></svg>Cold Shower Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M15.523 5.428c.843-.838 1.442-1.432 1.638-1.62a1.697 1.697 0 1 1 2.922-.89 1.697 1.697 0 1 1-.89 2.922c-.2.206-.848.86-1.76 1.777m-9.88 9.88c-.883.878-1.512 1.501-1.714 1.696a1.697 1.697 0 1 1-2.922.89q-.128.02-.262.02a1.697 1.697 0 1 1 1.152-2.942 384 384 0 0 1 2.426-2.446m10.528-.005a386 386 0 0 1 2.432 2.451 1.697 1.697 0 1 1 .89 2.922q.02.128.02.262a1.697 1.697 0 1 1-2.942-1.152 272 272 0 0 1-1.716-1.698M5.57 7.619a263 263 0 0 1-1.762-1.78 1.697 1.697 0 1 1-.89-2.922 1.697 1.697 0 1 1 2.922.89c.196.189.794.78 1.635 1.618"/><path d="M7.495 16.234a.72.72 0 0 0-.272-.535c-1.485-1.2-2.431-3.011-2.431-5.039 0-3.612 3.003-6.54 6.708-6.54s6.708 2.928 6.708 6.54c0 2.028-.946 3.84-2.431 5.04a.72.72 0 0 0-.272.534c-.016.569-.04 1.002-.064 1.33-.044.572-.413 1.024-.98 1.12-.588.1-1.525.194-2.961.194s-2.373-.095-2.961-.194c-.567-.096-.936-.548-.98-1.12a28 28 0 0 1-.064-1.33Z"/><path d="M14.183 12.505c-.74 0-1.341-.75-1.341-1.677 0-.926.6-1.677 1.341-1.677s1.342.75 1.342 1.677c0 .926-.6 1.677-1.342 1.677Zm-4.025-1.677c0 .926-.6 1.677-1.342 1.677s-1.341-.75-1.341-1.677c0-.926.6-1.677 1.341-1.677s1.342.75 1.342 1.677Z"/><path stroke-linecap="round" d="M10.158 16.866v1.98m2.684-1.98v1.98"/></g></svg>75 Hard</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2.043 2.041c.119-.4.478-.699.94-.753 1.238-.145 3.75-.33 8.517-.33s7.279.185 8.517.33c.637.075 1.079.615.963 1.246-.654 3.563-4.307 7.756-7.345 9.307-.365.186-.609.558-.59.966l.012.251m-3.15.735-.224 4.711a1.5 1.5 0 0 1-1.02 1.335 40 40 0 0 0-2.54.996.62.62 0 0 0-.373.573c0 .35.284.634.634.634h10.232c.35 0 .634-.284.634-.634a.62.62 0 0 0-.374-.573 39 39 0 0 0-2.539-.996 1.5 1.5 0 0 1-1.02-1.335l-.065-1.367"/><path d="M19.734 5.727a157 157 0 0 0-14.11-.106M.958.958l21.084 21.084"/></g></svg>Sober October</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M13.215 9.785c1.88-1.86 4.76-2.23 6.869-.739 1.309-2.035 2.756-6.21 1.418-7.548-1.34-1.338-5.514.11-7.549 1.419 1.49 2.107 1.121 4.987-.738 6.866zM.965 22.035l12.74-12.74m-9.31 9.309-1.631-2.097c-1.16-1.491-1.77-3.377-1.153-5.162a15.6 15.6 0 0 1 2.616-4.696c.596-.736 1.693-.732 2.32-.022a41 41 0 0 1 1.462 1.764c1.707 2.172 1.364 5.235-.59 7.188zm0 .001 2.097 1.631c1.491 1.16 3.377 1.77 5.162 1.153a15.6 15.6 0 0 0 4.696-2.616c.736-.596.732-1.693.022-2.32a41 41 0 0 0-1.764-1.463c-2.172-1.706-5.235-1.363-7.188.59z"/><path d="m8.316 14.683 4.878-4.877M8.87 13.175l-.555 1.508 4.878-4.877c2-2.001 2.298-5.155.444-7.292a43 43 0 0 0-.709-.798 1.6 1.6 0 0 0-2.369-.001 41 41 0 0 0-2.342 2.804 6.1 6.1 0 0 0-1.174 2.684c.335.396.659.796.967 1.188 1.102 1.403 1.349 3.177.86 4.784m-.555 1.508 4.878-4.877m1.415 5.184c.391.308.79.631 1.187.966a6.1 6.1 0 0 0 2.686-1.175 41 41 0 0 0 2.804-2.342 1.6 1.6 0 0 0-.001-2.369 44 44 0 0 0-.798-.709c-2.137-1.854-5.291-1.556-7.292.445l-4.878 4.877 1.51-.554c1.606-.488 3.38-.24 4.782.861"/></g></svg>30 Days Gluten-Free</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round"><path stroke-linejoin="round" d="M2.965 2.835a.93.93 0 0 1 .824-1.023 77 77 0 0 1 7.71-.375c3.543 0 6.344.234 7.711.375.513.053.876.51.825 1.023a303 303 0 0 1-2.108 16.376c-.195 1.242-1.19 2.184-2.445 2.252-.984.054-2.31.1-3.982.1-1.671 0-2.999-.046-3.982-.1-1.256-.068-2.25-1.01-2.445-2.252-.486-3.09-1.4-9.292-2.108-16.376"/><path d="M3.833 8.146s3.355-.24 7.667-.24 7.667.24 7.667.24"/></g></svg>3-Day Water Fast</span></div></div></div>
+          </div>
+          <span class="deck__dim" aria-hidden="true"></span>
+        </li>
+        <li class="deck__card way--creative" data-deck-card>
+          <p class="deck__peek serif" aria-hidden="true">Creative</p>
+          <div class="deck__body">
+            <div class="deck__core">
+            <span class="medallion"><img src="/assets/img/glyph-flat-creativity.svg" alt="" width="24" height="24"></span>
+            <h3 class="serif">Creative</h3>
+            </div>
+            <div class="ticker" aria-label="Quests in this category"><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M21.029 9.225c.929-.929 1.291-2.28.585-3.388-.438-.686-1.077-1.523-2.003-2.449-.925-.925-1.762-1.564-2.449-2.002-1.107-.707-2.459-.344-3.388.585L1.563 14.18c-.26.261-.44.591-.482.957-.1.86-.227 2.751.016 5.9a.94.94 0 0 0 .864.864c3.149.242 5.04.116 5.9.016.366-.043.696-.221.956-.482z"/><path d="M19.403 10.852c-.51-.922-1.468-2.35-3.189-4.07-1.719-1.72-3.145-2.677-4.065-3.185l1.625-1.626c.93-.929 2.28-1.291 3.388-.585.687.438 1.524 1.077 2.45 2.003 1.238 1.239 1.846 2.438 2.144 3.33.31.93-.1 1.88-.794 2.574zM8.928 21.326A34 34 0 0 0 5.59 17.41a34 34 0 0 0-3.917-3.339l-.11.11c-.26.261-.44.59-.482.957-.1.86-.227 2.751.016 5.9a.94.94 0 0 0 .864.864c3.149.242 5.04.116 5.9.016.366-.043.696-.221.956-.482z"/></g></svg>Daily Drawing</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M6.71 21.561h12.3c1.238 0 2.293-.808 2.413-2.04.079-.802.14-1.864.14-3.231s-.061-2.429-.14-3.23c-.108-1.108-.973-1.874-2.047-2.016a3 3 0 0 1-.241.275l-8.698 8.699a5.26 5.26 0 0 1-3.728 1.543Z"/><path stroke-linejoin="round" d="M1.438 3.989c0-1.238.809-2.292 2.04-2.412.802-.079 1.864-.14 3.23-.14 1.367 0 2.43.061 3.23.14 1.233.12 2.042 1.175 2.042 2.413v12.3a5.272 5.272 0 0 1-10.542.002z"/><path stroke-linejoin="round" d="m10.458 19.996 8.676-8.676c.876-.876 1.05-2.193.263-3.15a33 33 0 0 0-2.185-2.382 33 33 0 0 0-2.382-2.185c-.861-.708-2.014-.638-2.874.022q.024.18.024.365v12.301a5.25 5.25 0 0 1-1.522 3.705Z"/><path stroke-linejoin="round" d="M11.979 13.896v2.395a5.272 5.272 0 0 1-10.541.002v-2.397z"/><path stroke-linecap="round" d="M1.438 7.667h10.541M1.438 13.896h10.541"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.23 17.73h.957"/></g></svg>The 100 Day Project</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M15.994 15.897c-3.183 2.664-5.119 6.528-8.806 4.502-4.313-2.37-.314-7.728 2.648-10.9.311-.294.69-.672 1.15-1.088m5.008 7.486c-2.451 2.37-1.272 4.354.298 4.976 1.198.474 2.875 0 2.875 0-2.875-2.844 2.875-2.844 2.875-6.635 0-4.671-5.798-4.595-8.968-1.868m2.92 3.527a12 12 0 0 1 1.741-1.217m-6.75-6.27c-2.128 1.906-4.162 4.362-5.362 5.959-.577.767-1.55 1.215-2.422.813a4.2 4.2 0 0 1-.837-.502 4.5 4.5 0 0 1-.951-1.078c-.337-.52-.332-1.17-.028-1.71 2.356-4.17 10.806-13.037 15.772-8.904 3.844 3.2-.178 5.618-4.083 9.382m-2.088-3.96c1.027-.917 2.104-1.729 3.091-2.228m-1.003 6.188c-1.128 1.094-2.333 2.39-3.238 3.763"/></svg>Creative Writing Daily</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M8.07 2.46C7.993 1.638 8.629.912 9.453.959c6.743.384 9.76 5.221 11.093 9.007.347.983-.909 1.475-1.61.705-2.139-2.352-4.508-3.551-6.35-4.048a.456.456 0 0 0-.568.47l.401 9.544q.013.17.015.342l.002.041h-.002v.003a5.019 5.019 0 1 1-3.429-4.762z"/></svg>Daily Music Practice</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M6.654 4.86c-1.212.04-2.211.09-2.999.138A2.6 2.6 0 0 0 1.207 7.37c-.128 1.406-.258 3.376-.258 5.569s.13 4.162.258 5.569a2.6 2.6 0 0 0 2.448 2.371c1.666.103 4.279.212 7.845.212s6.179-.11 7.845-.212a2.6 2.6 0 0 0 2.448-2.371c.128-1.407.258-3.376.258-5.57s-.13-4.162-.258-5.568a2.6 2.6 0 0 0-2.448-2.372 103 103 0 0 0-3-.138l-.784-1.617c-.341-.703-1.003-1.194-1.783-1.253-.58-.044-1.351-.081-2.278-.081s-1.697.037-2.278.081c-.78.059-1.442.55-1.783 1.253z"/><path d="M15.816 12.46a4.316 4.316 0 1 1-8.632 0 4.316 4.316 0 0 1 8.632 0Z"/></g></svg>Photo-a-Day</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M21.029 9.225c.929-.929 1.291-2.28.585-3.388-.438-.686-1.077-1.523-2.003-2.449-.925-.925-1.762-1.564-2.449-2.002-1.107-.707-2.459-.344-3.388.585L1.563 14.18c-.26.261-.44.591-.482.957-.1.86-.227 2.751.016 5.9a.94.94 0 0 0 .864.864c3.149.242 5.04.116 5.9.016.366-.043.696-.221.956-.482z"/><path d="M19.403 10.852c-.51-.922-1.468-2.35-3.189-4.07-1.719-1.72-3.145-2.677-4.065-3.185l1.625-1.626c.93-.929 2.28-1.291 3.388-.585.687.438 1.524 1.077 2.45 2.003 1.238 1.239 1.846 2.438 2.144 3.33.31.93-.1 1.88-.794 2.574zM8.928 21.326A34 34 0 0 0 5.59 17.41a34 34 0 0 0-3.917-3.339l-.11.11c-.26.261-.44.59-.482.957-.1.86-.227 2.751.016 5.9a.94.94 0 0 0 .864.864c3.149.242 5.04.116 5.9.016.366-.043.696-.221.956-.482z"/></g></svg>Daily Drawing</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M6.71 21.561h12.3c1.238 0 2.293-.808 2.413-2.04.079-.802.14-1.864.14-3.231s-.061-2.429-.14-3.23c-.108-1.108-.973-1.874-2.047-2.016a3 3 0 0 1-.241.275l-8.698 8.699a5.26 5.26 0 0 1-3.728 1.543Z"/><path stroke-linejoin="round" d="M1.438 3.989c0-1.238.809-2.292 2.04-2.412.802-.079 1.864-.14 3.23-.14 1.367 0 2.43.061 3.23.14 1.233.12 2.042 1.175 2.042 2.413v12.3a5.272 5.272 0 0 1-10.542.002z"/><path stroke-linejoin="round" d="m10.458 19.996 8.676-8.676c.876-.876 1.05-2.193.263-3.15a33 33 0 0 0-2.185-2.382 33 33 0 0 0-2.382-2.185c-.861-.708-2.014-.638-2.874.022q.024.18.024.365v12.301a5.25 5.25 0 0 1-1.522 3.705Z"/><path stroke-linejoin="round" d="M11.979 13.896v2.395a5.272 5.272 0 0 1-10.541.002v-2.397z"/><path stroke-linecap="round" d="M1.438 7.667h10.541M1.438 13.896h10.541"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.23 17.73h.957"/></g></svg>The 100 Day Project</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M15.994 15.897c-3.183 2.664-5.119 6.528-8.806 4.502-4.313-2.37-.314-7.728 2.648-10.9.311-.294.69-.672 1.15-1.088m5.008 7.486c-2.451 2.37-1.272 4.354.298 4.976 1.198.474 2.875 0 2.875 0-2.875-2.844 2.875-2.844 2.875-6.635 0-4.671-5.798-4.595-8.968-1.868m2.92 3.527a12 12 0 0 1 1.741-1.217m-6.75-6.27c-2.128 1.906-4.162 4.362-5.362 5.959-.577.767-1.55 1.215-2.422.813a4.2 4.2 0 0 1-.837-.502 4.5 4.5 0 0 1-.951-1.078c-.337-.52-.332-1.17-.028-1.71 2.356-4.17 10.806-13.037 15.772-8.904 3.844 3.2-.178 5.618-4.083 9.382m-2.088-3.96c1.027-.917 2.104-1.729 3.091-2.228m-1.003 6.188c-1.128 1.094-2.333 2.39-3.238 3.763"/></svg>Creative Writing Daily</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="M8.07 2.46C7.993 1.638 8.629.912 9.453.959c6.743.384 9.76 5.221 11.093 9.007.347.983-.909 1.475-1.61.705-2.139-2.352-4.508-3.551-6.35-4.048a.456.456 0 0 0-.568.47l.401 9.544q.013.17.015.342l.002.041h-.002v.003a5.019 5.019 0 1 1-3.429-4.762z"/></svg>Daily Music Practice</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M6.654 4.86c-1.212.04-2.211.09-2.999.138A2.6 2.6 0 0 0 1.207 7.37c-.128 1.406-.258 3.376-.258 5.569s.13 4.162.258 5.569a2.6 2.6 0 0 0 2.448 2.371c1.666.103 4.279.212 7.845.212s6.179-.11 7.845-.212a2.6 2.6 0 0 0 2.448-2.371c.128-1.407.258-3.376.258-5.57s-.13-4.162-.258-5.568a2.6 2.6 0 0 0-2.448-2.372 103 103 0 0 0-3-.138l-.784-1.617c-.341-.703-1.003-1.194-1.783-1.253-.58-.044-1.351-.081-2.278-.081s-1.697.037-2.278.081c-.78.059-1.442.55-1.783 1.253z"/><path d="M15.816 12.46a4.316 4.316 0 1 1-8.632 0 4.316 4.316 0 0 1 8.632 0Z"/></g></svg>Photo-a-Day</span></div></div><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5.505 1.07v20.86M9.342 5.745h5.755M9.342 9.102h2.877m4.796 11.419c0 .654.347 1.259.987 1.394.364.076.832.136 1.411.136s1.047-.06 1.41-.136c.64-.135.988-.74.988-1.394V9.953a1.44 1.44 0 0 0-.166-.703c-.207-.372-.627-1.022-1.365-1.765a1.22 1.22 0 0 0-1.734 0c-.738.743-1.158 1.393-1.365 1.765a1.43 1.43 0 0 0-.166.703z"/><path d="M14.857 21.942a88 88 0 0 1-4.556.109c-3.058 0-5.237-.128-6.646-.254-1.222-.11-2.137-1.063-2.225-2.286-.116-1.615-.24-4.233-.24-8.011s.124-6.396.24-8.011c.088-1.223 1.004-2.176 2.225-2.286C5.064 1.077 7.243.95 10.3.95c3.059 0 5.237.128 6.647.254 1.22.11 2.136 1.064 2.224 2.287q.034.471.068 1.056m-2.224 14.147s.96.48 2.398.48 2.398-.48 2.398-.48"/></g></svg>Morning Pages</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5.476 20.034a16.5 16.5 0 0 0 8.373-2.27.482.482 0 0 0-.04-.848l-1.806-.898c1.658 0 5.02-.671 5.02-.671 3.587-3.488 5.41-8.519 4.943-13.474a.93.93 0 0 0-.838-.839 16.7 16.7 0 0 0-7.62 1.054s-.829 1.953-1.004 2.886L11.49 3.56a.49.49 0 0 0-.658-.136c-4.72 2.9-7.864 7.755-7.864 14.35"/><path d="M.958 22.042C3.468 14.762 11.5 8.488 18.026 4.974"/></g></svg>Daily Poetry</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M18.83 13.773c1.94-.011 3.377-1.613 3.124-3.537C21.29 5.174 16.9.958 11.503.958 5.679.958.958 5.678.958 11.5S5.68 22.042 11.503 22.042c1.577 0 2.75-.324 2.98-1.261S14.4 19.591 13.335 17c-.543-1.325.047-2.544.917-2.98.85-.424 2.747-.237 4.577-.247Z"/><path stroke-linecap="round" d="M11.02 6.708a2.396 2.396 0 1 0 4.793 0 2.396 2.396 0 1 0-4.792 0m-6.229 3.594a2.156 2.156 0 1 0 4.312 0 2.156 2.156 0 1 0-4.312 0m2.396 6.229a1.677 1.677 0 1 0 3.354 0 1.677 1.677 0 1 0-3.354 0"/></g></svg>15-Minute Creativity</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m12.04 10.9-5.215 4.41c-.421.357-.95.596-1.474.422-.417-.14-.957-.424-1.532-1-.575-.574-.86-1.114-.999-1.532-.174-.523.065-1.052.42-1.473l4.415-5.22"/><path stroke-linejoin="round" d="M15.74 9.519A4.743 4.743 0 1 1 9.031 2.81a4.743 4.743 0 0 1 6.709 6.71Z"/><path stroke-linecap="round" d="M3.819 14.732c-1.9 1.9-1.813 3.818-.306 5.253 1.508 1.434 3.793 1.649 5.519-.04 1.726-1.688 5.448-5.777 7.943-7.69 2.702-2.071 5.212 1.119 2.576 3.177-2.11 1.647-3.675 3.194-4.194 3.762"/></g></svg>Speaking Practice</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M15.126 2.936A4.31 4.31 0 0 0 11.5.958a4.31 4.31 0 0 0-3.626 1.978A3.833 3.833 0 1 0 4.13 9.41 244 244 0 0 0 5.226 20.7a1.35 1.35 0 0 0 1.253 1.196c1 .067 2.673.145 5.021.145s4.022-.078 5.021-.145a1.35 1.35 0 0 0 1.253-1.196c.232-1.896.71-6.074 1.096-11.29a3.835 3.835 0 0 0-1.14-7.494 3.82 3.82 0 0 0-2.604 1.019Z"/><path stroke-linejoin="round" d="M18.095 17.903c-.128 1.18-.24 2.13-.322 2.798a1.35 1.35 0 0 1-1.252 1.196c-1 .067-2.673.145-5.021.145s-4.022-.078-5.022-.145a1.35 1.35 0 0 1-1.252-1.196 204 204 0 0 1-.322-2.798c1.224-.064 3.276-.127 6.596-.127s5.371.063 6.595.127Z"/><path stroke-linecap="round" d="m9.104 9.583.48 4.792m4.312-4.792-.48 4.792"/></g></svg>Weekly Recipe Master</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5.505 1.07v20.86M9.342 5.745h5.755M9.342 9.102h2.877m4.796 11.419c0 .654.347 1.259.987 1.394.364.076.832.136 1.411.136s1.047-.06 1.41-.136c.64-.135.988-.74.988-1.394V9.953a1.44 1.44 0 0 0-.166-.703c-.207-.372-.627-1.022-1.365-1.765a1.22 1.22 0 0 0-1.734 0c-.738.743-1.158 1.393-1.365 1.765a1.43 1.43 0 0 0-.166.703z"/><path d="M14.857 21.942a88 88 0 0 1-4.556.109c-3.058 0-5.237-.128-6.646-.254-1.222-.11-2.137-1.063-2.225-2.286-.116-1.615-.24-4.233-.24-8.011s.124-6.396.24-8.011c.088-1.223 1.004-2.176 2.225-2.286C5.064 1.077 7.243.95 10.3.95c3.059 0 5.237.128 6.647.254 1.22.11 2.136 1.064 2.224 2.287q.034.471.068 1.056m-2.224 14.147s.96.48 2.398.48 2.398-.48 2.398-.48"/></g></svg>Morning Pages</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5.476 20.034a16.5 16.5 0 0 0 8.373-2.27.482.482 0 0 0-.04-.848l-1.806-.898c1.658 0 5.02-.671 5.02-.671 3.587-3.488 5.41-8.519 4.943-13.474a.93.93 0 0 0-.838-.839 16.7 16.7 0 0 0-7.62 1.054s-.829 1.953-1.004 2.886L11.49 3.56a.49.49 0 0 0-.658-.136c-4.72 2.9-7.864 7.755-7.864 14.35"/><path d="M.958 22.042C3.468 14.762 11.5 8.488 18.026 4.974"/></g></svg>Daily Poetry</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M18.83 13.773c1.94-.011 3.377-1.613 3.124-3.537C21.29 5.174 16.9.958 11.503.958 5.679.958.958 5.678.958 11.5S5.68 22.042 11.503 22.042c1.577 0 2.75-.324 2.98-1.261S14.4 19.591 13.335 17c-.543-1.325.047-2.544.917-2.98.85-.424 2.747-.237 4.577-.247Z"/><path stroke-linecap="round" d="M11.02 6.708a2.396 2.396 0 1 0 4.793 0 2.396 2.396 0 1 0-4.792 0m-6.229 3.594a2.156 2.156 0 1 0 4.312 0 2.156 2.156 0 1 0-4.312 0m2.396 6.229a1.677 1.677 0 1 0 3.354 0 1.677 1.677 0 1 0-3.354 0"/></g></svg>15-Minute Creativity</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m12.04 10.9-5.215 4.41c-.421.357-.95.596-1.474.422-.417-.14-.957-.424-1.532-1-.575-.574-.86-1.114-.999-1.532-.174-.523.065-1.052.42-1.473l4.415-5.22"/><path stroke-linejoin="round" d="M15.74 9.519A4.743 4.743 0 1 1 9.031 2.81a4.743 4.743 0 0 1 6.709 6.71Z"/><path stroke-linecap="round" d="M3.819 14.732c-1.9 1.9-1.813 3.818-.306 5.253 1.508 1.434 3.793 1.649 5.519-.04 1.726-1.688 5.448-5.777 7.943-7.69 2.702-2.071 5.212 1.119 2.576 3.177-2.11 1.647-3.675 3.194-4.194 3.762"/></g></svg>Speaking Practice</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M15.126 2.936A4.31 4.31 0 0 0 11.5.958a4.31 4.31 0 0 0-3.626 1.978A3.833 3.833 0 1 0 4.13 9.41 244 244 0 0 0 5.226 20.7a1.35 1.35 0 0 0 1.253 1.196c1 .067 2.673.145 5.021.145s4.022-.078 5.021-.145a1.35 1.35 0 0 0 1.253-1.196c.232-1.896.71-6.074 1.096-11.29a3.835 3.835 0 0 0-1.14-7.494 3.82 3.82 0 0 0-2.604 1.019Z"/><path stroke-linejoin="round" d="M18.095 17.903c-.128 1.18-.24 2.13-.322 2.798a1.35 1.35 0 0 1-1.252 1.196c-1 .067-2.673.145-5.021.145s-4.022-.078-5.022-.145a1.35 1.35 0 0 1-1.252-1.196 204 204 0 0 1-.322-2.798c1.224-.064 3.276-.127 6.596-.127s5.371.063 6.595.127Z"/><path stroke-linecap="round" d="m9.104 9.583.48 4.792m4.312-4.792-.48 4.792"/></g></svg>Weekly Recipe Master</span></div></div></div>
+          </div>
+          <span class="deck__dim" aria-hidden="true"></span>
+        </li>
+        <li class="deck__card way--productive" data-deck-card>
+          <p class="deck__peek serif" aria-hidden="true">Productive</p>
+          <div class="deck__body">
+            <div class="deck__core">
+            <span class="medallion"><img src="/assets/img/glyph-flat-growth.svg" alt="" width="24" height="24"></span>
+            <h3 class="serif">Productive</h3>
+            </div>
+            <div class="ticker" aria-label="Quests in this category"><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.624 17.25 8.3 18.875a.96.96 0 0 1-.94.77h-.91c-.686 0-1.276.485-1.41 1.156l-.019.094a.958.958 0 0 0 .94 1.147h8.204a.958.958 0 0 0 .94-1.147l-.02-.094a1.44 1.44 0 0 0-1.409-1.155h-.91a.96.96 0 0 1-.94-.77L11.5 17.25"/><path stroke-linejoin="round" d="M18.955 5.906a.23.23 0 0 0 0-.309 38 38 0 0 0-2.317-2.38c-.458-.43-.535-1.146-.072-1.57a4 4 0 0 1 .574-.445c.42-.259.93-.096 1.309.22.984.819 2.055 1.968 2.851 2.877a2.195 2.195 0 0 1 0 2.906c-.797.908-1.868 2.058-2.852 2.875-.38.315-.887.477-1.306.219a4 4 0 0 1-.576-.446c-.463-.425-.386-1.14.072-1.57a38 38 0 0 0 2.317-2.377Zm-7.722 0a.23.23 0 0 1 0-.309 38 38 0 0 1 2.316-2.38c.458-.43.536-1.146.072-1.57a4 4 0 0 0-.573-.445c-.42-.259-.93-.096-1.31.22-.984.819-2.054 1.968-2.85 2.877a2.195 2.195 0 0 0 0 2.906c.796.908 1.867 2.058 2.852 2.875.379.315.886.477 1.306.219.201-.124.398-.283.576-.446.463-.425.385-1.14-.073-1.57a38 38 0 0 1-2.316-2.377Z" clip-rule="evenodd"/><path stroke-linecap="round" d="M6.23 3.88c-1.16.03-2.095.072-2.823.114-1.211.07-2.172.951-2.279 2.16-.09 1.028-.17 2.473-.17 4.386s.08 3.358.17 4.386c.107 1.208 1.068 2.09 2.279 2.16 1.408.08 3.589.162 6.656.162s5.247-.081 6.655-.162c1.211-.07 2.172-.952 2.279-2.16.057-.651.11-1.47.141-2.468"/></g></svg>100 Days of Code</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.781 3.335V6.69m10.392 15.333a22 22 0 0 0 .9-3.384c.229-1.293-.478-2.51-1.695-3.001-2.046-.826-4.086-1.282-4.086-1.282 0-.821-.083-2.55-.152-3.83-.05-.955-.674-1.802-1.625-1.891a7 7 0 0 0-.603-.029 5 5 0 0 0-.735.058c-.908.14-1.437 1.004-1.437 1.923v5.207l-.75.617c-.73.602-1.141 1.532-.963 2.462.281 1.461.726 2.346 1.132 3.15"/><path d="M20.663 12.44c.097-1.131.18-2.655.18-4.553 0-2.417-.134-4.226-.261-5.392A1.693 1.693 0 0 0 18.794.98c-3.156.171-5.238.886-7.55 2.106a.99.99 0 0 1-.926 0C8.006 1.866 5.925 1.151 2.768.98A1.693 1.693 0 0 0 .982 2.495C.854 3.661.719 5.47.719 7.887s.135 4.227.262 5.392c.098.909.876 1.547 1.788 1.597 1.937.105 3.469.415 4.898.92"/></g></svg>Daily Reading</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M1.978 18.502c-.511.022-.934.351-.985.86-.02.209-.035.462-.035.763s.015.554.035.763c.051.509.474.838.985.86.624.027 1.659.054 3.293.054s2.669-.027 3.293-.054c.51-.022.934-.351.984-.86q.033-.312.035-.763-.002-.45-.035-.763c-.05-.509-.473-.838-.984-.86a79 79 0 0 0-3.293-.054c-1.634 0-2.67.027-3.293.054Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.08 8.838a57 57 0 0 0-.124-2.271 2.2 2.2 0 0 0-.222-.81m0 0a2.26 2.26 0 0 0-1.526-1.175 11 11 0 0 0-.429-2.323c-.262-.828-1.073-1.305-1.94-1.281-6.36.174-9.71 1.512-11.286 2.439-.85.5-1.3 1.403-1.406 2.382-.13 1.188-.272 3.089-.272 5.702 0 1.1.025 2.055.064 2.875q.04.805.09 1.437M19.735 5.757c-.405-.81-1.301-1.309-2.276-1.226-2.09.177-5.388.399-8.833.399M20.084 14a48 48 0 0 1-.162 2.69c-.094 1.027-.817 1.842-1.834 2.013-1.213.203-3.135.424-5.87.458"/><path stroke-linejoin="round" d="M15.366 12.764c.04.696.545 1.244 1.238 1.324 1.357.155 2.895.042 4.245-.212.642-.121 1.115-.63 1.156-1.282a25 25 0 0 0 .012-2.494c-.039-.83-.78-1.386-1.606-1.297-1.136.122-2.305.204-3.441.174-.83-.023-1.573.534-1.611 1.363a25 25 0 0 0 .007 2.424Z"/><path stroke-linecap="round" d="M17.73 11.38v.48"/></g></svg>No-Spend Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.781 3.335V6.69m10.392 15.333a22 22 0 0 0 .9-3.384c.229-1.293-.478-2.51-1.695-3.001-2.046-.826-4.086-1.282-4.086-1.282 0-.821-.083-2.55-.152-3.83-.05-.955-.674-1.802-1.625-1.891a7 7 0 0 0-.603-.029 5 5 0 0 0-.735.058c-.908.14-1.437 1.004-1.437 1.923v5.207l-.75.617c-.73.602-1.141 1.532-.963 2.462.281 1.461.726 2.346 1.132 3.15"/><path d="M20.663 12.44c.097-1.131.18-2.655.18-4.553 0-2.417-.134-4.226-.261-5.392A1.693 1.693 0 0 0 18.794.98c-3.156.171-5.238.886-7.55 2.106a.99.99 0 0 1-.926 0C8.006 1.866 5.925 1.151 2.768.98A1.693 1.693 0 0 0 .982 2.495C.854 3.661.719 5.47.719 7.887s.135 4.227.262 5.392c.098.909.876 1.547 1.788 1.597 1.937.105 3.469.415 4.898.92"/></g></svg>Daily Learning</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.042 11.5C22.042 5.678 17.322.958 11.5.958S.958 5.678.958 11.5 5.678 22.042 11.5 22.042s10.542-4.72 10.542-10.542Z"/><path stroke-linecap="round" d="M16.332 6.668 11.5 11.5"/></g></svg>Power Hour</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.624 17.25 8.3 18.875a.96.96 0 0 1-.94.77h-.91c-.686 0-1.276.485-1.41 1.156l-.019.094a.958.958 0 0 0 .94 1.147h8.204a.958.958 0 0 0 .94-1.147l-.02-.094a1.44 1.44 0 0 0-1.409-1.155h-.91a.96.96 0 0 1-.94-.77L11.5 17.25"/><path stroke-linejoin="round" d="M18.955 5.906a.23.23 0 0 0 0-.309 38 38 0 0 0-2.317-2.38c-.458-.43-.535-1.146-.072-1.57a4 4 0 0 1 .574-.445c.42-.259.93-.096 1.309.22.984.819 2.055 1.968 2.851 2.877a2.195 2.195 0 0 1 0 2.906c-.797.908-1.868 2.058-2.852 2.875-.38.315-.887.477-1.306.219a4 4 0 0 1-.576-.446c-.463-.425-.386-1.14.072-1.57a38 38 0 0 0 2.317-2.377Zm-7.722 0a.23.23 0 0 1 0-.309 38 38 0 0 1 2.316-2.38c.458-.43.536-1.146.072-1.57a4 4 0 0 0-.573-.445c-.42-.259-.93-.096-1.31.22-.984.819-2.054 1.968-2.85 2.877a2.195 2.195 0 0 0 0 2.906c.796.908 1.867 2.058 2.852 2.875.379.315.886.477 1.306.219.201-.124.398-.283.576-.446.463-.425.385-1.14-.073-1.57a38 38 0 0 1-2.316-2.377Z" clip-rule="evenodd"/><path stroke-linecap="round" d="M6.23 3.88c-1.16.03-2.095.072-2.823.114-1.211.07-2.172.951-2.279 2.16-.09 1.028-.17 2.473-.17 4.386s.08 3.358.17 4.386c.107 1.208 1.068 2.09 2.279 2.16 1.408.08 3.589.162 6.656.162s5.247-.081 6.655-.162c1.211-.07 2.172-.952 2.279-2.16.057-.651.11-1.47.141-2.468"/></g></svg>100 Days of Code</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.781 3.335V6.69m10.392 15.333a22 22 0 0 0 .9-3.384c.229-1.293-.478-2.51-1.695-3.001-2.046-.826-4.086-1.282-4.086-1.282 0-.821-.083-2.55-.152-3.83-.05-.955-.674-1.802-1.625-1.891a7 7 0 0 0-.603-.029 5 5 0 0 0-.735.058c-.908.14-1.437 1.004-1.437 1.923v5.207l-.75.617c-.73.602-1.141 1.532-.963 2.462.281 1.461.726 2.346 1.132 3.15"/><path d="M20.663 12.44c.097-1.131.18-2.655.18-4.553 0-2.417-.134-4.226-.261-5.392A1.693 1.693 0 0 0 18.794.98c-3.156.171-5.238.886-7.55 2.106a.99.99 0 0 1-.926 0C8.006 1.866 5.925 1.151 2.768.98A1.693 1.693 0 0 0 .982 2.495C.854 3.661.719 5.47.719 7.887s.135 4.227.262 5.392c.098.909.876 1.547 1.788 1.597 1.937.105 3.469.415 4.898.92"/></g></svg>Daily Reading</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M1.978 18.502c-.511.022-.934.351-.985.86-.02.209-.035.462-.035.763s.015.554.035.763c.051.509.474.838.985.86.624.027 1.659.054 3.293.054s2.669-.027 3.293-.054c.51-.022.934-.351.984-.86q.033-.312.035-.763-.002-.45-.035-.763c-.05-.509-.473-.838-.984-.86a79 79 0 0 0-3.293-.054c-1.634 0-2.67.027-3.293.054Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.08 8.838a57 57 0 0 0-.124-2.271 2.2 2.2 0 0 0-.222-.81m0 0a2.26 2.26 0 0 0-1.526-1.175 11 11 0 0 0-.429-2.323c-.262-.828-1.073-1.305-1.94-1.281-6.36.174-9.71 1.512-11.286 2.439-.85.5-1.3 1.403-1.406 2.382-.13 1.188-.272 3.089-.272 5.702 0 1.1.025 2.055.064 2.875q.04.805.09 1.437M19.735 5.757c-.405-.81-1.301-1.309-2.276-1.226-2.09.177-5.388.399-8.833.399M20.084 14a48 48 0 0 1-.162 2.69c-.094 1.027-.817 1.842-1.834 2.013-1.213.203-3.135.424-5.87.458"/><path stroke-linejoin="round" d="M15.366 12.764c.04.696.545 1.244 1.238 1.324 1.357.155 2.895.042 4.245-.212.642-.121 1.115-.63 1.156-1.282a25 25 0 0 0 .012-2.494c-.039-.83-.78-1.386-1.606-1.297-1.136.122-2.305.204-3.441.174-.83-.023-1.573.534-1.611 1.363a25 25 0 0 0 .007 2.424Z"/><path stroke-linecap="round" d="M17.73 11.38v.48"/></g></svg>No-Spend Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.781 3.335V6.69m10.392 15.333a22 22 0 0 0 .9-3.384c.229-1.293-.478-2.51-1.695-3.001-2.046-.826-4.086-1.282-4.086-1.282 0-.821-.083-2.55-.152-3.83-.05-.955-.674-1.802-1.625-1.891a7 7 0 0 0-.603-.029 5 5 0 0 0-.735.058c-.908.14-1.437 1.004-1.437 1.923v5.207l-.75.617c-.73.602-1.141 1.532-.963 2.462.281 1.461.726 2.346 1.132 3.15"/><path d="M20.663 12.44c.097-1.131.18-2.655.18-4.553 0-2.417-.134-4.226-.261-5.392A1.693 1.693 0 0 0 18.794.98c-3.156.171-5.238.886-7.55 2.106a.99.99 0 0 1-.926 0C8.006 1.866 5.925 1.151 2.768.98A1.693 1.693 0 0 0 .982 2.495C.854 3.661.719 5.47.719 7.887s.135 4.227.262 5.392c.098.909.876 1.547 1.788 1.597 1.937.105 3.469.415 4.898.92"/></g></svg>Daily Learning</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.042 11.5C22.042 5.678 17.322.958 11.5.958S.958 5.678.958 11.5 5.678 22.042 11.5 22.042s10.542-4.72 10.542-10.542Z"/><path stroke-linecap="round" d="M16.332 6.668 11.5 11.5"/></g></svg>Power Hour</span></div></div><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path stroke-linecap="round" d="M20.604 21.95s-3.034.092-9.104.092c-3.62 0-6.006-.033-7.342-.059-.843-.017-1.635-.448-1.73-1.286q-.031-.258-.032-.572c0-.314.012-.4.031-.572.096-.838.888-1.27 1.73-1.286 1.337-.026 3.723-.059 7.343-.059"/><path d="M19.646 22.042v-3.834m-17.25-8.145c0-2.935.112-5.138.223-6.593A2.475 2.475 0 0 1 4.93 1.16c1.406-.1 3.554-.202 6.547-.202s5.141.1 6.548.202a2.475 2.475 0 0 1 2.31 2.31c.111 1.455.224 3.658.224 6.593 0 2.841.01 4.886.022 6.227a1.96 1.96 0 0 1-1.987 1.968 455 455 0 0 0-7.117-.05c-3.606 0-5.984.033-7.318.059-.845.016-1.637.45-1.732 1.288q-.03.256-.031.57z"/><path stroke-linecap="round" d="M13.209 8.67h3.803l-4.04 5.705h4.278m-11.5-3.878 1.751-5.254a.66.66 0 0 1 1.252 0l1.751 5.254m-4.12-1.902H9.87"/></g></svg>30-Minute Language</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M12.992.97c.318.004.633.06.923.19.762.341 2.288 1.147 3.814 2.673 1.483 1.483 2.286 2.966 2.643 3.748.135.296.196.62.203.945q.028 1.343.03 2.974c0 3.82-.136 6.421-.263 8.02a2.45 2.45 0 0 1-2.255 2.272c-1.437.123-3.632.25-6.587.25s-5.15-.127-6.587-.25a2.45 2.45 0 0 1-2.255-2.271c-.127-1.6-.262-4.201-.262-8.021s.135-6.421.262-8.02a2.45 2.45 0 0 1 2.255-2.272C6.35 1.085 8.545.958 11.5.958q.781 0 1.492.011Z"/><path d="M13.897 1.153c.755.336 2.294 1.143 3.832 2.681 1.539 1.539 2.345 3.077 2.681 3.832-1.166-.011-2.622-.124-3.812-.237a2.73 2.73 0 0 1-2.463-2.464c-.113-1.19-.226-2.646-.238-3.812Z"/><path stroke-linecap="round" d="m5.75 11.5 1.917 1.917 2.396-3.355m2.395 1.918h4.792m-11.5 4.79 1.917 1.918 2.396-3.355m2.395 1.917h4.792"/></g></svg>Eat the Frog</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path stroke-linecap="round" d="M1.438 1.438c0 7.812.144 15.48.209 18.52.016.766.63 1.38 1.396 1.395 3.038.065 10.707.21 18.52.21"/><path d="M9.657 6.404c-.57.717-.18 1.587.735 1.643.4.025.883.048 1.465.065a16 16 0 0 1 .033 1.282c-.029 2.052-1.286 3.816-3.009 4.93l-2.046 1.324c-.166.108-.32.243-.376.434-.03.104-.053.24-.053.408 0 .48.463.75.943.747.735-.005 1.46-.053 2.161-.132 4.316-.482 6.975-4.461 7.477-8.775l.026-.222c.528-.017.972-.038 1.344-.06.915-.057 1.306-.927.736-1.644-.385-.484-.9-1.096-1.582-1.85-1.046-1.154-1.83-1.814-2.353-2.185a1.325 1.325 0 0 0-1.566 0c-.523.371-1.307 1.031-2.354 2.186a38 38 0 0 0-1.581 1.85Z"/></g></svg>Financial Fitness</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M5.319 10.137a36 36 0 0 0-.048 1.922c0 1.483.076 2.413.151 2.971.065.487.344.9.78 1.128.841.44 2.55 1.092 5.298 1.092s4.457-.651 5.299-1.092a1.47 1.47 0 0 0 .779-1.128c.075-.558.151-1.488.151-2.971 0-.747-.02-1.385-.048-1.922"/><path stroke-linejoin="round" d="M1.462 8.412c-.662-.318-.662-1.173 0-1.49a85 85 0 0 1 4-1.771c2.55-1.062 4.291-1.692 5.226-2.01a2.5 2.5 0 0 1 1.624 0c.935.318 2.677.948 5.226 2.01a85 85 0 0 1 4 1.77c.662.318.662 1.173 0 1.49a85 85 0 0 1-4 1.771c-2.55 1.062-4.291 1.692-5.226 2.011a2.5 2.5 0 0 1-1.624 0c-.935-.32-2.677-.949-5.226-2.01a85 85 0 0 1-4-1.771Z"/><path stroke-linecap="round" d="M2.396 9.104v9.104"/><path stroke-linejoin="round" d="M.958 19.646a1.437 1.437 0 1 0 2.875 0 1.437 1.437 0 0 0-2.875 0Z"/></g></svg>Skill Building Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="m11.5 2.105-.64-.78a1.08 1.08 0 0 0-1.53-.139l-.635.538a1.08 1.08 0 0 0-.137 1.507l1.458 1.776v3.88l-3.308-1.94L5.929 4.8a1.08 1.08 0 0 0-1.39-.643l-.768.286a1.08 1.08 0 0 0-.636 1.377l.356.984-.997.175a1.08 1.08 0 0 0-.876 1.242l.144.847c.1.59.66.984 1.249.881l2.212-.388L8.53 11.5l-3.308 1.94-2.212-.388a1.08 1.08 0 0 0-1.249.88l-.144.847c-.1.585.292 1.14.877 1.243l.997.175-.356.983c-.202.556.082 1.17.636 1.377l.767.287a1.08 1.08 0 0 0 1.39-.643l.779-2.149 3.308-1.94v3.88L8.558 19.77a1.08 1.08 0 0 0 .137 1.506l.636.538c.46.39 1.148.327 1.53-.139l.64-.78.639.78c.382.466 1.07.528 1.53.14l.635-.539c.45-.38.51-1.05.137-1.506l-1.457-1.777v-3.88l3.308 1.94.778 2.15c.204.563.829.852 1.39.642l.768-.287c.553-.206.837-.82.636-1.377l-.356-.983.997-.175c.584-.102.976-.658.876-1.243l-.144-.846c-.1-.59-.66-.985-1.249-.881l-2.212.388-3.307-1.94 3.308-1.94 2.212.388a1.08 1.08 0 0 0 1.249-.88l.144-.848c.1-.585-.292-1.14-.876-1.242l-.997-.175.355-.984a1.08 1.08 0 0 0-.636-1.377l-.767-.286a1.08 1.08 0 0 0-1.39.643l-.779 2.148-3.308 1.94v-3.88l1.457-1.776a1.08 1.08 0 0 0-.137-1.507l-.635-.538a1.08 1.08 0 0 0-1.53.14z"/></svg>Winter Arc</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path stroke-linecap="round" d="M20.604 21.95s-3.034.092-9.104.092c-3.62 0-6.006-.033-7.342-.059-.843-.017-1.635-.448-1.73-1.286q-.031-.258-.032-.572c0-.314.012-.4.031-.572.096-.838.888-1.27 1.73-1.286 1.337-.026 3.723-.059 7.343-.059"/><path d="M19.646 22.042v-3.834m-17.25-8.145c0-2.935.112-5.138.223-6.593A2.475 2.475 0 0 1 4.93 1.16c1.406-.1 3.554-.202 6.547-.202s5.141.1 6.548.202a2.475 2.475 0 0 1 2.31 2.31c.111 1.455.224 3.658.224 6.593 0 2.841.01 4.886.022 6.227a1.96 1.96 0 0 1-1.987 1.968 455 455 0 0 0-7.117-.05c-3.606 0-5.984.033-7.318.059-.845.016-1.637.45-1.732 1.288q-.03.256-.031.57z"/><path stroke-linecap="round" d="M13.209 8.67h3.803l-4.04 5.705h4.278m-11.5-3.878 1.751-5.254a.66.66 0 0 1 1.252 0l1.751 5.254m-4.12-1.902H9.87"/></g></svg>30-Minute Language</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M12.992.97c.318.004.633.06.923.19.762.341 2.288 1.147 3.814 2.673 1.483 1.483 2.286 2.966 2.643 3.748.135.296.196.62.203.945q.028 1.343.03 2.974c0 3.82-.136 6.421-.263 8.02a2.45 2.45 0 0 1-2.255 2.272c-1.437.123-3.632.25-6.587.25s-5.15-.127-6.587-.25a2.45 2.45 0 0 1-2.255-2.271c-.127-1.6-.262-4.201-.262-8.021s.135-6.421.262-8.02a2.45 2.45 0 0 1 2.255-2.272C6.35 1.085 8.545.958 11.5.958q.781 0 1.492.011Z"/><path d="M13.897 1.153c.755.336 2.294 1.143 3.832 2.681 1.539 1.539 2.345 3.077 2.681 3.832-1.166-.011-2.622-.124-3.812-.237a2.73 2.73 0 0 1-2.463-2.464c-.113-1.19-.226-2.646-.238-3.812Z"/><path stroke-linecap="round" d="m5.75 11.5 1.917 1.917 2.396-3.355m2.395 1.918h4.792m-11.5 4.79 1.917 1.918 2.396-3.355m2.395 1.917h4.792"/></g></svg>Eat the Frog</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path stroke-linecap="round" d="M1.438 1.438c0 7.812.144 15.48.209 18.52.016.766.63 1.38 1.396 1.395 3.038.065 10.707.21 18.52.21"/><path d="M9.657 6.404c-.57.717-.18 1.587.735 1.643.4.025.883.048 1.465.065a16 16 0 0 1 .033 1.282c-.029 2.052-1.286 3.816-3.009 4.93l-2.046 1.324c-.166.108-.32.243-.376.434-.03.104-.053.24-.053.408 0 .48.463.75.943.747.735-.005 1.46-.053 2.161-.132 4.316-.482 6.975-4.461 7.477-8.775l.026-.222c.528-.017.972-.038 1.344-.06.915-.057 1.306-.927.736-1.644-.385-.484-.9-1.096-1.582-1.85-1.046-1.154-1.83-1.814-2.353-2.185a1.325 1.325 0 0 0-1.566 0c-.523.371-1.307 1.031-2.354 2.186a38 38 0 0 0-1.581 1.85Z"/></g></svg>Financial Fitness</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M5.319 10.137a36 36 0 0 0-.048 1.922c0 1.483.076 2.413.151 2.971.065.487.344.9.78 1.128.841.44 2.55 1.092 5.298 1.092s4.457-.651 5.299-1.092a1.47 1.47 0 0 0 .779-1.128c.075-.558.151-1.488.151-2.971 0-.747-.02-1.385-.048-1.922"/><path stroke-linejoin="round" d="M1.462 8.412c-.662-.318-.662-1.173 0-1.49a85 85 0 0 1 4-1.771c2.55-1.062 4.291-1.692 5.226-2.01a2.5 2.5 0 0 1 1.624 0c.935.318 2.677.948 5.226 2.01a85 85 0 0 1 4 1.77c.662.318.662 1.173 0 1.49a85 85 0 0 1-4 1.771c-2.55 1.062-4.291 1.692-5.226 2.011a2.5 2.5 0 0 1-1.624 0c-.935-.32-2.677-.949-5.226-2.01a85 85 0 0 1-4-1.771Z"/><path stroke-linecap="round" d="M2.396 9.104v9.104"/><path stroke-linejoin="round" d="M.958 19.646a1.437 1.437 0 1 0 2.875 0 1.437 1.437 0 0 0-2.875 0Z"/></g></svg>Skill Building Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linejoin="round" d="m11.5 2.105-.64-.78a1.08 1.08 0 0 0-1.53-.139l-.635.538a1.08 1.08 0 0 0-.137 1.507l1.458 1.776v3.88l-3.308-1.94L5.929 4.8a1.08 1.08 0 0 0-1.39-.643l-.768.286a1.08 1.08 0 0 0-.636 1.377l.356.984-.997.175a1.08 1.08 0 0 0-.876 1.242l.144.847c.1.59.66.984 1.249.881l2.212-.388L8.53 11.5l-3.308 1.94-2.212-.388a1.08 1.08 0 0 0-1.249.88l-.144.847c-.1.585.292 1.14.877 1.243l.997.175-.356.983c-.202.556.082 1.17.636 1.377l.767.287a1.08 1.08 0 0 0 1.39-.643l.779-2.149 3.308-1.94v3.88L8.558 19.77a1.08 1.08 0 0 0 .137 1.506l.636.538c.46.39 1.148.327 1.53-.139l.64-.78.639.78c.382.466 1.07.528 1.53.14l.635-.539c.45-.38.51-1.05.137-1.506l-1.457-1.777v-3.88l3.308 1.94.778 2.15c.204.563.829.852 1.39.642l.768-.287c.553-.206.837-.82.636-1.377l-.356-.983.997-.175c.584-.102.976-.658.876-1.243l-.144-.846c-.1-.59-.66-.985-1.249-.881l-2.212.388-3.307-1.94 3.308-1.94 2.212.388a1.08 1.08 0 0 0 1.249-.88l.144-.848c.1-.585-.292-1.14-.876-1.242l-.997-.175.355-.984a1.08 1.08 0 0 0-.636-1.377l-.767-.286a1.08 1.08 0 0 0-1.39.643l-.779 2.148-3.308 1.94v-3.88l1.457-1.776a1.08 1.08 0 0 0-.137-1.507l-.635-.538a1.08 1.08 0 0 0-1.53.14z"/></svg>Winter Arc</span></div></div></div>
+          </div>
+          <span class="deck__dim" aria-hidden="true"></span>
+        </li>
+        <li class="deck__card way--social" data-deck-card>
+          <p class="deck__peek serif" aria-hidden="true">Social</p>
+          <div class="deck__body">
+            <div class="deck__core">
+            <span class="medallion"><img src="/assets/img/glyph-flat-social.svg" alt="" width="24" height="24"></span>
+            <h3 class="serif">Social</h3>
+            </div>
+            <div class="ticker" aria-label="Quests in this category"><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M17.17 17.17c-2.037 2.039-10.388 3.8-14.244 4.522a1.373 1.373 0 0 1-1.61-1.617C2.055 16.206 3.849 7.81 5.829 5.83s10.378-3.774 14.246-4.513a1.373 1.373 0 0 1 1.617 1.61c-.722 3.856-2.483 12.207-4.521 14.245Z"/><path d="M11.5 8.146a3.354 3.354 0 1 0 0 6.708 3.354 3.354 0 0 0 0-6.708Z"/></g></svg>Adventure August</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.042 11.5C22.042 5.678 17.322.958 11.5.958S.958 5.678.958 11.5c0 1.908.507 3.698 1.394 5.242-.463 1.21-.9 2.62-1.182 4.024a.865.865 0 0 0 1.055 1.018 33 33 0 0 0 3.916-1.204 10.5 10.5 0 0 0 5.359 1.462c5.822 0 10.542-4.72 10.542-10.542Z"/><path d="M17.49 10.084v2.41h-.011c-.142 2.03-1.641 3.238-3.34 3.761-.24.074-.503.038-.684-.134-.21-.201-.39-.45-.521-.656-.142-.222-.044-.505.187-.634 1.062-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.131-1.132 47 47 0 0 1-.015-1.25c0-.557.007-.992.017-1.327.017-.6.45-1.056 1.05-1.08.333-.015.767-.024 1.329-.024s.996.01 1.329.023c.6.025 1.032.48 1.05 1.08.01.334.016.765.017 1.314Zm-7.188 0v2.41h-.01c-.143 2.03-1.642 3.238-3.34 3.761-.24.074-.504.038-.684-.134-.21-.201-.39-.45-.522-.656-.141-.222-.043-.505.187-.634 1.063-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.13-1.132 47 47 0 0 1-.016-1.25c0-.557.007-.992.017-1.327.018-.6.45-1.056 1.05-1.08.333-.015.768-.024 1.33-.024.56 0 .995.01 1.328.023.6.025 1.033.48 1.05 1.08.01.334.017.765.017 1.314Z"/></g></svg>Daily Compliments</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M11.529 2.487c.067-.734.492-1.394 1.222-1.488A5.6 5.6 0 0 1 13.98.986c.862.087 1.374.875 1.401 1.74.07 2.195.192 6.617.192 10.69 0 0 1.198-.718 2.791-1.648.935-.546 2.146-.387 2.636.579.154.303.295.643.397 1.01.205.734-.134 1.477-.679 2.01a199 199 0 0 1-5.217 4.936c-.944.859-2.085 1.469-3.355 1.592-.825.08-1.938.146-3.377.146a42 42 0 0 1-2.187-.055c-2.118-.112-3.86-1.47-4.337-3.536-.42-1.822-.807-4.478-.807-8.075 0-3.185.12-5.618.19-6.769.03-.478.22-.945.667-1.118.3-.115.722-.212 1.3-.212.623 0 1.066.113 1.368.24.398.168.58.585.63 1.015.108.931.302 2.798.436 5.229 3.32-.59 5.104-.541 5.104-.541 0-1.24.248-4.115.397-5.732Z"/><path stroke-linecap="round" d="M15.573 13.416c-2.156-.479-5.031.48-5.99 3.354"/></g></svg>Daily Kindness</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M19.648 17.212c.944-.023 1.553-.072 1.945-.122.447-.057.706-.419.621-.861-.259-1.361-1.254-2.469-2.566-2.913a2.833 2.833 0 0 0-1.924-5.287M3.352 17.212c-.944-.023-1.553-.072-1.945-.122-.447-.057-.706-.419-.621-.861.259-1.361 1.254-2.469 2.566-2.913A2.833 2.833 0 0 1 5.276 8.03m8.172 4.572a4.31 4.31 0 1 0-3.898.001c-1.995.676-3.509 2.36-3.903 4.43-.128.674.266 1.224.946 1.311.83.107 2.306.209 4.907.209s4.076-.102 4.907-.209c.68-.087 1.074-.637.946-1.31-.395-2.07-1.91-3.756-3.905-4.432"/></svg>Daily Connection</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m8.752 1.02.195 1.554c.09.72.701 1.26 1.426 1.26h2.254c.725 0 1.336-.54 1.426-1.26l.194-1.555A59 59 0 0 0 11.5.96c-1.043 0-1.957.023-2.748.06m1.311 18.147h2.874M.958.958l21.084 21.084M3.89 6.948a169 169 0 0 0-.057 4.552c0 3.794.107 6.417.205 8.028.073 1.21.953 2.172 2.16 2.29 1.186.116 2.93.224 5.302.224 2.373 0 4.116-.108 5.303-.224.44-.043.836-.198 1.166-.437"/><path d="M18.993 18.993c.089-1.634.174-4.094.174-7.493 0-3.794-.106-6.417-.204-8.028-.074-1.21-.954-2.172-2.16-2.29-1.187-.115-2.93-.224-5.303-.224s-4.115.109-5.302.224c-1.207.118-2.086 1.08-2.16 2.29l-.03.535"/></g></svg>30 Days No Social Media</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M17.17 17.17c-2.037 2.039-10.388 3.8-14.244 4.522a1.373 1.373 0 0 1-1.61-1.617C2.055 16.206 3.849 7.81 5.829 5.83s10.378-3.774 14.246-4.513a1.373 1.373 0 0 1 1.617 1.61c-.722 3.856-2.483 12.207-4.521 14.245Z"/><path d="M11.5 8.146a3.354 3.354 0 1 0 0 6.708 3.354 3.354 0 0 0 0-6.708Z"/></g></svg>Adventure August</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M22.042 11.5C22.042 5.678 17.322.958 11.5.958S.958 5.678.958 11.5c0 1.908.507 3.698 1.394 5.242-.463 1.21-.9 2.62-1.182 4.024a.865.865 0 0 0 1.055 1.018 33 33 0 0 0 3.916-1.204 10.5 10.5 0 0 0 5.359 1.462c5.822 0 10.542-4.72 10.542-10.542Z"/><path d="M17.49 10.084v2.41h-.011c-.142 2.03-1.641 3.238-3.34 3.761-.24.074-.503.038-.684-.134-.21-.201-.39-.45-.521-.656-.142-.222-.044-.505.187-.634 1.062-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.131-1.132 47 47 0 0 1-.015-1.25c0-.557.007-.992.017-1.327.017-.6.45-1.056 1.05-1.08.333-.015.767-.024 1.329-.024s.996.01 1.329.023c.6.025 1.032.48 1.05 1.08.01.334.016.765.017 1.314Zm-7.188 0v2.41h-.01c-.143 2.03-1.642 3.238-3.34 3.761-.24.074-.504.038-.684-.134-.21-.201-.39-.45-.522-.656-.141-.222-.043-.505.187-.634 1.063-.593 1.61-1.24 1.695-2.338-.39-.002-.71-.007-.972-.013a1.137 1.137 0 0 1-1.13-1.132 47 47 0 0 1-.016-1.25c0-.557.007-.992.017-1.327.018-.6.45-1.056 1.05-1.08.333-.015.768-.024 1.33-.024.56 0 .995.01 1.328.023.6.025 1.033.48 1.05 1.08.01.334.017.765.017 1.314Z"/></g></svg>Daily Compliments</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linejoin="round" d="M11.529 2.487c.067-.734.492-1.394 1.222-1.488A5.6 5.6 0 0 1 13.98.986c.862.087 1.374.875 1.401 1.74.07 2.195.192 6.617.192 10.69 0 0 1.198-.718 2.791-1.648.935-.546 2.146-.387 2.636.579.154.303.295.643.397 1.01.205.734-.134 1.477-.679 2.01a199 199 0 0 1-5.217 4.936c-.944.859-2.085 1.469-3.355 1.592-.825.08-1.938.146-3.377.146a42 42 0 0 1-2.187-.055c-2.118-.112-3.86-1.47-4.337-3.536-.42-1.822-.807-4.478-.807-8.075 0-3.185.12-5.618.19-6.769.03-.478.22-.945.667-1.118.3-.115.722-.212 1.3-.212.623 0 1.066.113 1.368.24.398.168.58.585.63 1.015.108.931.302 2.798.436 5.229 3.32-.59 5.104-.541 5.104-.541 0-1.24.248-4.115.397-5.732Z"/><path stroke-linecap="round" d="M15.573 13.416c-2.156-.479-5.031.48-5.99 3.354"/></g></svg>Daily Kindness</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M19.648 17.212c.944-.023 1.553-.072 1.945-.122.447-.057.706-.419.621-.861-.259-1.361-1.254-2.469-2.566-2.913a2.833 2.833 0 0 0-1.924-5.287M3.352 17.212c-.944-.023-1.553-.072-1.945-.122-.447-.057-.706-.419-.621-.861.259-1.361 1.254-2.469 2.566-2.913A2.833 2.833 0 0 1 5.276 8.03m8.172 4.572a4.31 4.31 0 1 0-3.898.001c-1.995.676-3.509 2.36-3.903 4.43-.128.674.266 1.224.946 1.311.83.107 2.306.209 4.907.209s4.076-.102 4.907-.209c.68-.087 1.074-.637.946-1.31-.395-2.07-1.91-3.756-3.905-4.432"/></svg>Daily Connection</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m8.752 1.02.195 1.554c.09.72.701 1.26 1.426 1.26h2.254c.725 0 1.336-.54 1.426-1.26l.194-1.555A59 59 0 0 0 11.5.96c-1.043 0-1.957.023-2.748.06m1.311 18.147h2.874M.958.958l21.084 21.084M3.89 6.948a169 169 0 0 0-.057 4.552c0 3.794.107 6.417.205 8.028.073 1.21.953 2.172 2.16 2.29 1.186.116 2.93.224 5.302.224 2.373 0 4.116-.108 5.303-.224.44-.043.836-.198 1.166-.437"/><path d="M18.993 18.993c.089-1.634.174-4.094.174-7.493 0-3.794-.106-6.417-.204-8.028-.074-1.21-.954-2.172-2.16-2.29-1.187-.115-2.93-.224-5.303-.224s-4.115.109-5.302.224c-1.207.118-2.086 1.08-2.16 2.29l-.03.535"/></g></svg>30 Days No Social Media</span></div></div><div class="ticker__row"><div class="ticker__lane"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m8.752 1.02.195 1.554c.09.72.701 1.26 1.426 1.26h2.254c.725 0 1.336-.54 1.426-1.26l.194-1.555A59 59 0 0 0 11.5.96c-1.043 0-1.957.023-2.748.06m1.311 18.147h2.874M.958.958l21.084 21.084M3.89 6.948a169 169 0 0 0-.057 4.552c0 3.794.107 6.417.205 8.028.073 1.21.953 2.172 2.16 2.29 1.186.116 2.93.224 5.302.224 2.373 0 4.116-.108 5.303-.224.44-.043.836-.198 1.166-.437"/><path d="M18.993 18.993c.089-1.634.174-4.094.174-7.493 0-3.794-.106-6.417-.204-8.028-.074-1.21-.954-2.172-2.16-2.29-1.187-.115-2.93-.224-5.303-.224s-4.115.109-5.302.224c-1.207.118-2.086 1.08-2.16 2.29l-.03.535"/></g></svg>Digital Detox December</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" d="M22.042 20.604h-5.75m4.312-2.874h-5.75m4.313-2.876h-5.75M4.336 18.08c-.08.718 0 2.491.958 3.833M7.69 18.2s0 2.395 1.414 3.593"/><path stroke-linecap="round" stroke-linejoin="round" d="M10.816 1.33a9 9 0 0 0-.426-.114c-.515-.124-.954.197-1.114.703-.774 2.46-1.497 5.193-2.174 7.755l-.361 1.361q.187-.014.376-.014c.738 0 1.399.21 1.956.57q.244-.903.502-1.84c.654-2.39 1.343-4.906 1.863-7.24.117-.525-.107-1.03-.622-1.181"/><path stroke-linejoin="round" d="M2.005 15.311c.644-2.415 2.613-4.29 5.112-4.29 2.346 0 3.913 2.12 3.86 4.465l-.027 1.231a3.36 3.36 0 0 0 1.005 2.47l.53.52c.76.747.316 2.025-.745 2.113-1.373.113-3.071.222-4.552.222-1.908 0-3.816-.18-5.008-.32-.705-.082-1.225-.684-1.158-1.39.153-1.612.562-3.444.983-5.02Z"/></g></svg>Daily Cleaning</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M1.172 18.402a1.84 1.84 0 0 1 0-1.346c.834-2.125 2.998-3.64 5.536-3.64s4.702 1.515 5.536 3.64c.17.432.17.914 0 1.346-.834 2.125-2.998 3.64-5.536 3.64s-4.702-1.515-5.536-3.64Z"/><path d="M4.792 17.73a1.917 1.917 0 1 0 3.833 0 1.917 1.917 0 1 0-3.833 0"/><path stroke-linecap="round" d="M14.371 1.07a21.6 21.6 0 0 1 .118 3.133c-.017.504-.19.995-.546 1.352-.788.79-1.565 1.052-1.87 1.13-.09.022-.18.03-.272.036-.533.039-2.457.235-2.733 1.065-.212.64.088 1.926.315 2.721.092.325.14.662.11.993m12.483-.34c-2.117-.436-4.255-.726-5.536-.88-.774-.093-1.588.052-2.123.62a5 5 0 0 0-.548.704c-.712 1.107-.138 2.465.905 3.269l.94.724c.328.254.524.643.547 1.058.026.454.075 1.11.168 1.859"/><path stroke-linecap="round" d="M3.987 11.74a9.104 9.104 0 1 1 10.388 7.314"/></g></svg>Environmental Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path d="M14.454 4.375c.023.814.536 1.46 1.35 1.485a12 12 0 0 0 .703 0c.813-.025 1.326-.671 1.35-1.485a34 34 0 0 0 0-1.92c-.024-.814-.537-1.46-1.35-1.485a12 12 0 0 0-.704 0c-.813.025-1.326.671-1.35 1.485a34 34 0 0 0 0 1.92Zm-9.31 0c.023.814.536 1.46 1.35 1.485a12 12 0 0 0 .703 0c.813-.025 1.326-.671 1.35-1.485a34 34 0 0 0 0-1.92C8.522 1.64 8.01.995 7.196.97a12 12 0 0 0-.704 0c-.813.025-1.326.671-1.35 1.485a34 34 0 0 0 0 1.92Z"/><path d="M6.493 5.86c-.813-.025-1.326-.671-1.35-1.485a34 34 0 0 1-.013-.806q-.76.041-1.345.085C2.534 3.746 1.564 4.69 1.457 5.94c-.123 1.44-.247 3.664-.247 6.785s.124 5.345.247 6.785c.107 1.25 1.077 2.194 2.328 2.286 1.582.116 4.106.239 7.715.239s6.133-.123 7.715-.239c1.251-.092 2.221-1.036 2.328-2.286.123-1.44.247-3.664.247-6.785s-.124-5.345-.247-6.785c-.107-1.25-1.077-2.194-2.328-2.286q-.585-.044-1.345-.085-.003.443-.014.806c-.023.814-.536 1.46-1.35 1.485a12 12 0 0 1-.703 0c-.813-.025-1.326-.671-1.35-1.485a34 34 0 0 1-.013-.93 142 142 0 0 0-5.88 0q-.001.516-.014.93c-.023.814-.536 1.46-1.35 1.485a12 12 0 0 1-.703 0Z"/><path d="M6.6 13.705c-.004 3.772 4.077 6.134 7.346 4.25a4.9 4.9 0 0 0 2.454-4.25c.004-3.772-4.077-6.134-7.346-4.25a4.9 4.9 0 0 0-2.454 4.25"/><path stroke-linecap="round" stroke-linejoin="round" d="m14.964 17.17-6.93-6.93"/></g></svg>Digital Sabbath</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M1.438 7.756c0-3.276.901-6.318 4.914-6.318 2.808 0 3.744 1.404 5.148 1.404s2.34-1.404 5.148-1.404c4.013 0 4.915 3.042 4.915 6.318 0 2.105-.74 3.766-1.388 4.817-.533.866-.939 1.84-.994 2.854-.174 3.2-.937 6.136-3 6.136-2.947 0-1.873-5.85-4.681-5.85s-1.734 5.85-4.68 5.85c-2.064 0-2.827-2.935-3.001-6.136-.055-1.015-.46-1.988-.994-2.854-.648-1.05-1.388-2.712-1.388-4.817"/><path d="M13.896 5.75c-1.968.645-3.025.632-4.792 0"/></g></svg>Daily Floss</span></div><div class="ticker__lane" aria-hidden="true"><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m8.752 1.02.195 1.554c.09.72.701 1.26 1.426 1.26h2.254c.725 0 1.336-.54 1.426-1.26l.194-1.555A59 59 0 0 0 11.5.96c-1.043 0-1.957.023-2.748.06m1.311 18.147h2.874M.958.958l21.084 21.084M3.89 6.948a169 169 0 0 0-.057 4.552c0 3.794.107 6.417.205 8.028.073 1.21.953 2.172 2.16 2.29 1.186.116 2.93.224 5.302.224 2.373 0 4.116-.108 5.303-.224.44-.043.836-.198 1.166-.437"/><path d="M18.993 18.993c.089-1.634.174-4.094.174-7.493 0-3.794-.106-6.417-.204-8.028-.074-1.21-.954-2.172-2.16-2.29-1.187-.115-2.93-.224-5.303-.224s-4.115.109-5.302.224c-1.207.118-2.086 1.08-2.16 2.29l-.03.535"/></g></svg>Digital Detox December</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path stroke-linecap="round" d="M22.042 20.604h-5.75m4.312-2.874h-5.75m4.313-2.876h-5.75M4.336 18.08c-.08.718 0 2.491.958 3.833M7.69 18.2s0 2.395 1.414 3.593"/><path stroke-linecap="round" stroke-linejoin="round" d="M10.816 1.33a9 9 0 0 0-.426-.114c-.515-.124-.954.197-1.114.703-.774 2.46-1.497 5.193-2.174 7.755l-.361 1.361q.187-.014.376-.014c.738 0 1.399.21 1.956.57q.244-.903.502-1.84c.654-2.39 1.343-4.906 1.863-7.24.117-.525-.107-1.03-.622-1.181"/><path stroke-linejoin="round" d="M2.005 15.311c.644-2.415 2.613-4.29 5.112-4.29 2.346 0 3.913 2.12 3.86 4.465l-.027 1.231a3.36 3.36 0 0 0 1.005 2.47l.53.52c.76.747.316 2.025-.745 2.113-1.373.113-3.071.222-4.552.222-1.908 0-3.816-.18-5.008-.32-.705-.082-1.225-.684-1.158-1.39.153-1.612.562-3.444.983-5.02Z"/></g></svg>Daily Cleaning</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linejoin="round"><path d="M1.172 18.402a1.84 1.84 0 0 1 0-1.346c.834-2.125 2.998-3.64 5.536-3.64s4.702 1.515 5.536 3.64c.17.432.17.914 0 1.346-.834 2.125-2.998 3.64-5.536 3.64s-4.702-1.515-5.536-3.64Z"/><path d="M4.792 17.73a1.917 1.917 0 1 0 3.833 0 1.917 1.917 0 1 0-3.833 0"/><path stroke-linecap="round" d="M14.371 1.07a21.6 21.6 0 0 1 .118 3.133c-.017.504-.19.995-.546 1.352-.788.79-1.565 1.052-1.87 1.13-.09.022-.18.03-.272.036-.533.039-2.457.235-2.733 1.065-.212.64.088 1.926.315 2.721.092.325.14.662.11.993m12.483-.34c-2.117-.436-4.255-.726-5.536-.88-.774-.093-1.588.052-2.123.62a5 5 0 0 0-.548.704c-.712 1.107-.138 2.465.905 3.269l.94.724c.328.254.524.643.547 1.058.026.454.075 1.11.168 1.859"/><path stroke-linecap="round" d="M3.987 11.74a9.104 9.104 0 1 1 10.388 7.314"/></g></svg>Environmental Challenge</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor"><path d="M14.454 4.375c.023.814.536 1.46 1.35 1.485a12 12 0 0 0 .703 0c.813-.025 1.326-.671 1.35-1.485a34 34 0 0 0 0-1.92c-.024-.814-.537-1.46-1.35-1.485a12 12 0 0 0-.704 0c-.813.025-1.326.671-1.35 1.485a34 34 0 0 0 0 1.92Zm-9.31 0c.023.814.536 1.46 1.35 1.485a12 12 0 0 0 .703 0c.813-.025 1.326-.671 1.35-1.485a34 34 0 0 0 0-1.92C8.522 1.64 8.01.995 7.196.97a12 12 0 0 0-.704 0c-.813.025-1.326.671-1.35 1.485a34 34 0 0 0 0 1.92Z"/><path d="M6.493 5.86c-.813-.025-1.326-.671-1.35-1.485a34 34 0 0 1-.013-.806q-.76.041-1.345.085C2.534 3.746 1.564 4.69 1.457 5.94c-.123 1.44-.247 3.664-.247 6.785s.124 5.345.247 6.785c.107 1.25 1.077 2.194 2.328 2.286 1.582.116 4.106.239 7.715.239s6.133-.123 7.715-.239c1.251-.092 2.221-1.036 2.328-2.286.123-1.44.247-3.664.247-6.785s-.124-5.345-.247-6.785c-.107-1.25-1.077-2.194-2.328-2.286q-.585-.044-1.345-.085-.003.443-.014.806c-.023.814-.536 1.46-1.35 1.485a12 12 0 0 1-.703 0c-.813-.025-1.326-.671-1.35-1.485a34 34 0 0 1-.013-.93 142 142 0 0 0-5.88 0q-.001.516-.014.93c-.023.814-.536 1.46-1.35 1.485a12 12 0 0 1-.703 0Z"/><path d="M6.6 13.705c-.004 3.772 4.077 6.134 7.346 4.25a4.9 4.9 0 0 0 2.454-4.25c.004-3.772-4.077-6.134-7.346-4.25a4.9 4.9 0 0 0-2.454 4.25"/><path stroke-linecap="round" stroke-linejoin="round" d="m14.964 17.17-6.93-6.93"/></g></svg>Digital Sabbath</span><span class="tick"><svg viewBox="-0.5 -0.5 24 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M1.438 7.756c0-3.276.901-6.318 4.914-6.318 2.808 0 3.744 1.404 5.148 1.404s2.34-1.404 5.148-1.404c4.013 0 4.915 3.042 4.915 6.318 0 2.105-.74 3.766-1.388 4.817-.533.866-.939 1.84-.994 2.854-.174 3.2-.937 6.136-3 6.136-2.947 0-1.873-5.85-4.681-5.85s-1.734 5.85-4.68 5.85c-2.064 0-2.827-2.935-3.001-6.136-.055-1.015-.46-1.988-.994-2.854-.648-1.05-1.388-2.712-1.388-4.817"/><path d="M13.896 5.75c-1.968.645-3.025.632-4.792 0"/></g></svg>Daily Floss</span></div></div></div>
+          </div>
+          <span class="deck__dim" aria-hidden="true"></span>
+        </li>
+        </ul>
+        <div class="deck__controls">
+          <button type="button" class="deck__arrow" data-deck-prev aria-label="Previous category">&larr;</button>
+          <button type="button" class="deck__arrow" data-deck-next aria-label="Next category">&rarr;</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      const introSection = document.querySelector('.intro');
-      if (introSection) {
-        observer.observe(introSection);
-      }
-      
-      // Counter animation for why section
-      const whyCounter = document.querySelector('.why__stat-counter');
-      let hasCountedWhy = false;
-      
-      const whyObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !hasCountedWhy) {
-            hasCountedWhy = true;
-            let currentCount = 0;
-            const targetCount = 65;
-            const duration = 1500; // 1.5 seconds
-            const increment = targetCount / (duration / 16); // 60fps
-            
-            const counterInterval = setInterval(() => {
-              currentCount += increment;
-              if (currentCount >= targetCount) {
-                whyCounter.textContent = targetCount;
-                clearInterval(counterInterval);
-              } else {
-                whyCounter.textContent = Math.floor(currentCount);
-              }
-            }, 16);
-          }
-        });
-      }, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+  <!-- 3. Science: three stat cards from the app's Home habit facts. -->
+  <section class="section science" id="science" aria-labelledby="science-title" data-fade>
+    <div class="shell">
+      <div class="section__head section__head--center" data-reveal>
+        <h2 id="science-title" class="serif">Backed by science</h2>
+      </div>
+      <ul class="facts" aria-label="Habit research" data-stagger="180">
+        <li class="card fact fact--social" data-reveal>
+          <img class="fact__glyph" src="/assets/img/glyph-flat-social.svg" alt="">
+          <p class="fact__headline serif">95%</p>
+          <p class="fact__body">of people who joined a weight-loss program with friends finished it, against 76% of those who went alone.</p>
+          <p class="fact__cite">Wing &amp; Jeffery, 1999</p>
+        </li>
+        <li class="card fact fact--mindful" data-reveal>
+          <img class="fact__glyph" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
+          <p class="fact__headline serif">66 days</p>
+          <p class="fact__body">for a repeated action to start feeling automatic, on average. The range ran from 18 to 254.</p>
+          <p class="fact__cite">Lally et al., 2010</p>
+        </li>
+        <li class="card fact fact--productive" data-reveal>
+          <img class="fact__glyph" src="/assets/img/glyph-flat-growth.svg" alt="">
+          <p class="fact__headline serif">2x</p>
+          <p class="fact__body">more likely to reach a goal when it is written down and a friend gets weekly progress.</p>
+          <p class="fact__cite">Matthews, 2015</p>
+        </li>
+      </ul>
+    </div>
+  </section>
 
-      const whySection = document.querySelector('.why');
-      if (whySection) {
-        whyObserver.observe(whySection);
-      }
-      
-      // Feature cards slide-in animation (bidirectional)
-      const featureCards = document.querySelectorAll('.feature-card--slide');
-      
-      const featureObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            // Stagger the animation based on card index
-            const cards = Array.from(featureCards);
-            const index = cards.indexOf(entry.target);
-            entry.target.style.transitionDelay = `${index * 0.1}s`;
-            entry.target.classList.add('feature-card--visible');
-            featureObserver.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
-      
-      featureCards.forEach(card => {
-        featureObserver.observe(card);
-      });
-      
-      // Smooth scroll for download button
-      document.querySelector('.download-chip')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.target.blur(); // Remove focus immediately after click
-        const ctaElement = document.getElementById('cta');
-        if (!ctaElement) return;
-        
-        const targetPosition = ctaElement.offsetTop - (window.innerHeight * 0.1);
-        const startPosition = window.pageYOffset;
-        const distance = targetPosition - startPosition;
-        const duration = 2000; // 2 seconds for slow, dramatic scroll
-        let start = null;
-        
-        function easeOutCubic(t) {
-          return 1 - Math.pow(1 - t, 3);
-        }
-        
-        function animation(currentTime) {
-          if (start === null) start = currentTime;
-          const timeElapsed = currentTime - start;
-          const progress = Math.min(timeElapsed / duration, 1);
-          const ease = easeOutCubic(progress);
-          
-          window.scrollTo(0, startPosition + (distance * ease));
-          
-          if (timeElapsed < duration) {
-            requestAnimationFrame(animation);
-          }
-        }
-        
-        requestAnimationFrame(animation);
-      });
-      
-      // Logo reveal animation on scroll
-      const ctaSection = document.querySelector('.cta');
-      const clipRect = document.getElementById('clipRect');
-      const ctaGlyph = document.querySelector('.cta__glyph-svg');
-      let logoScrollProgress = 0;
-      let hasCompleted = false;
-      
-      let logoRafPending = false;
-      window.addEventListener('scroll', () => {
-        if (logoRafPending || !ctaSection || !clipRect || !ctaGlyph) return;
-        logoRafPending = true;
-        requestAnimationFrame(() => {
-          logoRafPending = false;
-          const rect = ctaSection.getBoundingClientRect();
-          const windowHeight = window.innerHeight;
+  <!-- 4. Reviews: the rating, then a marquee of short pieces of real App Store
+       reviews that drifts across the page. -->
+  <section class="section reviews" id="reviews" aria-labelledby="reviews-title" data-fade>
+    <div class="shell">
+      <div class="rating">
+        <p class="rating__num serif" aria-hidden="true">4.9</p>
+        <p class="stars" aria-hidden="true">★★★★★</p>
+        <h2 id="reviews-title" class="micro">4.9 out of 5 on the App Store</h2>
+      </div>
+    </div>
+    <!-- Snippets are verbatim App Store text, 120 characters max so they hold
+         to four lines in the card; "..." marks skipped text. -->
+    <div class="marquee fade" data-marquee>
+      <ul class="marquee__track" aria-label="App Store reviews">
+        <li class="card quote">
+          <p class="quote__text serif">“It’s been kind of life-changing... The rewards system is actually very incentivizing.”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/eli.webp" alt="" width="28" height="28" decoding="async">Purfessor X</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“This one has actually helped me live healthier. I got one of my friends to join and we’re halfway through...”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/jordan.webp" alt="" width="28" height="28" decoding="async">Waverdog</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“Crazy that there is no other app on the market that allows you to habit track socially.”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/maya.webp" alt="" width="28" height="28" decoding="async">Traja16</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“Best habit tracking app I’ve seen. Use it to track my diets (just started 75 hard) with my buddies and it works amazing.”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/jordan.webp" alt="" width="28" height="28" decoding="async">Gaitnairn</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“It’s very enjoyable and engaging to do creative challenges and meditation... with people I know. Kinda keeps you honest.”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/eli.webp" alt="" width="28" height="28" decoding="async">Godan82</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“The built in accountability from your friend network makes it easy to try new challenges and stay engaged!”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/priya.webp" alt="" width="28" height="28" decoding="async">Giac333</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“...a great way to create new positive habits with friends. The community is great and there is active support.”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/maya.webp" alt="" width="28" height="28" decoding="async">ReadTh1s</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“Found this app looking for a way to start a meditation habit with my friends. Worked exactly as needed.”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/jordan.webp" alt="" width="28" height="28" decoding="async">Maddskulllll</p>
+        </li>
+        <li class="card quote">
+          <p class="quote__text serif">“Meditating with my family is great! Easy to use.”</p>
+          <p class="quote__by"><img class="quote__face" src="/assets/img/avatars/priya.webp" alt="" width="28" height="28" decoding="async">brandyopp</p>
+        </li>
+      </ul>
+    </div>
+  </section>
 
-          const scrollStart = windowHeight * 0.6;
-          const scrollEnd = windowHeight * 0.15;
+  <!-- 5. Start together. -->
+  <section class="section cta" id="download" aria-labelledby="download-title" data-fade>
+    <div class="shell cta__inner">
+      <img class="cta__icon" src="/assets/img/app-icon-sunset.webp" alt="" width="72" height="72">
+      <h2 id="download-title" class="serif">Start together</h2>
+      <div class="store-row">
+        <a href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store"><img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="132" height="44" loading="lazy"></a>
+        <a href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play"><img src="/google-play-badge.svg" alt="Get it on Google Play" width="148" height="44" loading="lazy"></a>
+      </div>
+    </div>
+  </section>
 
-          if (rect.top <= scrollStart && rect.top >= scrollEnd) {
-            logoScrollProgress = 1 - ((rect.top - scrollEnd) / (scrollStart - scrollEnd));
-          } else if (rect.top > scrollStart) {
-            logoScrollProgress = 0;
-          } else if (rect.top < scrollEnd) {
-            logoScrollProgress = 1;
-          }
+</main>
 
-          const revealHeight = logoScrollProgress * 100;
-          clipRect.setAttribute('y', String(100 - revealHeight));
-          clipRect.setAttribute('height', String(revealHeight));
-        });
-      }, { passive: true });
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__top">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
+      <nav class="footer__links" aria-label="Footer">
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/health-privacy.html">Health Data</a>
+        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener">YouTube</a>
+      </nav>
+    </div>
+    <p class="footer__legal">&copy; <span data-year>2026</span> Nothing Serious LLC</p>
+  </div>
+</footer>
 
-      // Generic Scroll Reveal (one-shot)
-      const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });
-
-      document.querySelectorAll('.scroll-reveal').forEach(el => {
-        revealObserver.observe(el);
-      });
-
-      let heroAnimationInitialized = false;
-      function initHeroAnimation() {
-        if (heroAnimationInitialized) return;
-        heroAnimationInitialized = true;
-
-        setTimeout(() => {
-          const heroContent = document.querySelector('.hero__content');
-          const phoneBack = document.querySelector('.hero__phone--back');
-          const phoneFront = document.querySelector('.hero__phone--front');
-          
-          if (heroContent) heroContent.classList.add('is-loaded');
-          if (phoneFront) phoneFront.classList.add('is-loaded');
-          
-          // Delay back phone so front is fully solid first
-          setTimeout(() => {
-            if (phoneBack) phoneBack.classList.add('is-loaded');
-          }, 400);
-        }, 100);
-      }
-      
-      if (document.readyState === 'complete') {
-        initHeroAnimation();
-      } else {
-        window.addEventListener('load', initHeroAnimation);
-        // Fallback just in case
-        document.addEventListener('DOMContentLoaded', initHeroAnimation);
-      }
-    </script>
-  </body>
+</body>
 </html>
-

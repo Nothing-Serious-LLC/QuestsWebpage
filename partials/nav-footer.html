@@ -1,0 +1,140 @@
+<!-- =========================================================================
+     Quests V2 canonical shell snippets ("The Quest World").
+     This file is a reference fragment. It is never deployed and never linked.
+     Copy these blocks verbatim into every page so the shell stays identical.
+
+     Paths are root relative on purpose: they resolve the same from /index.html,
+     /q/index.html and /dev/components.html when served from the repo root.
+
+     Contract:
+     - Every page needs id="download" on its final store CTA, the nav pill
+       points at it.
+     - Pages that open on a WORLD-mood surface (homepage hero, q invite, the
+       compact subpage header band) put data-nav-hero on that surface and use
+       the .btn-outline-white nav pill. js/site.js swaps the nav to frosted
+       cream with .is-past-hero the moment that surface leaves the bar.
+     - Pages with no world surface put data-nav-solid on <body>. The nav then
+       starts frosted and the pill can stay .btn-outline-white, it is restyled
+       to the ink pill by the .is-past-hero rules.
+     ========================================================================= -->
+
+
+<!-- ===================== 1. HEAD (inside <head>) ===================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}.site-nav{background:rgba(243,241,231,.86);border-bottom-color:rgba(25,25,25,.07)}.site-nav .site-nav__logo img{filter:none}.site-nav .btn-outline-white{background:#191919;color:#FDFBF6;box-shadow:none}</style></noscript>
+<script src="/js/site.js" defer></script>
+<!-- quest-card.js only on pages that carry a quest card -->
+<script src="/js/quest-card.js" defer></script>
+
+
+<!-- ===================== 2. NAV (first thing in <body>) ===================== -->
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-nav">
+  <div class="container site-nav__inner">
+    <a class="site-nav__logo" href="/" aria-label="Quests home">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+    </a>
+    <a class="btn btn-outline-white" href="/#download" aria-label="Download Quests">Download</a>
+  </div>
+</header>
+
+
+<!-- ===================== 3. WORLD SCENE (any purple surface) =====================
+     Drop as the first child of a .world element. The element also needs
+     data-nav-hero if it is the surface the nav sits over at the top of the page.
+     .world__body carries the content above the scene. -->
+
+<!-- <span class="seam" aria-hidden="true"></span>  full-bleed world blocks only -->
+
+
+<!-- ===================== 4. SUBPAGE HEADER BAND =====================
+     The compact world-mood page header. Roughly 240px tall under the nav. -->
+
+<section class="page-header cat-growth">
+    <div class="container">
+      <div class="page-header__road">
+        <svg class="page-header__stub" viewBox="0 0 60 214" fill="none" aria-hidden="true" focusable="false">
+          <path d="M30 0 C30 70 12 120 30 178 C42 198 32 206 30 212"></path>
+        </svg>
+        <span class="page-header__mark cat-growth" aria-hidden="true">
+          <img src="/assets/img/icon-growth.svg" alt="" width="28" height="28" decoding="async">
+        </span>
+      </div>
+    <h1 class="page-header__title">Page title</h1>
+    <p class="page-header__sub">One line of subtitle.</p>
+  </div>
+</section>
+
+
+<!-- ===================== 5. STORE BADGE ROW =====================
+     Add store-badges&#45;&#45;center to centre the row.
+     On CREAM use the bare .store-badge. On PURPLE add .store-badge&#45;&#45;world,
+     which puts the official artwork on a white-outlined plate. The badge
+     artwork itself is never recoloured. -->
+
+<div class="store-badges">
+  <a class="store-badge" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store">
+    <img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">
+  </a>
+  <a class="store-badge" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play">
+    <img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40">
+  </a>
+</div>
+
+
+<!-- ===================== 6. GIANT WORDMARK BAND =====================
+     Sits directly above the footer on every page. Decorative, because the
+     footer brand mark names Quests immediately below it. -->
+
+<div class="wordmark-band reveal">
+  <div class="container">
+    <img src="/assets/img/wordmark-caps-ink.png" alt="" aria-hidden="true" width="2241" height="593" loading="lazy" decoding="async">
+  </div>
+</div>
+
+
+<!-- ===================== 7. FOOTER (last thing in <body>) ===================== -->
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+        <p>The home of the healthy challenge.</p>
+        <div class="site-footer__social">
+          <a href="https://instagram.com/quests.app" target="_blank" rel="noopener" aria-label="Quests on Instagram">Instagram</a>
+          <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener" aria-label="Quests on TikTok">TikTok</a>
+          <a href="https://x.com/Quests_app_" target="_blank" rel="noopener" aria-label="Quests on X">X</a>
+        </div>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Product">
+        <h2>Product</h2>
+        <ul>
+          <li><a href="/#download">Download</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Legal">
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/privacy.html">Privacy</a></li>
+          <li><a href="/terms.html">Terms</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="site-footer__legal">
+      <p>&copy; <span data-year>2026</span> Nothing Serious LLC</p>
+      <p>Download Quests on iOS and Android.</p>
+    </div>
+  </div>
+</footer>

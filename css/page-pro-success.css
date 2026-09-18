@@ -1,0 +1,60 @@
+/* ==========================================================================
+   Quests V2 - pro/success.html page-specific styles
+   Foundation tokens, the .world page-header band and the .card white surface
+   come from css/site.css. This file only adds the things unique to the
+   Quests Pro checkout-return card.
+   ========================================================================== */
+
+.success-card {
+  max-width: 420px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.success-check {
+  /* Gold quest-complete medallion, per DESIGN-BRIEF-V4: this page's own
+     completion moment. Uses the site's gold tokens, fixed brand constants
+     that hold their color in both light and dark mode. */
+  width: 68px;
+  height: 68px;
+  margin-inline: auto;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: linear-gradient(150deg, var(--gold-lit) 0%, var(--gold) 62%, #C79526 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-check svg {
+  width: 30px;
+  height: 30px;
+  color: var(--gold-ink);
+}
+
+.success-status {
+  margin-top: var(--s-16);
+  color: var(--ink-2);
+}
+
+.success-actions {
+  margin-top: var(--s-32);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-12);
+}
+
+.success-actions .btn,
+.success-actions .btn-ghost {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The checkout-return script toggles the staging escape hatch with the
+   native `hidden` attribute. `.btn` sets its own `display`, which would
+   otherwise win over the UA default and leave it visible. */
+#staging-link[hidden] {
+  display: none !important;
+}

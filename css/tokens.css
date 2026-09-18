@@ -1,0 +1,214 @@
+/* ==========================================================================
+   Quests design tokens for the web
+   Ported from the app. Every value here has a source in the app repo; the
+   mapping is documented in DESIGN-SYSTEM.md. Change the app first, then this.
+
+   Sources
+     src/uiNext/tokens.ts                          colors, type, radius, shadows
+     src/ui/theme/onboarding/brand-light.ts        light brand layer
+     src/ui/theme/onboarding/brand-dark.ts         dark brand layer
+     src/components/ui/questFeedTokens.ts          category ramps (light + dark)
+     src/components/ui/medallionFigmaConstants.ts  medallion spec
+     src/ui/theme/design-system/source/*.json      radius, space, motion, opacity
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+}
+/* The homepage pins light: the tan page is the brand surface on the web. */
+:root[data-theme="light"] { color-scheme: light; }
+
+:root {
+
+  /* ---- Surfaces (brand-light.ts, tokens.ts colors) ---- */
+  --q-page: #F3F1E7;            /* backgroundWashTop / decorativeBg / surfaceAlt */
+  --q-page-wash: #FFFFFF;       /* backgroundWashBottom */
+  --q-surface: #FDFBF6;         /* background (card face, Neutral/Cream) */
+  --q-surface-raised: #FEFEFD;  /* surface (Background/subtle) */
+  --q-white: #FFFFFF;
+  --q-glass: rgba(255, 255, 255, 0.6);        /* Transparent/glass-60 */
+  --q-glass-strong: rgba(255, 255, 255, 0.8); /* Alpha/White/80 */
+
+  /* ---- Text ---- */
+  --q-text-display: #191919;    /* textDisplay: Instrument Serif headings */
+  --q-text: #292929;            /* textPrimary: Neutral/Graphite */
+  --q-text-2: #696969;          /* textSecondary: Text/tertiary */
+  --q-text-3: #5C5C5C;          /* textTertiary: stat numbers */
+  --q-text-inverse: #FFFFFF;
+
+  /* ---- Actions ---- */
+  --q-action: #191919;          /* Action/primary */
+  --q-action-pressed: #101010;  /* Action/primary-pressed */
+  --q-on-action: #FFFFFF;
+
+  /* ---- Accent, purple family (light only; dark swaps to silver) ---- */
+  --q-accent: #A961CC;          /* Primary/Purple Strong */
+  --q-accent-deep: #9354B3;
+  --q-accent-medium: #C796DF;
+  --q-accent-light: #F1E2F8;
+  --q-accent-border: #F2E8F8;
+
+  /* ---- Borders ---- */
+  --q-border-subtle: #FDFBF6;   /* Border/subtle, cream hairline on frosted cards */
+  --q-border-light: #FFFFFF;    /* Border/light, white hairline on solid cards */
+  --q-divider: #E4E2DD;         /* divider */
+  --q-border-neutral: #D4D4D4;  /* Neutral/300 */
+  --q-hairline: rgba(25, 25, 25, 0.08);
+
+  /* ---- Misc accents ---- */
+  --q-gold: #DBB66B;            /* Primary/Gold Strong */
+  --q-gold-light: #EBD3A3;
+  --q-flame: #F04D4E;
+
+  /* ---- Category ramps (questFeedTokens.ts LIGHT_RAMPS) ----
+     Display labels are adjectives (docs/design-system/quest-category-naming.md):
+     recharge = Healthy, mindfulness = Mindful, creativity = Creative,
+     growth/productivity = Productive, social = Social. */
+  --q-mindful: #A961CC;    --q-mindful-deep: #9354B3;    --q-mindful-medium: #C796DF;    --q-mindful-light: #F1E2F8;    --q-mindful-border: #F2E8F8;
+  --q-creative: #F0925B;   --q-creative-deep: #D17F4F;   --q-creative-medium: #F5B793;   --q-creative-light: #FFE4D6;   --q-creative-border: #FFD9C4;
+  --q-social: #A1B717;     --q-social-deep: #8A9D14;     --q-social-medium: #C5D26F;     --q-social-light: #EEF2D5;     --q-social-border: #E5EBBE;
+  --q-productive: #DBB66B; --q-productive-deep: #BF9E5D; --q-productive-medium: #E7CF9D; --q-productive-light: #F5E9CF; --q-productive-border: #EFDFBD;
+  --q-healthy: #889FE9;    --q-healthy-deep: #768ACB;    --q-healthy-medium: #B0C0F0;    --q-healthy-light: #ECF0FE;    --q-healthy-border: #DCE5FB;
+
+  /* ---- Type (tokens.ts fonts + type) ---- */
+  --q-font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --q-font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  /* display/* Instrument Serif. Figma sets lineHeight == fontSize; web uses 1.0 to 1.05. */
+  --q-display-xl: 56px;   /* screen H1 */
+  --q-display-lg: 48px;
+  --q-display-md: 40px;
+  --q-display-sm: 32px;   /* quest names, card headings */
+  --q-display-xs: 24px;   /* quest card titles */
+  --q-headline: 28px;     /* Manrope 400 28/36 */
+  --q-title-md: 16px;     /* Manrope 500 16/24 lede */
+  --q-title-sm: 14px;     /* Manrope 500 14/24 */
+  --q-body-md: 14px;      /* Manrope 400 14/20 */
+  --q-body-sm: 12px;      /* Manrope 400 12/16 */
+  --q-label-lg: 14px;     /* Manrope 500 14/20 */
+  --q-label-md: 12px;     /* Manrope 500 12/16 */
+
+  /* ---- Radius (tokens.ts radius) ---- */
+  --q-r-xs: 8px;
+  --q-r-sm: 12px;
+  --q-r-md: 16px;         /* alerts, small cards, icon tiles */
+  --q-r-input: 20px;
+  --q-r-card: 24px;       /* quest cards */
+  --q-r-stats: 32px;      /* stats cards */
+  --q-r-hero: 40px;       /* hero feature cards */
+  --q-r-full: 999px;
+
+  /* ---- Space (Space.json + tokens.ts spacing) ---- */
+  --q-s-1: 4px;  --q-s-2: 8px;  --q-s-3: 12px; --q-s-4: 16px; --q-s-5: 20px;
+  --q-s-6: 24px; --q-s-7: 28px; --q-s-8: 32px; --q-s-10: 40px; --q-s-12: 48px;
+  --q-s-15: 60px; --q-s-18: 72px;
+  --q-gutter: 24px;       /* layout.screenGutter */
+
+  /* ---- Motion (Motion.json) ---- */
+  --q-t-fast: 100ms;
+  --q-t-base: 200ms;
+  --q-t-moderate: 300ms;
+  --q-t-slow: 400ms;
+  --q-t-lazy: 600ms;
+  --q-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --q-ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --q-ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --q-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- Shadows (tokens.ts shadows; Figma blur 30 = css blur 30) ---- */
+  --q-sh-card: 0 4px 30px rgba(220, 220, 218, 0.22);
+  --q-sh-card-deep: 4px 4px 30px rgba(0, 0, 0, 0.05);
+  --q-sh-card-deep-strong: 4px 4px 30px rgba(0, 0, 0, 0.12);
+  --q-sh-bubble: 6.5px 13px 45px rgba(10, 10, 10, 0.16);
+  --q-sh-glow: 0 4px 30px rgba(255, 255, 255, 0.5);
+
+  /* ---- Medallion (medallionFigmaConstants.ts MEDALLION_CATEGORY) ---- */
+  --q-medallion: 54px;
+  --q-medallion-border: 2px;
+  --q-medallion-icon: 24px;
+  --q-medallion-face: #FEFEFD;
+
+  /* ---- Opacity (Opacity.json, tokens.ts opacity) ---- */
+  --q-o-disabled: 0.5;
+  --q-o-20: 0.2;
+  --q-o-40: 0.4;
+  --q-o-60: 0.6;
+
+  /* ---- Mode-derived helpers ---- */
+  --q-nav-bg: rgba(243, 241, 231, 0.72);
+  --q-mark-filter: none;             /* wordmark SVGs are ink; inverted in dark */
+  --q-category-tint-alpha: 1;        /* light: solid pale fills */
+}
+
+/* --------------------------------------------------------------------------
+   Dark mode (brand-dark.ts, Semantic-Dark.json, questFeedTokens.ts dark method)
+   The purple accent steps aside for Theme silver. Category ink stays vivid;
+   its tints become low-alpha washes over the #1C1C1E surface.
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --q-page: #0E0E12;               /* decorativeBg */
+    --q-page-wash: #0E0E12;
+    --q-surface: #1C1C1E;            /* backgroundSubtle / bg.surface */
+    --q-surface-raised: #2C2C2E;     /* bg.surface-raised */
+    --q-glass: rgba(255, 255, 255, 0.08);
+    --q-glass-strong: rgba(255, 255, 255, 0.12);
+
+    --q-text-display: #FFFFFF;
+    --q-text: #F2F2F7;               /* textSecondary (dark) */
+    --q-text-2: #AEAEB2;             /* textTertiary = Theme silver */
+    --q-text-3: #AEAEB2;
+    --q-text-inverse: #000000;
+
+    --q-action: #FFFFFF;             /* actionPrimary (dark) */
+    --q-action-pressed: #E5E5EA;
+    --q-on-action: #000000;
+
+    --q-accent: #AEAEB2;             /* DARK_THEME_SILVER, approved 2026-07-16 */
+    --q-accent-deep: #C7C7CC;
+    --q-accent-medium: #8E8E93;
+    --q-accent-light: rgba(174, 174, 178, 0.18);   /* accentSubtle */
+    --q-accent-border: rgba(174, 174, 178, 0.35);
+
+    --q-border-subtle: #2C2C2E;
+    --q-border-light: #2C2C2E;
+    --q-divider: #3A3A3C;
+    --q-border-neutral: #48484A;
+    --q-hairline: rgba(255, 255, 255, 0.10);
+
+    --q-mindful-light: rgba(169, 97, 204, 0.16);    --q-mindful-border: rgba(169, 97, 204, 0.35);    --q-mindful-deep: #C08BDA;
+    --q-creative-light: rgba(240, 146, 91, 0.16);   --q-creative-border: rgba(240, 146, 91, 0.35);   --q-creative-deep: #F4A67A;
+    --q-social-light: rgba(161, 183, 23, 0.16);     --q-social-border: rgba(161, 183, 23, 0.35);     --q-social-deep: #B4C646;
+    --q-productive-light: rgba(219, 182, 107, 0.16);--q-productive-border: rgba(219, 182, 107, 0.35);--q-productive-deep: #E2C384;
+    --q-healthy-light: rgba(136, 159, 233, 0.16);   --q-healthy-border: rgba(136, 159, 233, 0.35);   --q-healthy-deep: #A1B3EE;
+
+    --q-sh-card: 0 4px 30px rgba(0, 0, 0, 0.35);
+    --q-sh-card-deep: 4px 4px 30px rgba(0, 0, 0, 0.45);
+    --q-sh-card-deep-strong: 4px 4px 30px rgba(0, 0, 0, 0.6);
+    --q-sh-bubble: 6.5px 13px 45px rgba(0, 0, 0, 0.5);
+    --q-sh-glow: none;
+
+    --q-medallion-face: #1C1C1E;
+    --q-nav-bg: rgba(28, 28, 30, 0.72);
+    --q-mark-filter: brightness(0) invert(1);
+  }
+}
+
+/* Explicit override hook, mirrors the block above for QA and for a future toggle. */
+:root[data-theme="dark"] {
+  --q-page: #0E0E12; --q-page-wash: #0E0E12; --q-surface: #1C1C1E; --q-surface-raised: #2C2C2E;
+  --q-glass: rgba(255, 255, 255, 0.08); --q-glass-strong: rgba(255, 255, 255, 0.12);
+  --q-text-display: #FFFFFF; --q-text: #F2F2F7; --q-text-2: #AEAEB2; --q-text-3: #AEAEB2; --q-text-inverse: #000000;
+  --q-action: #FFFFFF; --q-action-pressed: #E5E5EA; --q-on-action: #000000;
+  --q-accent: #AEAEB2; --q-accent-deep: #C7C7CC; --q-accent-medium: #8E8E93;
+  --q-accent-light: rgba(174, 174, 178, 0.18); --q-accent-border: rgba(174, 174, 178, 0.35);
+  --q-border-subtle: #2C2C2E; --q-border-light: #2C2C2E; --q-divider: #3A3A3C; --q-border-neutral: #48484A;
+  --q-hairline: rgba(255, 255, 255, 0.10);
+  --q-mindful-light: rgba(169, 97, 204, 0.16);    --q-mindful-border: rgba(169, 97, 204, 0.35);    --q-mindful-deep: #C08BDA;
+  --q-creative-light: rgba(240, 146, 91, 0.16);   --q-creative-border: rgba(240, 146, 91, 0.35);   --q-creative-deep: #F4A67A;
+  --q-social-light: rgba(161, 183, 23, 0.16);     --q-social-border: rgba(161, 183, 23, 0.35);     --q-social-deep: #B4C646;
+  --q-productive-light: rgba(219, 182, 107, 0.16);--q-productive-border: rgba(219, 182, 107, 0.35);--q-productive-deep: #E2C384;
+  --q-healthy-light: rgba(136, 159, 233, 0.16);   --q-healthy-border: rgba(136, 159, 233, 0.35);   --q-healthy-deep: #A1B3EE;
+  --q-sh-card: 0 4px 30px rgba(0, 0, 0, 0.35); --q-sh-card-deep: 4px 4px 30px rgba(0, 0, 0, 0.45);
+  --q-sh-card-deep-strong: 4px 4px 30px rgba(0, 0, 0, 0.6); --q-sh-bubble: 6.5px 13px 45px rgba(0, 0, 0, 0.5); --q-sh-glow: none;
+  --q-medallion-face: #1C1C1E; --q-nav-bg: rgba(28, 28, 30, 0.72); --q-mark-filter: brightness(0) invert(1);
+}

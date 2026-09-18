@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Quests V2 - get-card.html page-specific styles
+   Foundation tokens, the .world page-header band and the .card white surface
+   come from css/site.css. This file only adds the things unique to the
+   Apple Wallet download card: the wordmark preview box, the QR frame and
+   its API-failure placeholder.
+   ========================================================================== */
+
+.wallet-card {
+  max-width: 420px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.wallet-preview {
+  /* Fixed dark plate, a brand constant. A physical Wallet pass keeps its own
+     dark card face in both modes, so this uses --ink-card, the app's
+     replicated-card ink, which stays fixed across light and dark. */
+  background: var(--ink-card);
+  border-radius: var(--r-card);
+  padding: var(--s-32) var(--s-24);
+}
+
+.wallet-preview__wordmark {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.14em;
+  color: #FFFFFF;
+  margin-bottom: var(--s-24);
+}
+
+.wallet-preview__qr {
+  width: 200px;
+  height: 200px;
+  margin-inline: auto;
+  background: #FFFFFF;
+  border-radius: var(--s-12);
+  padding: var(--s-16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wallet-preview__qr img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wallet-preview__qr-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--s-8);
+  background: repeating-linear-gradient(45deg, var(--sand), var(--sand) 10px, #FFFFFF 10px, #FFFFFF 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+  text-align: center;
+  padding: var(--s-16);
+}
+
+.wallet-caption {
+  margin-top: var(--s-20);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.wallet-cta {
+  margin-top: var(--s-24);
+}

@@ -1,0 +1,27 @@
+/* ==========================================================================
+   Quests V2 - share.html page-specific styles
+   Foundation tokens, the .world page-header band and the .card white surface
+   come from css/site.css. This file only adds the QR frame sizing.
+   ========================================================================== */
+
+.share-card {
+  max-width: 320px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.share-qr {
+  margin-inline: auto;
+  width: fit-content;
+}
+
+.share-qr img {
+  width: 220px;
+  height: 220px;
+  display: block;
+  border-radius: var(--s-12);
+}
+
+@media (max-width: 400px) {
+  .share-qr img { width: 180px; height: 180px; }
+}

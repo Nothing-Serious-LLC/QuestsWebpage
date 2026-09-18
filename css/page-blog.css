@@ -1,0 +1,61 @@
+/* ==========================================================================
+   Quests V4, blog.html page-specific styles
+   Foundation tokens and components (the journey system, page-header, .card,
+   .card--hover) come from css/site.css. This file only adds what's unique
+   to the blog list: the post grid, the category chip, and the hover lift.
+   ========================================================================== */
+
+.blog-grid {
+  display: grid;
+  gap: var(--s-24);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--t-mid) var(--ease), box-shadow var(--t-mid) var(--ease);
+}
+.blog-card:hover {
+  transform: translateY(-4px);
+}
+
+.blog-card__category {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: var(--cat-soft);
+  color: var(--cat-text);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--s-16);
+}
+
+.blog-card__title {
+  margin-top: 0;
+}
+
+.blog-card__excerpt {
+  flex: 1;
+}
+
+.blog-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-8);
+  margin-top: var(--s-20);
+  padding-top: var(--s-16);
+  border-top: 1px solid var(--hairline);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+/* Whole card is the target: the title link stretches over the card. */
+.blog-card { position: relative; }
+.blog-card__link { color: inherit; text-decoration: none; }
+.blog-card__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.blog-card:focus-within { outline: 2px solid var(--cat-text); outline-offset: 2px; }
