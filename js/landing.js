@@ -264,7 +264,10 @@
     var WIDTH_STEP = 38, WIDTH_STEP_DECAY = -11, MIN_WIDTH_STEP = 8;
     var MAX_ROT = 8, ARC_UP = 56, LANE_PEAK_FRACTION = 0.85, SEAT_ZONE = 0.25, SCALE_DIP = 0.04;
     var DIM_BASE = 0.10, DIM_PER_RANK = 0.10, MAX_DIM = 0.30;
-    var DRAG_SPAN = 0.6, COMMIT = 0.3, FLICK_VX = 500, TRAVEL_MS = 560;
+    /* Arrow, tap and auto-advance travel: a slow, legible arc (the app's
+       "silk" preset stretched for the larger desktop card). A drag release
+       settles on its own shorter clock so the hand-off stays continuous. */
+    var DRAG_SPAN = 0.6, COMMIT = 0.3, FLICK_VX = 500, TRAVEL_MS = 1100, SETTLE_MS = 640;
     var AUTO_MS = 4200, AUTO_REST_MS = 9000;
 
     var P = 0, target = 0, cardW = 346;
@@ -335,17 +338,19 @@
     function measure() { cardW = stage.getBoundingClientRect().width || cardW; deckRoot.style.setProperty('--deck-w', cardW + 'px'); render(); }
 
     function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-    function animateTo(to, ms) {
+    /* Slow in, slow out: the card lifts off gently and seats gently. */
+    function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function animateTo(to, ms, easing) {
       if (anim) window.cancelAnimationFrame(anim);
       target = to;
       if (reducedMotion) { P = to; render(); return; }
-      var from = P, start = null;
-      var dur = Math.min(TRAVEL_MS * Math.max(1, Math.abs(to - from)), 1400);
+      var from = P, start = null, ease = easing || easeInOut;
+      var dur = Math.min(TRAVEL_MS * Math.max(1, Math.abs(to - from)), 2200);
       if (ms) dur = ms;
       function step(now) {
         if (start === null) start = now;
         var t = Math.min(1, (now - start) / dur);
-        P = lerp(from, to, easeOut(t));
+        P = lerp(from, to, ease(t));
         render();
         if (t < 1) anim = window.requestAnimationFrame(step); else { anim = null; P = to; render(); }
       }
@@ -353,8 +358,8 @@
     }
     function settle(from, to, flick) {
       var remaining = Math.abs(to - from);
-      var dur = Math.min(TRAVEL_MS, Math.max(180, TRAVEL_MS * remaining));
-      animateTo(to, flick ? Math.max(150, dur * 0.7) : dur);
+      var dur = Math.min(SETTLE_MS, Math.max(180, SETTLE_MS * remaining));
+      animateTo(to, flick ? Math.max(150, dur * 0.7) : dur, easeOut);
     }
     /* Forward = the front card lifts off along the arc and lands at the back; P falls by one. */
     function advance(n) { lastUser = Date.now(); animateTo(Math.round(target) - n); }
@@ -391,7 +396,7 @@
       if (!decided) {
         /* Tap without a drag: if nothing is animating and the deck is off a
            whole position, glide it to its target. */
-        if (!anim && Math.abs(P - Math.round(P)) > 1e-3) animateTo(Math.round(target));
+        if (!anim && Math.abs(P - Math.round(P)) > 1e-3) animateTo(Math.round(target), SETTLE_MS, easeOut);
         return;
       }
       var fraction = P - base, flick = Math.abs(vx) > FLICK_VX;
