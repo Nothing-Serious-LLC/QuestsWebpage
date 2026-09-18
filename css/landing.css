@@ -45,6 +45,7 @@ em { font-style: italic; }
   background: var(--q-action); color: var(--q-on-action); font-weight: 700; font-size: 14px;
 }
 .skip-link:focus { top: 12px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* ---- Layout ----------------------------------------------------------------- */
 .shell {
@@ -61,7 +62,7 @@ em { font-style: italic; }
 
 .lede {
   color: var(--q-text-2);
-  font-size: clamp(16px, 0.95rem + 0.35vw, 19px);
+  font-size: clamp(17px, 1rem + 0.4vw, 20px);
   font-weight: 500;
   line-height: 1.5;
   max-width: 44ch;
@@ -228,7 +229,7 @@ em { font-style: italic; }
 .hero h1 em { color: var(--hero-accent); }
 
 
-.hero .lede { margin-top: clamp(20px, 3vh, 32px); max-width: none; }
+.hero .lede { margin-top: clamp(16px, 2.5vh, 32px); max-width: none; font-size: clamp(19px, 1.05rem + 0.55vw, 24px); }
 .hero .store-row { margin-top: var(--q-s-8); justify-content: center; }
 
 /* ---- The app in frames --------------------------------------------------------
@@ -237,17 +238,15 @@ em { font-style: italic; }
    proportions of the device width. The phones lead the hero: the front one
    centered, the back one peeking out behind it, both fully in view, with the
    title rising underneath. */
-@property --bob { syntax: "<length>"; inherits: false; initial-value: 0px; }
 .phones {
-  --phone-w: clamp(196px, 15vw, 232px);
+  --phone-w: clamp(176px, min(15vw, 23vh), 232px);
   --tilt-x: 0deg; --tilt-y: 0deg;
   position: relative;
   width: var(--phone-w);
   height: calc(var(--phone-w) * 2.17);
-  margin-bottom: clamp(32px, 4.5vh, 48px);
+  margin-bottom: clamp(24px, 4vh, 48px);
   perspective: 1400px; transform-style: preserve-3d;
 }
-@property --bob { syntax: "<length>"; inherits: false; initial-value: 0px; }
 .phone {
   position: relative; display: block;
   width: var(--phone-w);
@@ -258,7 +257,7 @@ em { font-style: italic; }
     inset 0 0 0 1px rgba(255, 255, 255, 0.08),
     0 1px 2px rgba(25, 25, 25, 0.12),
     0 40px 80px -20px rgba(25, 25, 25, 0.35);
-  transform: translateY(var(--bob)) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+  transform: rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
 }
 .phone::before, .phone::after {
   content: ""; position: absolute; width: calc(var(--phone-w) * 0.01); border-radius: 2px;
@@ -297,10 +296,6 @@ em { font-style: italic; }
   border-radius: var(--q-r-full);
   background: #050505;
 }
-@keyframes phone-bob { 0%, 100% { --bob: 0px; } 50% { --bob: -7px; } }
-@supports (text-wrap: balance) {
-  .is-ready .phone { animation: phone-bob 6s ease-in-out 1.6s infinite; }
-}
 
 /* Copy stagger, once the intro glyphs have cleared. */
 .hero__inner > * {
@@ -317,6 +312,52 @@ em { font-style: italic; }
 /* ---- Sections ------------------------------------------------------------------ */
 .section { padding-block: clamp(96px, 14vh, 176px); }
 
+/* ---- Pager: one section per screen ------------------------------------------------
+   html[data-snap] turns the page into a deck of screens. The document does
+   not scroll. Every section is stacked in the same viewport-sized frame and
+   staged by class: the current screen's content is lit, screens above sit
+   faded a little high, screens below a little low, so each arrival rises in
+   and each departure drifts on (landing.js "Pager" moves the classes on a
+   wheel burst, swipe or key). Nothing large ever moves: only opacity and a
+   short transform on each screen's content layer, which stays inside the
+   viewport the whole time, so WebKit never has to repaint a screen's worth of
+   content mid-transition. The backdrop glyphs glide by a virtual scroll
+   offset to keep the sense of travel. The footer shares the last screen with
+   the CTA (--footer-h, measured by JS). ?snap=0 turns it off; reduced motion
+   and a viewport too short for a screen's content keep native scroll. */
+html[data-snap], html[data-snap] body { height: 100svh; overflow: hidden; overscroll-behavior: none; scroll-behavior: auto; }
+/* iOS ignores overflow: hidden on the document for touch scrolling; a fixed
+   body is the one lock it honours. */
+html[data-snap] body { position: fixed; inset: 0; width: 100%; }
+[data-snap] .pager { position: relative; z-index: 1; height: 100svh; overflow: hidden; }
+[data-snap] main { position: static; }
+[data-snap] .glyph { transition: transform var(--page-ms, 900ms) cubic-bezier(0.6, 0, 0.3, 1); }
+[data-snap] .hero, [data-snap] .section {
+  position: absolute; inset: 0; box-sizing: border-box; min-height: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-block: clamp(80px, 12vh, 112px) clamp(16px, 4vh, 40px);
+  pointer-events: none;
+}
+[data-snap] .hero.is-current, [data-snap] .section.is-current { pointer-events: auto; }
+[data-snap] .hero { padding-block: clamp(72px, 10vh, 80px) 12px; }
+[data-snap] .section.cta { padding-bottom: calc(40px + var(--footer-h, 0px)); }
+[data-snap] [data-fade] > .shell, [data-snap] .footer {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 460ms var(--q-ease-standard), transform 820ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+[data-snap] [data-fade].is-before > .shell, [data-snap] .footer.is-before { transform: translateY(-40px); }
+[data-snap] [data-fade].is-current > .shell, [data-snap] .footer.is-current { opacity: 1; transform: none; transition-delay: 140ms; }
+/* The full-width marquee fades only. Moving its box while the cards inside
+   move on their own layers left stale copies of the cards behind in Safari. */
+[data-snap] [data-fade] .fade { opacity: 0; transition: opacity 460ms var(--q-ease-standard); will-change: opacity; }
+[data-snap] [data-fade].is-current .fade { opacity: 1; transition-delay: 140ms; }
+[data-snap] .footer { position: absolute; left: 0; right: 0; bottom: 0; pointer-events: none; }
+/* Reveal items keep their own layers under the pager, so a reveal is only a
+   compositor change and never a repaint on the first frame of a page turn. */
+[data-snap] [data-reveal], [data-snap] .section__head[data-reveal] > * { will-change: opacity, transform; }
+[data-snap] .footer.is-current { pointer-events: auto; }
+
 .section__head { max-width: 640px; }
 .section__head h2 {
   font-size: clamp(40px, 2rem + 2.6vw, 64px);
@@ -330,11 +371,12 @@ em { font-style: italic; }
 /* Scroll fade: JS writes --fade (0..1) on each [data-fade] section. */
 [data-fade] > .shell, [data-fade] .fade {
   opacity: var(--fade, 1);
-  transform: translateY(calc((1 - var(--fade, 1)) * 24px));
-  /* A short ease so a fast wheel or flick glides through the band instead
-     of stepping; slow scrolling is unaffected. */
-  transition: opacity 220ms linear, transform 220ms var(--q-ease-standard);
-  will-change: opacity, transform;
+  /* Opacity only. Any vertical offset here fights the page's own scroll and
+     reads as content drifting against the thumb, worst on iOS where scroll
+     events lag a momentum flick. A short ease so a fast wheel or flick glides
+     through the band instead of stepping; slow scrolling is unaffected. */
+  transition: opacity 180ms linear;
+  will-change: opacity;
 }
 
 /* ---- Cards ------------------------------------------------------------------------ */
@@ -370,10 +412,10 @@ em { font-style: italic; }
    the deck position moves, so this file only shapes the resting card. */
 .ways__inner { display: flex; flex-direction: column; align-items: center; gap: var(--q-s-6); }
 .ways .section__head { text-align: center; }
-.ways__lede { max-width: 420px; margin-inline: auto; text-align: center; margin-top: var(--q-s-3); font-size: 17px; line-height: 26px; }
+.ways__lede { max-width: 560px; margin-inline: auto; text-align: center; margin-top: var(--q-s-3); font-size: 17px; line-height: 26px; }
 .deck__hint { margin-top: var(--q-s-3); color: var(--q-text-2); font-weight: 500; letter-spacing: 0.08em; }
 
-.deck { --card-h: 292px; --peek: 24px; --arc: 56px; width: 100%; max-width: 380px; margin-inline: auto; }
+.deck { --card-h: clamp(248px, 35vh, 292px); --peek: 24px; --arc: 56px; width: 100%; max-width: 380px; margin-inline: auto; }
 .deck__stage {
   position: relative;
   height: calc(var(--card-h) + var(--peek) * 4 + var(--arc) + 8px);
@@ -382,9 +424,8 @@ em { font-style: italic; }
   cursor: grab;
 }
 .deck__stage.is-dragging { cursor: grabbing; }
-/* Cards follow the app's width model. Their body is a fixed-width layer
-   centered on the card, and the peek, body and dim are promoted, so a moving
-   deck re-rasters only the card face; the pills inside are never touched. */
+/* Cards follow the app's width model as a scale (see landing.js render), so
+   a moving deck is transform and opacity only: no layout, no repaint. */
 .deck__card {
   position: absolute; left: 0; bottom: 0;
   width: 100%; height: var(--card-h);
@@ -393,13 +434,16 @@ em { font-style: italic; }
   background: var(--face);
   border: 1px solid color-mix(in srgb, var(--ring) 40%, transparent);
   box-shadow: var(--q-sh-card-deep);
-  transform-origin: 50% 100%;
-  will-change: transform, width, opacity;
+  transform-origin: 50% 0;
+  will-change: transform, opacity;
 }
 .deck__peek, .deck__body, .deck__dim { will-change: opacity; }
 .deck__peek {
   position: absolute; left: 0; right: 0; top: 0;
-  height: var(--peek); line-height: var(--peek);
+  height: var(--peek); line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding-top: 1px; /* Instrument Serif sits high in its em box */
+  transform-origin: 50% 0; will-change: opacity, transform;
   text-align: center;
   font-size: 15px; letter-spacing: 0.01em; color: var(--q-text);
   pointer-events: none;
@@ -533,8 +577,7 @@ em { font-style: italic; }
 .stars { margin-top: var(--q-s-4); color: var(--q-gold); font-size: clamp(22px, 1rem + 1vw, 28px); letter-spacing: 0.16em; line-height: 1; }
 .rating .micro { margin-top: var(--q-s-3); font-weight: 400; }
 
-/* Quotes: a marquee of cards drifting left across the full width. JS clones
-   the track once so the loop is seamless and it never stops. Fades at
+/* Quotes: a marquee of cards drifting left across the full width. Fades at
    both edges so cards dissolve in and out instead of clipping. The block has
    breathing room above and below so shadows never get cut. */
 .marquee {
@@ -542,19 +585,19 @@ em { font-style: italic; }
   margin-top: clamp(24px, 4vh, 40px);
   padding-block: 32px;
   overflow: hidden;
-  display: flex; gap: var(--marquee-gap);
   mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
 }
-.marquee__track {
-  flex: none;
-  display: flex; gap: var(--marquee-gap);
-  animation: marquee 90s linear infinite;
-  will-change: transform; backface-visibility: hidden;
-}
-@keyframes marquee { to { transform: translate3d(calc(-100% - var(--marquee-gap)), 0, 0); } }
+/* JS drives the loop (see landing.js): one clock moves every card, and a
+   card that leaves on the left is placed after the last one on the right, so
+   there is never a gap and nothing to drift out of sync. Each card is its own
+   small compositing layer; one giant animated strip went blank in Safari once
+   it exceeded the GPU texture limit on a 3x phone. --marquee-seconds is how
+   long one full lap of the track takes. */
+.marquee { --marquee-seconds: 90; }
+.marquee__track { display: flex; gap: var(--marquee-gap); width: max-content; }
+.marquee__track > .quote { will-change: transform; backface-visibility: hidden; }
 .no-js .marquee { overflow-x: auto; }
-.no-js .marquee__track { animation: none; }
 
 .quote {
   flex: 0 0 clamp(320px, 30vw, 440px);
@@ -609,6 +652,16 @@ em { font-style: italic; }
 .section__head.is-above > * { transform: translateY(-22px); transition-delay: 0ms; }
 .section__head.is-visible > *, .no-js .section__head > * { opacity: 1; transform: none; }
 
+/* Touch screens: reveals are opacity only. A finger already moves the page;
+   content that also slides against it reads as a lurch, and iOS delivers
+   scroll positions late during a flick, so the slide lands out of step. */
+@media (hover: none) and (pointer: coarse) {
+  [data-reveal], [data-reveal].is-above, .card[data-reveal], .card[data-reveal].is-above,
+  .section__head[data-reveal] > *, .section__head.is-above > * { transform: none; }
+  [data-reveal], .section__head[data-reveal] > * { transition-property: opacity; transition-duration: 520ms; }
+  .section__head[data-reveal] > .lede { transition-delay: 90ms; }
+}
+
 
 /* ---- Small screens ----------------------------------------------------------------- */
 @media (max-width: 900px) {
@@ -630,12 +683,12 @@ em { font-style: italic; }
   /* Budget for one phone screen under Safari's bars (about 660px of page):
      nav 104 + phone 350 + title 46 + lede 58 + badges 58 + gaps. The phone
      leads; the title steps down so the device reads as the hero. */
-  .hero { padding: 104px 0 24px; min-height: auto; }
+  .hero { padding: 122px 0 24px; min-height: auto; }
   .hero h1 { font-size: min(clamp(34px, 10.5vw, 44px), calc((100vw - 40px) / 6.5)); }
   .phones { --phone-w: min(41vw, 162px); margin-bottom: 22px; }
   .hero .lede br { display: none; }
-  .hero .lede { font-size: 16px; line-height: 22px; margin-top: 14px; }
-  .hero .store-row { margin-top: 18px; }
+  .hero .lede { font-size: 18px; line-height: 24px; margin-top: 14px; }
+  .hero .store-row { margin-top: 28px; }
   .store-row img { height: 40px; }
 
   .section { padding-block: 88px; }
@@ -657,7 +710,7 @@ em { font-style: italic; }
   .deck__card { box-shadow: 0 2px 8px rgba(25, 25, 25, 0.06); }
   /* Slow enough to read four lines as a card crosses a phone. */
   .marquee { mask-image: none; -webkit-mask-image: none; }
-  .marquee__track { animation-duration: 150s; }
+  .marquee { --marquee-seconds: 150; }
   /* Cheaper raster for 18 moving cards on a 3x phone: flat cards, no blur. */
   .quote { box-shadow: 0 1px 2px rgba(25, 25, 25, 0.06); }
   .quote__face { box-shadow: none; }
@@ -671,6 +724,19 @@ em { font-style: italic; }
 
   .cta h2 { font-size: clamp(48px, 16vw, 76px); }
   .footer__top { flex-direction: column; align-items: flex-start; }
+
+  /* Pager on a phone: every screen is nav-clear at the top and centered in
+     what is left. The science cards shrink so all three sit on one screen. */
+  [data-snap] .hero, [data-snap] .section, [data-snap] .ways.section { padding-block: 84px 12px; }
+  [data-snap] .science .section__head h2 { font-size: 34px; }
+  [data-snap] .facts { gap: 10px; margin-top: 18px; grid-auto-rows: 1fr; }
+  [data-snap] .fact { padding: 14px 16px 12px; }
+  [data-snap] .fact__headline { font-size: 40px; line-height: 1; }
+  [data-snap] .fact__body { margin-top: 6px; font-size: 14px; line-height: 19px; max-width: 34ch; }
+  [data-snap] .fact__cite { margin-top: 8px; font-size: 11px; line-height: 14px; padding: 3px 8px; }
+  [data-snap] .fact__glyph { width: 32%; }
+  [data-snap] .section.cta { padding-bottom: calc(16px + var(--footer-h, 0px)); }
+  [data-snap] .footer { padding-top: var(--q-s-6); }
 }
 
 /* ---- Reduced motion --------------------------------------------------------------- */
@@ -679,7 +745,7 @@ em { font-style: italic; }
   .intro { display: none; }
   .hero { animation: none; }
   .marquee { overflow-x: auto; mask-image: none; -webkit-mask-image: none; }
-  .marquee__track { animation: none; }
+  .marquee__track > .quote { transform: none !important; }
   .fact .fact__glyph { opacity: 0.16 !important; }
   .nav, .backdrop, .hero__inner > *, [data-reveal], [data-reveal] * { opacity: 1 !important; transform: none !important; transition: none !important; }
   .hero__inner > .phones { transform: none !important; }
