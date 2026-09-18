@@ -44,4 +44,6 @@
 - Store badge: `download-on-the-app-store.svg` in repo root; create a visually matched Google Play badge SVG.
 
 ## Old site pages to replace (keep filenames)
-`index.html`, `blog.html`, `contact.html`, `privacy.html`, `terms.html`, `404.html`, `success.html`, `get-card.html`, `share.html`, `q/index.html` (reskin only), shared `styles.css` replaced by `css/site.css` (old styles.css may be deleted once no page references it). Legal text content in privacy/terms must be preserved word-for-word, only restyled. Contact page email/links preserved.
+`index.html`, `blog.html`, `contact.html`, `privacy.html`, `terms.html`, `404.html`, `success.html`, `get-card.html`, `share.html`, `q/index.html` (reskin only). Legal text content in privacy/terms must be preserved word-for-word, only restyled. Contact page email/links preserved.
+
+Stylesheets today: the homepage is `css/tokens.css` + `css/landing.css` + `js/landing.js`. Every other page (blog, articles, contact, legal, share, card, 404) is `css/tokens.css` + `css/page.css` + `js/page.js`, which carry the same nav, backdrop glyphs and footer as the homepage. `css/site.css`, `js/site.js` and `css/page-*.css` are the previous system and no page references them.

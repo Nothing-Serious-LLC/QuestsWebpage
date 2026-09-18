@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" class="no-js" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,10 +37,9 @@
 <link rel="preload" href="/assets/fonts/woff2/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/fonts.css">
 
-<link rel="stylesheet" href="/css/site.css">
-<link rel="stylesheet" href="/css/page-article.css">
-<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}.site-nav{background:rgba(243,241,231,.86);border-bottom-color:rgba(25,25,25,.07)}.site-nav .site-nav__logo img{filter:none}.site-nav .btn-outline-white{background:#191919;color:#FDFBF6;box-shadow:none}</style></noscript>
-<script src="/js/site.js" defer></script>
+<link rel="stylesheet" href="/css/tokens.css?v=3">
+<link rel="stylesheet" href="/css/page.css?v=2">
+<script src="/js/page.js?v=2" defer></script>
 
 <script type="application/ld+json">
 {
@@ -142,35 +141,38 @@
 
 <a class="skip-link" href="#main">Skip to content</a>
 
-<header class="site-nav">
-  <div class="container site-nav__inner">
-    <a class="site-nav__logo" href="/" aria-label="Quests home">
-      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+<!-- Home screen decorative tail: the flat category glyphs, large and sparse. -->
+<div class="backdrop" aria-hidden="true">
+  <img class="glyph glyph--1" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
+  <img class="glyph glyph--2" src="/assets/img/glyph-flat-social.svg" alt="">
+  <img class="glyph glyph--3" src="/assets/img/glyph-flat-recharge.svg" alt="">
+  <img class="glyph glyph--4" src="/assets/img/glyph-flat-creativity.svg" alt="">
+  <img class="glyph glyph--5" src="/assets/img/glyph-flat-growth.svg" alt="">
+  <img class="glyph glyph--6" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
+  <img class="glyph glyph--7" src="/assets/img/glyph-flat-social.svg" alt="">
+  <img class="glyph glyph--8" src="/assets/img/glyph-flat-recharge.svg" alt="">
+</div>
+
+<header class="nav">
+  <div class="shell nav__inner">
+    <a class="nav__logo" href="/" aria-label="Quests home">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
     </a>
-    <a class="btn btn-outline-white" href="/#download" aria-label="Download Quests">Download</a>
+    <a class="nav__cta" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" data-store-link target="_blank" rel="noopener">Download</a>
   </div>
 </header>
 
 <main id="main">
 
-  <section class="page-header cat-mindfulness">
-    <div class="container container--narrow">
-      <div class="page-header__road">
-        <svg class="page-header__stub" viewBox="0 0 60 214" fill="none" aria-hidden="true" focusable="false">
-          <path d="M30 0 C30 70 12 120 30 178 C42 198 32 206 30 212"></path>
-        </svg>
-        <span class="page-header__mark cat-mindfulness" aria-hidden="true">
-          <img src="/assets/img/icon-mindfulness.svg" alt="" width="28" height="28" decoding="async">
-        </span>
-      </div>
-      <nav class="article__crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/blog.html">Blog</a></nav>
-      <h1 class="page-header__title article__title">Why Social Accountability Is the Secret to Lasting Habits</h1>
-      <p class="article__meta"><span class="blog-card__category">Science</span> <time datetime="2026-09-02">Sep 2, 2026</time> <span aria-hidden="true">&middot;</span> <span>6 min read</span></p>
-    </div>
-  </section>
+  <section class="page-head cat-mindfulness">
+  <div class="shell container--narrow">
+    <h1 class="serif">Why Social Accountability Is the Secret to Lasting Habits</h1>
+    <p class="article__meta"><span class="tag">Science</span> <time datetime="2026-09-02">Sep 2, 2026</time> <span aria-hidden="true">&middot;</span> <span>6 min read</span></p>
+  </div>
+</section>
 
-  <section class="section--tight" style="padding-top:0">
-    <div class="container container--narrow">
+  <section class="section">
+    <div class="shell container--narrow">
       <article class="card article cat-mindfulness">
         <div class="prose article__body">
 <p>Most habit advice focuses on you: your willpower, your morning routine, your calendar. The research points somewhere else. The strongest predictor of whether a new habit survives its first two months is often <strong>who knows about it</strong>.</p>
@@ -234,16 +236,16 @@
         </div>
         <div class="article-cta__stores">
           <a href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store"><img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40"></a>
-          <a href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play"><img src="/google-play-badge.svg" alt="Get it on Google Play" width="135" height="40"></a>
+          <a href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play"><img src="/google-play-badge.svg?v=2" alt="Get it on Google Play" width="120" height="40"></a>
         </div>
       </aside>
 
       <section class="more" aria-labelledby="more-title">
         <h2 id="more-title" class="serif">More from the blog</h2>
         <ul class="more__list">
-        <li><a class="more__link cat-growth" href="/blog/how-long-does-it-take-to-build-a-habit.html"><span class="blog-card__category">Science</span><span class="more__title">How Long Does It Take to Build a Habit? What the Research Says</span></a></li>
-        <li><a class="more__link cat-social" href="/blog/30-day-challenge-with-friends.html"><span class="blog-card__category">Guide</span><span class="more__title">How to Do a 30-Day Challenge With Friends (and Actually Finish)</span></a></li>
-        <li><a class="more__link cat-recharge" href="/blog/dry-january-guide.html"><span class="blog-card__category">Challenges</span><span class="more__title">The Complete Guide to Dry January</span></a></li>
+        <li><a class="more__link cat-growth" href="/blog/how-long-does-it-take-to-build-a-habit.html"><span class="tag">Science</span><span class="more__title">How Long Does It Take to Build a Habit? What the Research Says</span></a></li>
+        <li><a class="more__link cat-social" href="/blog/30-day-challenge-with-friends.html"><span class="tag">Guide</span><span class="more__title">How to Do a 30-Day Challenge With Friends (and Actually Finish)</span></a></li>
+        <li><a class="more__link cat-recharge" href="/blog/dry-january-guide.html"><span class="tag">Challenges</span><span class="more__title">The Complete Guide to Dry January</span></a></li>
         </ul>
       </section>
     </div>
@@ -252,49 +254,24 @@
 </main>
 
 <!-- ===================== GIANT WORDMARK BAND ===================== -->
-<div class="wordmark-band reveal">
-  <div class="container">
-    <img src="/assets/img/wordmark-caps-ink.png" alt="" aria-hidden="true" width="2241" height="593" loading="lazy" decoding="async">
-  </div>
-</div>
 
 <!-- ===================== FOOTER ===================== -->
-<footer class="site-footer">
-  <div class="container">
-    <div class="site-footer__top">
-      <div class="site-footer__brand">
-        <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
-        <p>The home of the healthy challenge.</p>
-        <div class="site-footer__social">
-          <a href="https://instagram.com/quests.app" target="_blank" rel="noopener" aria-label="Quests on Instagram">Instagram</a>
-          <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener" aria-label="Quests on TikTok">TikTok</a>
-          <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener" aria-label="Quests on YouTube">YouTube</a>
-        </div>
-      </div>
-
-      <nav class="site-footer__col" aria-label="Product">
-        <h2>Product</h2>
-        <ul>
-          <li><a href="/#download">Download</a></li>
-          <li><a href="/blog.html">Blog</a></li>
-          <li><a href="/contact.html">Contact</a></li>
-        </ul>
-      </nav>
-
-      <nav class="site-footer__col" aria-label="Legal">
-        <h2>Legal</h2>
-        <ul>
-          <li><a href="/privacy.html">Privacy</a></li>
-          <li><a href="/terms.html">Terms</a></li>
-          <li><a href="/health-privacy.html">Health Data Privacy</a></li>
-        </ul>
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__top">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
+      <nav class="footer__links" aria-label="Footer">
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/health-privacy.html">Health Data</a>
+        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener">YouTube</a>
       </nav>
     </div>
-
-    <div class="site-footer__legal">
-      <p>&copy; <span data-year>2026</span> Nothing Serious LLC</p>
-      <p>Download Quests on iOS and Android.</p>
-    </div>
+    <p class="footer__legal">&copy; <span data-year>2026</span> Nothing Serious LLC</p>
   </div>
 </footer>
 

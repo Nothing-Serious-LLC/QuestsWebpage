@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" class="no-js" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,10 +26,9 @@
 <meta name="theme-color" content="#F3F1E7">
 <link rel="preload" href="/assets/fonts/woff2/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/fonts.css">
-<link rel="stylesheet" href="/css/site.css">
-<link rel="stylesheet" href="/css/page-404.css">
-<noscript><style>.reveal{opacity:1;transform:none}.load-in,.load-settle{opacity:1;animation:none}</style></noscript>
-<script src="/js/site.js" defer></script>
+<link rel="stylesheet" href="/css/tokens.css?v=3">
+<link rel="stylesheet" href="/css/page.css?v=2">
+<script src="/js/page.js?v=2" defer></script>
 
 <script type="application/ld+json">
 {
@@ -50,12 +49,24 @@
 
 <a class="skip-link" href="#main">Skip to content</a>
 
-<header class="site-nav">
-  <div class="container site-nav__inner">
-    <a class="site-nav__logo" href="/" aria-label="Quests home">
-      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="91" height="24">
+<!-- Home screen decorative tail: the flat category glyphs, large and sparse. -->
+<div class="backdrop" aria-hidden="true">
+  <img class="glyph glyph--1" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
+  <img class="glyph glyph--2" src="/assets/img/glyph-flat-social.svg" alt="">
+  <img class="glyph glyph--3" src="/assets/img/glyph-flat-recharge.svg" alt="">
+  <img class="glyph glyph--4" src="/assets/img/glyph-flat-creativity.svg" alt="">
+  <img class="glyph glyph--5" src="/assets/img/glyph-flat-growth.svg" alt="">
+  <img class="glyph glyph--6" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
+  <img class="glyph glyph--7" src="/assets/img/glyph-flat-social.svg" alt="">
+  <img class="glyph glyph--8" src="/assets/img/glyph-flat-recharge.svg" alt="">
+</div>
+
+<header class="nav">
+  <div class="shell nav__inner">
+    <a class="nav__logo" href="/" aria-label="Quests home">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
     </a>
-    <a class="btn btn-outline-white" href="/#download" aria-label="Download Quests">Download</a>
+    <a class="nav__cta" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" data-store-link target="_blank" rel="noopener">Download</a>
   </div>
 </header>
 
@@ -75,7 +86,7 @@
         <article class="quest-card quest-card--roadmap cat-mindfulness">
           <div class="quest-card__inner">
             <span class="quest-card__medallion" aria-hidden="true">
-              <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              <svg class="quest-card__glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path d="M22.5085 15.4326C22.8337 15.8578 23.0089 16.3101 23.0089 16.7791C23.0089 19.2665 18.0799 21.2829 11.9996 21.2829C5.91928 21.2829 0.990234 19.2665 0.990234 16.7791C0.990234 16.3101 1.16548 15.8578 1.49063 15.4326"/>
                 <path d="M17.5045 10.9528C17.5045 7.45365 14.6834 4.5133 13.0804 3.12495C12.452 2.58075 11.5476 2.58075 10.9193 3.12495C9.31622 4.5133 6.49512 7.45365 6.49512 10.9528C6.49512 14.1922 8.95967 16.2793 11.9998 16.2793C15.04 16.2793 17.5045 14.1922 17.5045 10.9528Z"/>
                 <path d="M8.40171 5.82592C6.62991 5.26442 4.77841 5.22817 3.55566 5.29327C2.71101 5.33827 2.05991 5.98937 2.01496 6.83402C1.90886 8.82642 2.07181 12.4882 4.33811 14.7545C5.93751 16.3539 8.00091 16.641 9.76426 15.8668C7.83806 15.1074 6.49501 13.3439 6.49501 10.9526C6.49501 9.01662 7.35861 7.25167 8.40171 5.82592Z"/>
@@ -139,6 +150,25 @@
     </footer>
   </section>
 </main>
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__top">
+      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
+      <nav class="footer__links" aria-label="Footer">
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/health-privacy.html">Health Data</a>
+        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener">YouTube</a>
+      </nav>
+    </div>
+    <p class="footer__legal">&copy; <span data-year>2026</span> Nothing Serious LLC</p>
+  </div>
+</footer>
 
 <script>
   // This page is the GitHub Pages catch-all for the apex domain, so a broken
