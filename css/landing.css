@@ -659,6 +659,18 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
 .cta__button:hover { background: var(--q-action-pressed); transform: translateY(-2px); box-shadow: 0 16px 36px rgba(25, 25, 25, 0.22); }
 .cta__button:active { transform: scale(0.97); box-shadow: 0 8px 20px rgba(25, 25, 25, 0.16); }
 .cta .store-row { justify-content: center; margin-top: var(--q-s-8); }
+/* Variant b: six still faces tethered to the line by dotted arcs. */
+[data-cta="b"] .cta__friend:nth-of-type(-n + 2) { display: none; }
+.cta__tethers { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.cta__tethers path { fill: none; stroke: color-mix(in srgb, var(--q-text) 38%, transparent); stroke-width: 1.5; stroke-dasharray: 2 6; stroke-linecap: round; }
+/* Variant c: the faces gathered in one overlapping row under the button. */
+[data-cta="c"] .cta__field { position: static; translate: none; width: auto; height: auto; order: 3; display: flex; justify-content: center; margin-top: var(--q-s-7); pointer-events: auto; }
+[data-cta="c"] .cta__friend { position: static; margin: 0 -9px; width: 64px; height: 64px; transform: none !important; transition: transform var(--q-t-base) var(--q-ease-standard); }
+[data-cta="c"] .cta__friend:hover { transform: translateY(-6px) scale(1.08) !important; z-index: 2; position: relative; }
+[data-cta="c"] .cta__face { box-shadow: 0 6px 18px rgba(25, 25, 25, 0.14), 0 0 0 3px var(--q-page); }
+[data-cta="c"] .cta__friend--ring { background-size: 100% 100%; }
+[data-cta="c"] .cta__friend--ring .cta__face { box-shadow: 0 6px 18px rgba(25, 25, 25, 0.14); }
+[data-cta="c"] .cta__inner::before { display: none; }
 
 /* ---- Footer -------------------------------------------------------------------- */
 .footer { padding: var(--q-s-10) 0 calc(var(--q-s-10) + env(safe-area-inset-bottom)); }
@@ -762,16 +774,21 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   .deck__card { box-shadow: 0 2px 8px rgba(25, 25, 25, 0.06); }
   /* Slow enough to read four lines as a card crosses a phone. */
   .marquee { mask-image: none; -webkit-mask-image: none; }
-  .cta__field { --k: 0.72; width: calc(100vw - 8px); height: min(58vh, 440px, calc(100svh - 84px - var(--footer-h, 140px) - 28px)); }
-  /* Footer as its own screen on phones. */
+  /* The field hugs the line and the button so the group keeps its pattern. */
+  .cta__field { --k: 0.72; width: calc(100vw - 8px); height: min(56svh, 400px); }
+  [data-cta="c"] .cta__friend { width: 52px; height: 52px; margin: 0 -7px; }
+  /* Footer as its own screen on phones: the content sits at the bottom. */
   [data-snap] .footer.is-screen {
     inset: 0; bottom: auto; height: 100svh; box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 84px 0 calc(24px + env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 84px 0 calc(28px + env(safe-area-inset-bottom));
   }
   [data-snap] .footer.is-screen > .shell { width: 100%; }
-  .footer-screen [data-snap] .section.cta, [data-snap] .footer-screen .section.cta, html.footer-screen[data-snap] .section.cta { padding-bottom: 12px; }
-  html.footer-screen[data-snap] .cta__field { height: min(58vh, 440px, calc(100svh - 84px - 28px)); }
+  [data-snap] .footer.is-screen .footer__top { gap: var(--q-s-7); }
+  [data-snap] .footer.is-screen .footer__links { display: grid; grid-template-columns: 1fr 1fr; gap: var(--q-s-4) var(--q-s-6); width: 100%; }
+  [data-snap] .footer.is-screen .footer__links a { font-size: 17px; line-height: 24px; }
+  [data-snap] .footer.is-screen .footer__legal { margin-top: var(--q-s-8); }
+  html.footer-screen[data-snap] .section.cta { padding-bottom: 12px; }
   /* Cheaper raster for 18 moving cards on a 3x phone: flat cards, no blur. */
   .quote { box-shadow: 0 1px 2px rgba(25, 25, 25, 0.06); }
   .quote__face { box-shadow: none; }
