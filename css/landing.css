@@ -614,11 +614,11 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   flex: 0 0 clamp(320px, 30vw, 440px);
   height: 212px;
   display: flex; flex-direction: column; justify-content: center;
-  padding: var(--q-s-5) var(--q-s-6) 52px;
+  padding: var(--q-s-5) var(--q-s-6) 68px;
 }
 .quote__text { font-size: clamp(19px, 1rem + 0.45vw, 22px); line-height: 1.2; text-wrap: pretty; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
 .quote__by { position: absolute; right: var(--q-s-6); bottom: var(--q-s-5); display: flex; align-items: center; gap: 8px; color: var(--q-text-2); font-size: var(--q-body-md); line-height: 20px; }
-.quote__face { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--q-surface); box-shadow: 0 1px 3px rgba(25,25,25,0.12); }
+.quote__face { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; object-position: center; border: 2px solid var(--q-surface); box-shadow: 0 1px 3px rgba(25,25,25,0.12); }
 
 /* CTA */
 /* ---- Closing CTA -------------------------------------------------------------------
