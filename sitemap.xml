@@ -8,31 +8,103 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog.html</loc>
-    <lastmod>2026-09-17</lastmod>
+    <lastmod>2026-09-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://thequestsapp.com/blog/social-accountability-habits.html</loc>
+    <loc>https://thequestsapp.com/blog/what-is-the-quests-app.html</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/healthy-challenge-ideas.html</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/challenge-with-friends.html</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/30-day-fitness-challenge-with-friends.html</loc>
     <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://thequestsapp.com/blog/how-long-does-it-take-to-build-a-habit.html</loc>
-    <lastmod>2026-09-05</lastmod>
+    <loc>https://thequestsapp.com/blog/how-to-find-an-accountability-partner.html</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://thequestsapp.com/blog/30-day-challenge-with-friends.html</loc>
-    <lastmod>2026-09-08</lastmod>
+    <loc>https://thequestsapp.com/blog/step-challenge-with-friends.html</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://thequestsapp.com/blog/dry-january-guide.html</loc>
-    <lastmod>2026-09-10</lastmod>
+    <loc>https://thequestsapp.com/blog/30-day-meditation-challenge.html</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/no-sugar-challenge.html</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/reading-challenge-with-friends.html</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/screen-time-challenge.html</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/workplace-wellness-challenge.html</loc>
+    <lastmod>2026-09-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/75-hard-challenge-with-friends.html</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/journaling-challenge.html</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/psychology-of-streaks.html</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/habits-with-your-partner.html</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/new-years-resolutions-with-friends.html</loc>
+    <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -43,8 +115,26 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://thequestsapp.com/blog/75-hard-challenge-with-friends.html</loc>
-    <lastmod>2026-09-15</lastmod>
+    <loc>https://thequestsapp.com/blog/dry-january-guide.html</loc>
+    <lastmod>2026-09-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/30-day-challenge-with-friends.html</loc>
+    <lastmod>2026-09-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/how-long-does-it-take-to-build-a-habit.html</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/social-accountability-habits.html</loc>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
