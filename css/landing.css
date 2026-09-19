@@ -644,8 +644,9 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
   position: absolute; left: 50%; top: 50%;
   width: calc(var(--s) * var(--k)); height: calc(var(--s) * var(--k));
   margin: calc(var(--s) * var(--k) / -2) 0 0 calc(var(--s) * var(--k) / -2);
-  will-change: transform; pointer-events: auto;
+  will-change: transform; pointer-events: none;
 }
+@media (hover: none) and (pointer: coarse) { .cta__friend { pointer-events: auto; } }
 .cta__face {
   position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
   background: var(--q-surface); box-shadow: 0 10px 30px rgba(25, 25, 25, 0.14), 0 0 0 3px var(--q-page);

@@ -1008,11 +1008,12 @@
      Each friend has a home position (percent of the field's half size) and a
      size, and holds its pattern around the line and the button. A slow,
      small drift keeps the group alive (larger on phones, where nothing else
-     stirs them). The pointer is a soft field: every face inside REACH is
-     pushed straight away from it, the nearer the further, so the group
-     parts around the cursor and closes again behind it. Meeting a face does
-     more: hovering lifts it, a click or tap pops it off in a random direction
-     and it springs back home.
+     stirs them). On desktop the pointer is a field the faces avoid: every
+     face inside REACH is pushed straight away from it, the nearer the
+     further, and a face is never allowed under the cursor, so the group
+     parts around it and closes again behind it. Faces are not clickable on
+     desktop. On a phone, where there is no cursor, a tap pops a face off in
+     a random direction and it springs back home.
      Everything is one translate3d + scale per face, on the compositor. */
   (function constellation() {
     var root = document.querySelector('[data-galaxy]');
@@ -1036,11 +1037,17 @@
       };
     });
     var W = 0, H = 0, L = 0, T = 0, k = 1, mx = null, my = null, frame = 0;
-    var LIFT = 0.12, KICK = 13, REACH = 340, PUSH = 92;
+    var KICK = 13, REACH = 460, PUSH = 150, CLEAR = 28;
+    var box = null, h2 = root.querySelector('h2'), btn = root.querySelector('.cta__button');
     function measure() {
       k = parseFloat(window.getComputedStyle(field).getPropertyValue('--k')) || 1;
       var r = field.getBoundingClientRect();
       W = r.width; H = r.height; L = r.left; T = r.top;
+      /* The content box the faces must stay clear of, centred on the field. */
+      if (h2 && btn) {
+        var a = h2.getBoundingClientRect(), b = btn.getBoundingClientRect();
+        box = { w: Math.max(a.width, b.width) + 16, h: (b.bottom - a.top) + 16 };
+      }
     }
     /* Home position, kept inside the field with room for the drift, so a
        face never sits half off a narrow screen. */
@@ -1065,20 +1072,31 @@
            little loop around home instead of ticking back and forth. */
         var ix = (Math.sin(now * f.wx + f.px) * f.ax + Math.cos(now * f.wo + f.po) * f.ro) * drift;
         var iy = (Math.sin(now * f.wy + f.py) * f.ay + Math.sin(now * f.wo + f.po) * f.ro) * drift;
-        var tx = ix, ty = iy, lift = 0;
+        var tx = ix, ty = iy;
         if (mx !== null) {
-          var fx = cx + home(f, 0), fy = cy + home(f, 1), rr = f.s * k / 2 + 8;
+          var fx = cx + home(f, 0) + f.x, fy = cy + home(f, 1) + f.y, rr = f.s * k / 2 + 8;
           var dx = fx - mx, dy = fy - my, d = Math.sqrt(dx * dx + dy * dy) || 1;
           if (d < REACH) {
-            /* Radial push, strongest right at the pointer, gone at REACH. */
-            var g = 1 - d / REACH, p = PUSH * g * g * (0.6 + 0.4 * f.z);
+            /* Radial push, strongest at the pointer, gone at REACH, and never
+               less than what keeps the face clear of the cursor. */
+            var g = 1 - d / REACH, p = PUSH * g * g * (0.7 + 0.3 * f.z);
+            p = Math.max(p, rr + CLEAR - d);
             tx += dx / d * p; ty += dy / d * p;
-            if (d < rr) lift = LIFT;
+          }
+        }
+        /* A fleeing face stays off the line and the button: if its target
+           lands inside the content box, slide it out along its own direction. */
+        if (box) {
+          var px = home(f, 0) + tx, py = home(f, 1) + ty, r2 = f.s * k / 2;
+          if (Math.abs(px) < box.w / 2 + r2 && Math.abs(py) < box.h / 2 + r2) {
+            var sx = (box.w / 2 + r2) / Math.max(Math.abs(px), 1), sy = (box.h / 2 + r2) / Math.max(Math.abs(py), 1);
+            var m = Math.min(sx, sy);
+            tx = px * m - home(f, 0); ty = py * m - home(f, 1);
           }
         }
         /* Spring toward the target, with the kick velocity damped out. */
         f.vx = (f.vx + (tx - f.x) * 0.08) * 0.78; f.vy = (f.vy + (ty - f.y) * 0.08) * 0.78;
-        f.x += f.vx; f.y += f.vy; f.k += (1 + lift - f.k) * 0.14;
+        f.x += f.vx; f.y += f.vy; f.k += (1 - f.k) * 0.14;
         place(f, f.x, f.y, f.k);
       }
       frame = window.requestAnimationFrame(step);
@@ -1097,7 +1115,7 @@
     measure(); seat();
     if (reduce) { window.addEventListener('resize', function () { measure(); seat(); }); return; }
     window.addEventListener('pointermove', pointer, { passive: true });
-    root.addEventListener('pointerdown', kick, { passive: true });
+    if (window.matchMedia('(hover: none)').matches) root.addEventListener('pointerdown', kick, { passive: true });
     window.addEventListener('pointerup', function () { if (window.matchMedia('(hover: none)').matches) leave(); }, { passive: true });
     window.addEventListener('pointercancel', leave, { passive: true });
     document.addEventListener('pointerleave', leave);
