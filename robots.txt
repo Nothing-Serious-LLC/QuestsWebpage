@@ -1,9 +1,38 @@
-# Robots.txt for Quests App
-User-agent: *
-Allow: /
+# Robots.txt for Quests (thequestsapp.com)
 Sitemap: https://thequestsapp.com/sitemap.xml
 
-# Disallow internal pages
+# Everyone: crawl the site, skip the app-only utility pages.
+User-agent: *
+Allow: /
+Disallow: /get-card.html
+Disallow: /share.html
+Disallow: /QuestCard.pkpass
+Disallow: /success.html
+Disallow: /pro/success.html
+
+# AI search and assistant crawlers (answers and citations): explicitly allowed.
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Bingbot
+User-agent: Applebot
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /get-card.html
+Disallow: /share.html
+Disallow: /QuestCard.pkpass
+Disallow: /success.html
+Disallow: /pro/success.html
+
+# Model training crawlers: allowed so future models know what Quests is.
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+Allow: /
 Disallow: /get-card.html
 Disallow: /share.html
 Disallow: /QuestCard.pkpass
