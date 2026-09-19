@@ -85,6 +85,17 @@
      while the marquee is off screen or the tab is hidden and resumes from the
      same offset. ---- */
   var marquee = document.querySelector('[data-marquee]');
+  /* Who owns a touch that began on the reviews: null while undecided (under
+     DECIDE px of travel), true when the marquee takes it sideways, false when
+     it is a clear vertical pull for the pager. A finger dragging a horizontal
+     list rarely starts dead level, so anything up to about 55 degrees from
+     level is sideways; the pager uses the same rule so the two never both
+     claim, or both drop, the same touch. */
+  var DECIDE = 14, VERT_RATIO = 1.5;
+  function marqueeClaims(dx, dy) {
+    if (Math.abs(dx) < DECIDE && Math.abs(dy) < DECIDE) return null;
+    return Math.abs(dy) < Math.abs(dx) * VERT_RATIO;
+  }
   if (marquee && !reducedMotion) (function () {
     var track = marquee.querySelector('.marquee__track');
     var cards = Array.prototype.slice.call(track.children);
@@ -105,8 +116,10 @@
          a re-measure mid-loop (Safari fires resize when its toolbar shrinks)
          read a ring twice as long and opened a hole in it. */
       lap = rights[rights.length - 1];
-      var seconds = parseFloat(window.getComputedStyle(marquee).getPropertyValue('--marquee-seconds')) || 90;
-      speed = lap / seconds;                        /* px per second */
+      /* A fixed px/s, the same on every screen size. A lap-based speed ran a
+         quarter slower on a phone, where the cards (and so the lap) are
+         narrower. */
+      speed = parseFloat(window.getComputedStyle(marquee).getPropertyValue('--marquee-speed')) || 90;
       offset = norm(offset);
     }
 
@@ -173,10 +186,11 @@
       if (!marquee.hasAttribute('data-pressed')) return;
       var dx = e.clientX - dragX, dy = e.clientY - dragY;
       if (!decided) {
-        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        var claim = marqueeClaims(dx, dy);
+        if (claim === null) return;
         decided = true;
-        /* A mostly vertical move belongs to the pager; let go of it. */
-        if (Math.abs(dy) > Math.abs(dx)) { marquee.removeAttribute('data-pressed'); return; }
+        /* A clearly vertical move belongs to the pager; let go of it. */
+        if (!claim) { marquee.removeAttribute('data-pressed'); return; }
         dragging = true; inertia = 0; marquee.classList.add('is-dragging');
         try { marquee.setPointerCapture(e.pointerId); } catch (err) {}
         dragLastX = e.clientX; dragLastT = e.timeStamp;
@@ -196,8 +210,11 @@
       dragging = false; marquee.classList.remove('is-dragging');
       try { marquee.releasePointerCapture(e.pointerId); } catch (err) {}
       /* The fling keeps the finger's direction and speed (capped), then eases
-         back into the drift. */
-      inertia = Math.max(-2400, Math.min(2400, dragV)) - speed;
+         back into the drift. A finger that let go slowly while moving with the
+         drift (or barely moving at all) hands straight back to the drift; it
+         must not leave the ring crawling for a second while inertia recovers. */
+      var v = Math.max(-2400, Math.min(2400, dragV));
+      inertia = (v >= 0 && v < speed) ? 0 : v - speed;
       last = 0;
     }
     window.addEventListener('pointerup', dragEnd);
@@ -546,7 +563,7 @@
        turn. A short flick that lets go before that still turns on release
        (SWIPE_MIN). Anything shorter springs back. Horizontal drags (the card
        deck) pass. */
-    var tx = 0, ty = 0, tracking = false, vertical = null, peeking = false, lastY = 0, lastT = 0, vy = 0, peekOff = 0, trail = [];
+    var tx = 0, ty = 0, tracking = false, vertical = null, onMarquee = false, peeking = false, lastY = 0, lastT = 0, vy = 0, peekOff = 0, trail = [];
     var CARRY = 90, CARRY_MS = 720, CARRY_EASE = 'cubic-bezier(0.25, 0.25, 0.2, 1)';   /* hand-off travel; the ease starts at slope 1 and only decelerates */
     var PEEK_MAX = 150, PEEK_K = 110, PEEK_DIM = 0.55, SPRING_MS = 360, FLICK_VY = 0.3;   /* px per ms */
     /* vh() is Safari's inner height with its bars showing (about 680px on a
@@ -656,13 +673,22 @@
     window.addEventListener('touchstart', function (e) {
       if (!active || e.touches.length !== 1) { tracking = false; return; }
       tracking = true; vertical = null; tx = e.touches[0].clientX; ty = lastY = e.touches[0].clientY; lastT = e.timeStamp; vy = 0;
+      onMarquee = !!(marquee && e.target && marquee.contains(e.target));
       trail.length = 0; trail.push([e.timeStamp, ty]);
     }, { passive: true });
     window.addEventListener('touchmove', function (e) {
       if (!tracking) return;
       var dx = e.touches[0].clientX - tx, dy = e.touches[0].clientY - ty;
-      if (vertical === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) vertical = Math.abs(dy) >= Math.abs(dx);
-      if (vertical === false) return;
+      if (vertical === null) {
+        if (onMarquee) {
+          /* Same rule the marquee uses, so a drag it takes is one we leave. */
+          var claim = marqueeClaims(dx, dy);
+          if (claim !== null) vertical = !claim;
+        } else if (Math.abs(dx) > 8 || Math.abs(dy) > 8) vertical = Math.abs(dy) >= Math.abs(dx);
+      }
+      /* Sideways on the reviews is the marquee's; keep Safari's own gesture
+         handling (selection, callouts) out of it. */
+      if (vertical === false) { if (onMarquee) e.preventDefault(); return; }
       e.preventDefault();
       if (vertical !== true) return;
       lastY = e.touches[0].clientY; lastT = e.timeStamp;
