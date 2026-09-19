@@ -599,9 +599,9 @@ html[data-snap] body, [data-snap] .deck__stage { touch-action: none; }
    card that leaves on the left is placed after the last one on the right, so
    there is never a gap and nothing to drift out of sync. Each card is its own
    small compositing layer; one giant animated strip went blank in Safari once
-   it exceeded the GPU texture limit on a 3x phone. --marquee-seconds is how
-   long one full lap of the track takes. */
-.marquee { --marquee-seconds: 90; }
+   it exceeded the GPU texture limit on a 3x phone. --marquee-speed is the
+   drift in px per second, the same on desktop and phone. */
+.marquee { --marquee-speed: 90; }
 /* Drag to browse (landing.js): sideways is ours, vertical stays with the page. */
 .marquee { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
 .marquee.is-dragging { cursor: grabbing; }
