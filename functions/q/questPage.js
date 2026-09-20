@@ -339,8 +339,11 @@ export function questSharePage({
         <form id="phone-claim-form" novalidate>
           <div class="phone-row">
             <label class="visually-hidden" for="phone-input">Phone number</label>
-            <input id="phone-input" class="phone-input" type="tel" inputmode="tel" autocomplete="tel"
-              placeholder="+1 (555) 000-0000" aria-describedby="phone-error phone-privacy" />
+            <div class="phone-number-field">
+              <span class="phone-country-prefix" aria-hidden="true">+1</span>
+              <input id="phone-input" class="phone-input" type="tel" inputmode="tel" autocomplete="tel"
+                placeholder="(555) 000-0000" aria-describedby="phone-error phone-privacy" />
+            </div>
             <button id="join-quest-button" class="join-button" type="submit" disabled>
               <span id="join-quest-label">Join Quest</span>
             </button>
@@ -468,11 +471,14 @@ export function questSharePage({
       .join-panel { width: 100%; margin-top: 18px; padding: 0 4px; text-align: center;
         animation: fade-soft 0.6s var(--ease-out) 1.85s both; }
       .phone-row { display: flex; flex-direction: column; gap: 10px; }
-      .phone-input { width: 100%; min-width: 0; min-height: 54px; border: 1px solid #e4e2dd; border-radius: 999px;
-        background: #ffffff; color: var(--title); padding: 0 22px; font-size: 17px; text-align: center; outline: none;
+      .phone-number-field { display: flex; align-items: center; min-height: 54px; border: 1px solid #e4e2dd; border-radius: 999px;
+        background: #ffffff; padding: 0 22px;
         box-shadow: 0 4px 30px rgba(255,255,255,.5); }
+      .phone-country-prefix { color: var(--title); font-size: 17px; flex-shrink: 0; }
+      .phone-input { width: 100%; min-width: 0; min-height: 52px; border: 0; border-radius: 999px;
+        background: transparent; color: var(--title); padding: 0 12px; font-size: 17px; text-align: center; outline: none; }
       .phone-input::placeholder { color: #9b9b95; }
-      .phone-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+      .phone-number-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
       .phone-input[aria-invalid="true"] { border-color: #b74040; }
       .join-button { width: 100%; min-height: 54px; border: 0; border-radius: 999px; background: var(--title); color: #ffffff;
         padding: 0 22px; font-size: 16px; font-weight: 700; cursor: pointer; }

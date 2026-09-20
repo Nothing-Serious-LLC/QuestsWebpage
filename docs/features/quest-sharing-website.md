@@ -232,3 +232,17 @@ Hosted staging still requires:
 
 Cloudflare publication, Supabase changes, production mutation, branch push, and
 gate activation remain outside this source lane.
+
+## Phone autofill correction, September 20, 2026
+
+The enhanced and legacy invite phone fields show a fixed +1 prefix outside the
+editable local number. Complete 11-digit US autofill values starting with 1 are
+normalized immediately to 10 local digits. Ordinary partial input is preserved;
+extra-long input remains invalid and is never silently truncated. Submission
+adds one +1 prefix. Backspacing through formatting separators clears the input.
+
+Validation: 50 website tests pass, including event-handler tests of actual phone
+claim payloads, replacement autofill, malformed lengths and legacy parity. The
+rendered page was also checked in a browser with formatted and bare-country-code
+paste. The native iPhone contact suggestion itself retains a physical-device
+review gate. This change preserves routes, backend bindings and Turnstile.

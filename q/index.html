@@ -546,6 +546,7 @@
       }
 
       .phone-input-group {
+        position: relative;
         display: flex;
         gap: 10px;
         margin-bottom: 12px;
@@ -553,7 +554,8 @@
 
       .phone-input {
         flex: 1;
-        padding: 14px 16px;
+        min-width: 0;
+        padding: 14px 16px 14px 48px;
         border-radius: 14px;
         border: 1px solid var(--border-strong);
         background: var(--surface-medium);
@@ -570,6 +572,15 @@
 
       .phone-input::placeholder {
         color: var(--text-soft);
+      }
+
+      .phone-country-prefix {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-strong);
+        pointer-events: none;
       }
 
       .phone-input:focus {
@@ -1081,13 +1092,14 @@
             <div id="gate-form">
               <div class="phone-input-group" id="phone-input-group">
                 <label for="phone-input" class="sr-only">Phone number</label>
+                <span class="phone-country-prefix" aria-hidden="true">+1</span>
                 <input
                   id="phone-input"
                   class="phone-input"
                   type="tel"
                   inputmode="tel"
                   autocomplete="tel"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="(555) 000-0000"
                   aria-label="Phone number"
                   aria-describedby="phone-error"
                 />
@@ -1583,24 +1595,22 @@
           return str.replace(/\D/g, '');
         }
 
-        // Extract the 10 user digits, ignoring the "+1" formatting prefix
+        // Normalize a complete autofilled US number to local digits.
         function getInputDigits(value) {
           var digits = stripNonDigits(value);
-          // Our "+1 (" prefix contributes a "1" — always strip leading 1
-          // Safe because US area codes never start with 0 or 1
-          if (digits.length >= 1 && digits.charAt(0) === '1') {
+          if (digits.length === 11 && digits.charAt(0) === '1') {
             digits = digits.substring(1);
           }
-          if (digits.length > 10) digits = digits.substring(0, 10);
           return digits;
         }
 
         function formatPhoneDisplay(value) {
           var digits = getInputDigits(value);
           if (digits.length === 0) return '';
-          if (digits.length <= 3) return '+1 (' + digits;
-          if (digits.length <= 6) return '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3);
-          return '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3, 6) + '-' + digits.substring(6);
+          if (digits.length > 10 || digits.length < 3) return digits;
+          if (digits.length === 3) return '(' + digits + ')';
+          if (digits.length <= 6) return '(' + digits.substring(0, 3) + ') ' + digits.substring(3);
+          return '(' + digits.substring(0, 3) + ') ' + digits.substring(3, 6) + '-' + digits.substring(6);
         }
 
         function normalizeToE164(value) {
@@ -1625,8 +1635,15 @@
           });
         }
 
+        var lastPhoneValue = '';
         phoneInput.addEventListener('input', function () {
-          var formatted = formatPhoneDisplay(phoneInput.value);
+          var value = phoneInput.value;
+          if (lastPhoneValue.length - value.length === 1 &&
+              stripNonDigits(value) === stripNonDigits(lastPhoneValue)) {
+            value = getInputDigits(value).slice(0, -1);
+          }
+          var formatted = formatPhoneDisplay(value);
+          lastPhoneValue = formatted;
           phoneInput.value = formatted;
           // Always position cursor at end — simple and reliable
           phoneInput.setSelectionRange(formatted.length, formatted.length);
