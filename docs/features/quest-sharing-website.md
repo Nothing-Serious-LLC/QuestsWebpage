@@ -39,8 +39,9 @@ On the staging hosts (`invite-staging.thequestsapp.com` and
 `quests-invite-staging.pages.dev`) the iOS handoff widens past this binding:
 `functions/q/appHandoffTargets.js` tries `info.nothingserious.quests` (the
 TestFlight build on the staging backend and the App Store build share that
-scheme) before `quests-staging` (the pure staging client), and the page adds a
-"Using the staging build? Open it here" link. Android keeps this binding and
+scheme) before `quests-staging` (the pure staging client). The visible Quest and
+Profile pages show their primary app-opening controls, with no extra build-specific
+prompt or alternate staging link. Android keeps this binding and
 `QUEST_SHARE_ANDROID_PACKAGE` as one pair. Production hosts render exactly the
 configured scheme.
 | `QUEST_SHARE_ANDROID_PACKAGE` | Android package for the installed-app intent | Value verified from the staging build artifact |
@@ -232,3 +233,17 @@ Hosted staging still requires:
 
 Cloudflare publication, Supabase changes, production mutation, branch push, and
 gate activation remain outside this source lane.
+
+## Phone autofill correction, September 20, 2026
+
+The enhanced and legacy invite phone fields show a fixed +1 prefix outside the
+editable local number. Complete 11-digit US autofill values starting with 1 are
+normalized immediately to 10 local digits. Ordinary partial input is preserved;
+extra-long input remains invalid and is never silently truncated. Submission
+adds one +1 prefix. Backspacing through formatting separators clears the input.
+
+Validation: 50 website tests pass, including event-handler tests of actual phone
+claim payloads, replacement autofill, malformed lengths and legacy parity. The
+rendered page was also checked in a browser with formatted and bare-country-code
+paste. The native iPhone contact suggestion itself retains a physical-device
+review gate. This change preserves routes, backend bindings and Turnstile.

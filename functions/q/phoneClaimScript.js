@@ -54,18 +54,20 @@ export function questPhoneClaimScript({
 
     function inputDigits(value) {
       var digits = String(value || "").replace(/\\D/g, "");
-      if (digits.charAt(0) === "1") digits = digits.substring(1);
-      return digits.substring(0, 10);
+      if (digits.length === 11 && digits.charAt(0) === "1") digits = digits.substring(1);
+      return digits;
     }
 
     function formatPhone(value) {
       var digits = inputDigits(value);
       if (!digits) return "";
-      if (digits.length <= 3) return "+1 (" + digits;
+      if (digits.length > 10) return digits;
+      if (digits.length < 3) return digits;
+      if (digits.length === 3) return "(" + digits + ")";
       if (digits.length <= 6) {
-        return "+1 (" + digits.substring(0, 3) + ") " + digits.substring(3);
+        return "(" + digits.substring(0, 3) + ") " + digits.substring(3);
       }
-      return "+1 (" + digits.substring(0, 3) + ") " + digits.substring(3, 6) + "-" + digits.substring(6);
+      return "(" + digits.substring(0, 3) + ") " + digits.substring(3, 6) + "-" + digits.substring(6);
     }
 
     function normalizedPhone() {
@@ -134,11 +136,17 @@ export function questPhoneClaimScript({
       return "Something went wrong. Try again.";
     }
 
+    var lastPhoneValue = "";
     input.addEventListener("input", function () {
       var previous = input.value;
       var caretFromEnd = previous.length - (input.selectionStart || 0);
+      if (lastPhoneValue.length - previous.length === 1 &&
+          previous.replace(/\\D/g, "") === lastPhoneValue.replace(/\\D/g, "")) {
+        previous = inputDigits(previous).slice(0, -1);
+      }
       var formatted = formatPhone(previous);
-      if (formatted !== previous) {
+      lastPhoneValue = formatted;
+      if (formatted !== input.value) {
         input.value = formatted;
         var caret = Math.max(0, formatted.length - caretFromEnd);
         input.setSelectionRange(caret, caret);
