@@ -39,8 +39,9 @@ On the staging hosts (`invite-staging.thequestsapp.com` and
 `quests-invite-staging.pages.dev`) the iOS handoff widens past this binding:
 `functions/q/appHandoffTargets.js` tries `info.nothingserious.quests` (the
 TestFlight build on the staging backend and the App Store build share that
-scheme) before `quests-staging` (the pure staging client), and the page adds a
-"Using the staging build? Open it here" link. Android keeps this binding and
+scheme) before `quests-staging` (the pure staging client). The visible Quest and
+Profile pages show their primary app-opening controls, with no extra build-specific
+prompt or alternate staging link. Android keeps this binding and
 `QUEST_SHARE_ANDROID_PACKAGE` as one pair. Production hosts render exactly the
 configured scheme.
 | `QUEST_SHARE_ANDROID_PACKAGE` | Android package for the installed-app intent | Value verified from the staging build artifact |

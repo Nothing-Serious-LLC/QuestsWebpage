@@ -1238,7 +1238,7 @@ test("staging host offers the universal link, both iOS schemes, and the staging 
     /<a id="open-app-link" class="open-app" href="https:\/\/invite-staging\.thequestsapp\.com\/q\/AbCd2345">Open in Quests<\/a>/,
   );
   assert.doesNotMatch(html, /<button id="open-app-link"/);
-  assert.match(html, /Using the staging build\? <a href="quests-staging:\/\/q\/AbCd2345">Open it here<\/a>/);
+  assert.doesNotMatch(html, /Using the staging build|Open it here/);
   assert.match(html, /var APP_SCHEME = "info\.nothingserious\.quests"/);
   assert.match(html, /var APP_SCHEMES = \["info\.nothingserious\.quests","quests-staging"\]/);
   assert.match(html, /var ANDROID_SCHEME = "quests-staging"/);
@@ -1248,7 +1248,7 @@ test("staging host offers the universal link, both iOS schemes, and the staging 
   assert.match(html, /property="og:url" content="https:\/\/invite-staging\.thequestsapp\.com\/q\/AbCd2345(\?r=\d+)?"/);
 });
 
-test("staging host app-only panel offers both schemes without assuming one client", async () => {
+test("staging host app-only panel keeps its primary control without a build-specific prompt", async () => {
   const presentation = await fixture("quest-share-upcoming.json");
   const response = await withFetch(
     async () => Response.json(presentation, { status: 200 }),
@@ -1266,7 +1266,7 @@ test("staging host app-only panel offers both schemes without assuming one clien
   assert.equal(response.status, 200);
   assert.doesNotMatch(html, /id="phone-claim-form"/);
   assert.match(html, /<a class="store-button" href="info\.nothingserious\.quests:\/\/q\/AbCd2345">Open Quests<\/a>/);
-  assert.match(html, /Using the staging build\? <a href="quests-staging:\/\/q\/AbCd2345">Open it here<\/a>/);
+  assert.doesNotMatch(html, /Using the staging build|Open it here/);
 });
 
 test("production host keeps its single-client Open in Quests control", async () => {
@@ -1285,7 +1285,7 @@ test("production host keeps its single-client Open in Quests control", async () 
   assert.match(html, /var ANDROID_SCHEME = "info\.nothingserious\.quests"/);
 });
 
-test("Profile route offers the staging scheme only on the staging host", async () => {
+test("Profile route keeps its primary control without a build-specific prompt on either host", async () => {
   const profileCode = "0123456789abcdef0123456789abcdef";
   const metadata = {
     displayName: "Taylor",
@@ -1309,7 +1309,7 @@ test("Profile route offers the staging scheme only on the staging host", async (
 
   const staging = await (await render("https://invite-staging.thequestsapp.com")).text();
   assert.match(staging, new RegExp(`href="info\\.nothingserious\\.quests://p/${profileCode}">Open in the app`));
-  assert.match(staging, new RegExp(`href="quests-staging://p/${profileCode}">Using the staging build\\? Open it here`));
+  assert.doesNotMatch(staging, /Using the staging build|Open it here|quests-staging:\/\/p\//);
 
   const production = await (await render("https://invite.thequestsapp.com")).text();
   assert.match(production, new RegExp(`href="info\\.nothingserious\\.quests://p/${profileCode}">Open in the app`));
