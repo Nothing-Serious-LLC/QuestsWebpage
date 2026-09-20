@@ -17,10 +17,6 @@
  *   PROFILE_SHARE_WEB_SECRET     shared secret for profile-share-web
  */
 import {
-  STAGING_APP_SCHEME,
-  isStagingShareHost,
-} from '../q/appHandoffTargets.js';
-import {
   ICON_CREATIVITY,
   ICON_GROWTH,
   ICON_MINDFULNESS,
@@ -178,14 +174,6 @@ async function callProfileShareWeb(env, action, shareCode, revision) {
 }
 
 function profilePage({ origin, shareCode, revision, metadata }) {
-  // The staging host serves two clients (TestFlight/App Store on the
-  // production scheme, the pure staging client on quests-staging), so it
-  // offers both; the production host keeps its single link.
-  const stagingHost = isStagingShareHost(new URL(origin).hostname);
-  const stagingAppLink = stagingHost
-    ? `
-        <a class="secondary" href="${STAGING_APP_SCHEME}://p/${shareCode}">Using the staging build? Open it here</a>`
-    : '';
   const safeName = escapeHtml(String(metadata.displayName || '').trim());
   const canonicalUrl = `${origin}/p/${shareCode}?r=${revision}`;
   const imageUrl = `${origin}/p/${shareCode}/og.png?r=${revision}`;
@@ -300,7 +288,7 @@ function profilePage({ origin, shareCode, revision, metadata }) {
       </div>
       <div class="actions">
         <a class="cta" href="${APP_STORE_URL}">Get Quests</a>
-        <a class="secondary" href="info.nothingserious.quests://p/${shareCode}">Open in the app</a>${stagingAppLink}
+        <a class="secondary" href="info.nothingserious.quests://p/${shareCode}">Open in the app</a>
       </div>
     </main>
   </body>

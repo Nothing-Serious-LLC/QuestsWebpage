@@ -290,10 +290,6 @@ export function questSharePage({
   // The https share link is the first "open" offer: iOS routes it to whichever
   // installed client claims this host, so it never assumes one scheme.
   const universalLink = `${origin}/q/${shareCode}`;
-  const alternateAppMarkup = handoff.alternateAppSchemes
-    .map((scheme) =>
-      `<p class="alternate-app">Using the staging build? <a href="${escapeHtml(`${scheme}://q/${shareCode}`)}">Open it here</a></p>`)
-    .join("");
   const imageUrl = `${origin}/q/${shareCode}/og.png${revisionQuery}`;
   const pageTitle = presentation.availability === "ended"
     ? `${presentation.title} has ended | Quests`
@@ -333,7 +329,6 @@ export function questSharePage({
     : !usesPhoneClaim
       ? `<section class="join-panel" aria-label="Join this Quest">
         <a class="store-button" href="${escapeHtml(`${handoff.appScheme}://q/${shareCode}`)}">Open Quests</a>
-        ${alternateAppMarkup}
       </section>`
       : `<section class="join-panel" aria-label="Join this Quest">
         <form id="phone-claim-form" novalidate>
@@ -364,8 +359,7 @@ export function questSharePage({
   // alternates keep the original button markup.
   const openAppSlot = !isEnded && usesPhoneClaim
     ? handoff.alternateAppSchemes.length > 0
-      ? `<a id="open-app-link" class="open-app" href="${escapeHtml(universalLink)}">Open in Quests</a>
-      ${alternateAppMarkup}`
+      ? `<a id="open-app-link" class="open-app" href="${escapeHtml(universalLink)}">Open in Quests</a>`
       : `<button id="open-app-link" class="open-app" type="button">Open in Quests</button>`
     : "";
 
@@ -499,8 +493,6 @@ export function questSharePage({
       .open-app { display: block; margin: 26px auto 0; border: 0; background: transparent; color: #5e5e5a;
         font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
         width: fit-content; }
-      .alternate-app { margin: 12px auto 0; text-align: center; color: #777771; font-size: 13px; }
-      .alternate-app a { color: #5e5e5a; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
       .ended-panel { text-align: center; }
       .ended-mark { width: 50px; height: 50px; display: grid; place-items: center; margin: 0 auto 14px; border-radius: 50%;
         background: color-mix(in srgb, var(--accent) 14%, #ffffff); color: var(--accent); font-size: 24px; font-weight: 700; }
