@@ -1,6 +1,6 @@
 # Build 15: Subscribe, dismiss, reopen
 
-Status: website recovery changes implemented and locally tested. App and backend changes below are pending. Full abandonment recovery still needs staging device proof.
+Status: website recovery changes implemented, locally tested and deployed to staging from `4f2cf11`. App and backend changes below are pending. Full abandonment recovery still needs staging device proof.
 
 ## Agreed scope
 
@@ -47,6 +47,10 @@ The app agent must establish its current branch and integration authority before
 Files: `subscribe-app.js`, `functions/subscribe.js`, `functions/subscribe/check.js`, `tests/checkout-recovery.test.mjs`, `tests/payment-routing.test.mjs`.
 
 Compatibility: the backend already supports `inspect_web`. The website proxy now exposes that existing signed action. Existing version 2 claims and response shapes are unchanged. These changes can be staged independently. They do not release the existing started-attempt lock.
+
+Deployment evidence: `ec74f3e0-020f-4b23-9f33-e1d6a51f36a7`, source `4f2cf11`, [immutable staging deployment](https://ec74f3e0.quests-payment-review.pages.dev). The stable host is `quests-payment-review.pages.dev`. Cloudflare's Production slot for this staging project has `PAYMENT_BACKEND_ENVIRONMENT=staging`, confirmed by downloaded configuration. Chrome readback showed the new recovery function and the unsigned-link fallback. Pages Worker compilation passed. Authenticated recovery and device behavior remain pending.
+
+Deployment incident: an archive-extraction incompatibility led to a brief empty staging deployment (`11c45610`). The complete artifact replaced it approximately 23 seconds later at the deployment above. Production billing/site were untouched. Future deployment scripts must stop on packaging errors and assert the expected assets before invoking Wrangler. CLI HTTP probes received Cloudflare 403, so deployed content verification used Chrome.
 
 ## App implementation
 
