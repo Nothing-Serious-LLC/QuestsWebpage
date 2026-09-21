@@ -11,7 +11,7 @@
 //   We pass htmlTarget: #rc-checkout to purchase(), so RC mounts the Stripe
 //   checkout form INLINE into our own full-viewport container instead of its
 //   default centered modal window. Combined with a solid-WHITE body
-//   (.checkout-open) and hiding the navy .page, the result reads as one
+//   (.checkout-open) and hiding the cream .page, the result reads as one
 //   continuous full-screen checkout, not a card floating on a blue page. There
 //   is still NO RevenueCat package-selection/intro step, because we hand the
 //   SDK the single package the user already chose in the app.
@@ -48,26 +48,96 @@ const successMark = document.getElementById("success-mark");
 const primaryBtn = document.getElementById("primary-btn");
 const secondaryBtn = document.getElementById("secondary-btn");
 
-const NAVY = "#04102a";
+// RevenueCat renders the verified product title inline after purchase() starts.
+// Keep its real text node aligned with the concise checkout hierarchy so the
+// visual label and accessible label stay identical across SDK rerenders.
+function applyProductHeading() {
+  if (!mount) return;
+  const cadence = cfg && cfg.plan === "yearly" ? "Yearly" : "Monthly";
+  const productHeading = "Pro Subscription (" + cadence + ")";
+  const heading = mount.querySelector(
+    ".rcb-product-title > .rcb-typography"
+  );
+  const titleTextNode = heading
+    ? Array.from(heading.childNodes).find(
+        (node) =>
+          node.nodeType === Node.TEXT_NODE && node.nodeValue.trim().length > 0
+      )
+    : null;
+  if (titleTextNode && titleTextNode.nodeValue !== productHeading) {
+    titleTextNode.nodeValue = productHeading;
+  }
+}
+
+const CATEGORY_LOADER_KEYS = [
+  "mindfulness",
+  "recharge",
+  "creativity",
+  "growth",
+  "social",
+];
+
+function createCategoryLoader() {
+  const loader = document.createElement("span");
+  loader.className = "cat-loader";
+  loader.setAttribute("aria-hidden", "true");
+
+  CATEGORY_LOADER_KEYS.forEach((category) => {
+    const icon = document.createElement("span");
+    icon.className =
+      "cat-loader__icon cat-loader__icon--" + category;
+    loader.appendChild(icon);
+  });
+
+  return loader;
+}
+
+// RevenueCat creates its payment loader after the form mounts. Replace the
+// rotating SDK glyph with the same opacity-only category fade used by the app.
+function applyRevenueCatLoader() {
+  if (!mount) return;
+  const loaderHost = mount.querySelector(
+    ".rc-loading .rcb-modal-loader > .rcb-ui-asset-icon"
+  );
+  if (!loaderHost || loaderHost.classList.contains("quests-category-loader")) {
+    return;
+  }
+  loaderHost.classList.add("quests-category-loader");
+  loaderHost.appendChild(createCategoryLoader());
+}
+
+if (mount) {
+  const checkoutObserver = new MutationObserver(() => {
+    applyProductHeading();
+    applyRevenueCatLoader();
+  });
+  checkoutObserver.observe(mount, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
+}
+
+// V2 brand page background (sand/cream, matches css/site.css --page and the
+// theme-color meta the server emits). Restored when checkout chrome exits.
+const CREAM = "#F3F1E7";
+const GRAPHITE = "#191919";
 const WHITE = "#ffffff";
 
-// Switch the page to the full-screen WHITE checkout surface: solid-white body,
-// hide the navy .page, flip iOS browser-chrome theme-color to white. Called as
-// soon as the SDK is configured (before offerings load) so there's no navy
-// flash, and stays in effect through purchase().
+// Hide the page and match iOS browser chrome to the graphite offerings loader.
 function enterCheckoutChrome() {
   document.body.classList.add("checkout-open");
   if (pageEl) pageEl.hidden = true;
-  if (themeColorMeta) themeColorMeta.setAttribute("content", WHITE);
+  if (themeColorMeta) themeColorMeta.setAttribute("content", GRAPHITE);
 }
 
-// Restore the navy page chrome so the success/error notice renders on brand.
+// Restore the cream page chrome so the success/error notice renders on brand.
 function exitCheckoutChrome() {
   document.body.classList.remove("checkout-open");
   if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
   if (mount) mount.classList.remove("is-open");
   if (pageEl) pageEl.hidden = false;
-  if (themeColorMeta) themeColorMeta.setAttribute("content", NAVY);
+  if (themeColorMeta) themeColorMeta.setAttribute("content", CREAM);
 }
 
 function readConfig() {
@@ -111,7 +181,11 @@ function withTimeout(promise, ms, label) {
 //   cancel  -> home
 const scheme = (cfg && cfg.scheme) || "info.nothingserious.quests";
 const successDeepLink = scheme + "://pro-upgrade-success"; // legacy custom-scheme return (still used by /pro/success.html fallback)
-const homeDeepLink = scheme + "://home";
+// Return without a purchase result. The server-side 302 is the transport iOS
+// honors inside SFSafariViewController. The app dismisses the sheet and checks
+// purchase state itself before it offers any billing route again.
+const returnToAppUrl =
+  "/subscribe/return?scheme=" + encodeURIComponent(scheme) + "&to=home";
 // Universal-Link return target (see showSuccess). env is the server-validated
 // backend name; the landing page uses it only to surface a staging escape hatch.
 const successUniversalLink =
@@ -122,29 +196,84 @@ function hideLoading() {
   if (loadingEl) loadingEl.hidden = true;
 }
 
-// Render the canceled/error state: a retry primary + a "Return to Quests"
-// secondary that routes the app Home.
-function showError(title, text) {
+// Render the closed or error state.
+//   retry: true   only before the attempt was claimed (validate_web). The
+//                 reserved attempt is intact, so reloading the link is safe.
+//   retry: false  everywhere else. A claimed attempt stays pending on the
+//                 backend until explicit cancellation or entitlement, and a
+//                 cancelled attempt cannot be reopened from this link, so the
+//                 only action is returning to the app to check status.
+function showError(title, text, options) {
+  const retry = !!(options && options.retry);
   hideLoading();
-  // Restore the navy page so the error notice renders on brand (also clears the
-  // white body + white loader + checkout surface and resets theme-color).
+  // Restore the cream page so the notice renders on brand (also clears the
+  // checkout surface and resets theme-color).
   exitCheckoutChrome();
   if (mount) mount.replaceChildren();
   if (successMark) successMark.hidden = true;
   if (noticeTitle) noticeTitle.textContent = title;
   if (noticeText) noticeText.textContent = text;
   if (primaryBtn) {
-    primaryBtn.textContent = "Try again";
-    primaryBtn.onclick = function () {
-      window.location.reload();
-    };
+    if (retry) {
+      primaryBtn.textContent = "Try again";
+      primaryBtn.onclick = function () {
+        window.location.reload();
+      };
+    } else {
+      primaryBtn.textContent = "Return to Quests";
+      primaryBtn.onclick = function () {
+        window.location.href = returnToAppUrl;
+      };
+    }
   }
   if (secondaryBtn) {
-    secondaryBtn.hidden = false;
+    secondaryBtn.hidden = !retry;
     secondaryBtn.textContent = "Return to Quests";
-    secondaryBtn.setAttribute("href", homeDeepLink);
+    secondaryBtn.setAttribute("href", returnToAppUrl);
   }
   if (noticeEl) noticeEl.classList.add("is-visible");
+}
+
+// POST /subscribe/check. Resolves { ok, reason }. A transport failure reads as
+// closed, the same as a refusal.
+async function checkoutGate(action, outcome) {
+  try {
+    const body = { action: action, claims: cfg.claims, sig: cfg.sig };
+    if (outcome) body.outcome = outcome;
+    const res = await withTimeout(
+      fetch("/subscribe/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }),
+      15000,
+      action
+    );
+    let reason = null;
+    try {
+      reason = (await res.json()).reason || null;
+    } catch (_e) {
+      /* opaque body */
+    }
+    return { ok: res.ok, reason: reason };
+  } catch (_e) {
+    return { ok: false, reason: "checkout_unavailable" };
+  }
+}
+
+const PENDING_TEXT =
+  "Return to Quests to check your purchase status before trying again";
+
+function showGateRefusal(reason) {
+  if (reason === "web_checkout_disabled" || reason === "storefront_ineligible") {
+    showError("Checkout is paused", "Return to Quests to see your upgrade options");
+  } else if (reason === "already_subscribed") {
+    showError("You already have Quests Pro", "Return to Quests to continue");
+  } else if (reason === "purchase_pending" || reason === "attempt_unavailable") {
+    showError("Purchase in progress", PENDING_TEXT);
+  } else {
+    showError("Checkout unavailable", PENDING_TEXT);
+  }
 }
 
 // Render the success state. Entitlement is already granted SERVER-SIDE by the RC
@@ -160,7 +289,7 @@ function showError(title, text) {
 // offers a tap-to-open custom-scheme button + store fallback.
 function showSuccess() {
   hideLoading();
-  // Restore the navy page so the success notice renders on brand (also clears
+  // Restore the cream page so the success notice renders on brand (also clears
   // the white body + white loader + checkout surface and resets theme-color).
   exitCheckoutChrome();
   if (mount) mount.replaceChildren();
@@ -256,7 +385,7 @@ async function run() {
       " key=" +
       (cfg && cfg.apiKey ? cfg.apiKey.slice(0, 10) + "…" : "none")
   );
-  if (!cfg || !cfg.uid || !cfg.apiKey || !cfg.productId) {
+  if (!cfg || !cfg.uid || !cfg.apiKey || !cfg.productId || !cfg.claims || !cfg.sig) {
     dbg("FAIL: missing/invalid config");
     showError(
       "Something went wrong",
@@ -271,7 +400,7 @@ async function run() {
     purchases = Purchases.configure({ apiKey: cfg.apiKey, appUserId: cfg.uid });
     dbg("configured OK");
     // Whiten NOW (before the up-to-20s offerings fetch) so the user never sees a
-    // navy spinner flash right before the white checkout opens: hide the navy
+    // cream spinner flash right before the white checkout opens: hide the cream
     // loader/.page and show the WHITE loader. enterCheckoutChrome() also flips
     // the body white + theme-color white. showError/showSuccess undo all of it.
     if (loadingEl) loadingEl.hidden = true;
@@ -281,7 +410,8 @@ async function run() {
     dbg("FAIL configure: " + errStr(e));
     showError(
       "Something went wrong",
-      "We couldn't start checkout. Please reopen Quests and try again."
+      "We couldn't start checkout. Please reopen Quests and try again.",
+      { retry: true }
     );
     return;
   }
@@ -310,7 +440,8 @@ async function run() {
     dbg("FAIL getOfferings: " + errStr(e));
     showError(
       "Couldn't load plans",
-      "Please check your connection and try again."
+      "Please check your connection and try again.",
+      { retry: true }
     );
     return;
   }
@@ -318,59 +449,65 @@ async function run() {
   if (!pkg) {
     showError(
       "Plan unavailable",
-      "That plan isn't available right now. Please try again later."
+      "That plan isn't available right now. Please try again later.",
+      { retry: true }
     );
+    return;
+  }
+
+  // Final gate, immediately before the provider call. The backend rereads the
+  // kill switch, entitlement and provider state, then atomically moves this
+  // attempt from reserved to started. A stale page, a second tab or a repeat
+  // tap loses that race and never reaches RevenueCat. The loader stays up
+  // while this runs.
+  dbg("claiming checkout attempt…");
+  const gate = await checkoutGate("validate_web");
+  if (!gate.ok) {
+    dbg("gate refused: " + gate.reason);
+    showGateRefusal(gate.reason);
     return;
   }
 
   // Hand the SINGLE chosen package to the SDK. We pass htmlTarget so purchase()
   // mounts the checkout INLINE into our full-viewport #rc-checkout container
-  // (not RC's default centered modal window) — there is no package-selection/
+  // (not RC's default centered modal window). There is no package-selection or
   // intro step. skipSuccessPage:true returns control to us on completion.
   try {
     dbg("opening checkout (purchase)…");
-    // Go full-screen: swap the WHITE loader for the full-viewport checkout
-    // surface, then mount the RC checkout into it (htmlTarget) so it fills the
-    // screen instead of rendering as a small centered modal window. The body is
-    // already white (enterCheckoutChrome, above). The page's CSS does not zero
-    // margin/padding on *, so it doesn't leak into RC's DOM, and the fixed
-    // container is sized, so the inline form renders correctly.
     if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
     if (mount) mount.classList.add("is-open");
-    // Re-read the kill switch and atomically claim this checkout immediately
-    // before creating the provider checkout. A stale page cannot bypass it.
-    const guard = await fetch('/subscribe/check', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'validate_web', claims: cfg.claims, sig: cfg.sig }),
-    });
-    if (!guard.ok) throw new Error('Checkout is unavailable or already in progress');
+    if (themeColorMeta) themeColorMeta.setAttribute("content", WHITE);
     await purchases.purchase({
       rcPackage: pkg,
       htmlTarget: mount,
       brandingAppearanceOverride: BRAND_APPEARANCE,
       skipSuccessPage: true,
-      metadata: { supabase_uid: cfg.uid, source: "web_subscribe" },
+      metadata: {
+        supabase_uid: cfg.uid,
+        source: "web_subscribe",
+        attempt: cfg.claims.attempt,
+      },
     });
-    // Success: bounce back into the app. Entitlement is already being granted
-    // server-side via the RC webhook -> subscription_entitlements -> Realtime.
+    // The provider accepted payment. Entitlement arrives through the webhook;
+    // the app confirms it after the return.
     dbg("purchase resolved OK");
     showSuccess();
   } catch (e) {
-    // Only an explicit SDK cancellation releases the account attempt. An
-    // ambiguous rejection retains it for provider/entitlement reconciliation.
-    if (e?.errorCode === ErrorCode.UserCancelledError) {
-      try {
-        await fetch('/subscribe/check', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'finish_web', outcome: 'cancelled', claims: cfg.claims, sig: cfg.sig }),
-        });
-      } catch { /* Retain the pending attempt when confirmation is unavailable. */ }
-    }
+    // Only an explicit SDK cancellation releases the attempt. Every other
+    // rejection is ambiguous (the charge may have gone through), so the
+    // attempt stays pending for provider and entitlement reconciliation.
     dbg("purchase ended: " + errStr(e));
-    showError(
-      "Checkout closed",
-      "Return to Quests to check your purchase status before trying again"
-    );
+    if (e && e.errorCode === ErrorCode.UserCancelledError) {
+      const released = await checkoutGate("finish_web", "cancelled");
+      if (released.ok) {
+        showError(
+          "Checkout closed",
+          "No charge was made, return to Quests to choose how to upgrade"
+        );
+        return;
+      }
+    }
+    showError("Checkout closed", PENDING_TEXT);
   }
 }
 

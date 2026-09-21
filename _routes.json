@@ -5,6 +5,7 @@
     "/p/*",
     "/api/*",
     "/subscribe",
+    "/subscribe/check",
     "/subscribe/return"
   ],
   "exclude": [
