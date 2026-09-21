@@ -28,6 +28,8 @@ Read-only Chrome inspection established:
   app `app20b28546eb`, store `RC_BILLING`, environment `SANDBOX`, entitlement
   `pro`, and the matching purchase-attempt metadata. Annual sandbox renewal is
   accelerated to one hour. The customer dashboard showed active Pro.
+- Read-only staging SQL confirmed `pro`, `is_active=true`, expiry at
+  21:22:21.208 UTC, and update at 20:22:22.27799 UTC.
 - The production webhook returned HTTP 200 with
   `{"success":true,"ignored":true,"reason":"web_sandbox_requires_staging"}`.
   This closes actual provider proof for this web-sandbox exclusion path.
@@ -102,3 +104,13 @@ assets with other scripts.
 4. Final Build 15 artifact acceptance, native Apple sandbox regression,
    production signer/migration/routing gates, then Elliott's live purchase with
    the selected plan and final total visible. Production checkout stays gated.
+
+## Staging deployment
+
+Website commit `2257da0` was pushed to `github/codex/build15-payment-routing-20260921`
+and deployed from a clean archive to the staging project `quests-payment-review`.
+Deployment URL: https://217dabad.quests-payment-review.pages.dev. The artifact
+retains `PAYMENT_BACKEND_ENVIRONMENT=staging` and excludes documentation, scripts,
+tests, and private finance drafts. Chrome verified the stable host serves the
+expected closed state for an unsigned checkout URL. A fresh signed phone checkout
+is required for acceptance of the deployed notice inside RevenueCat.
