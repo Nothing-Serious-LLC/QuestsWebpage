@@ -486,7 +486,11 @@ receipt, same-account Pro access and the newly themed return screen.
 At approximately 22:44 UTC, after Elliott confirmed Pro was active on the phone,
 RevenueCat's sandbox profile showed Pro Monthly inactive, expired at 22:43 UTC.
 This occurred before any agent reset or refund action. The current monthly
-subscription therefore needs no manual provider reset. Staging expiration
-propagation and refreshed device purchase eligibility remain to be verified.
+subscription therefore needs no manual provider reset. Elliott then fully
+closed and reopened Quests [Staging] and confirmed that Upgrade to Pro offered
+a new purchase. This verifies refreshed device purchase eligibility on the
+same account. A fresh staging database expiration SELECT remains pending
+because Chrome editor input was unreliable; device eligibility and provider
+expiration are independently observed.
 No account deletion, database mutation or production subscription change was
 performed during this follow-through.
