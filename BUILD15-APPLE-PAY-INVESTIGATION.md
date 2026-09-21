@@ -494,3 +494,34 @@ because Chrome editor input was unreliable; device eligibility and provider
 expiration are independently observed.
 No account deletion, database mutation or production subscription change was
 performed during this follow-through.
+
+
+## September 21 checkout dismissal incident
+
+Elliott reported closing the Safari checkout sheet with its top X, an
+unresponsive app, repeated purchase-status checks, and a later loader-only
+checkout that returned to the app. Whether the final retry included a payment
+confirmation was not recorded and remains unknown.
+
+With explicit authorization, the read-only staging connector verified the
+prior monthly EXPIRATION at 22:43:39 UTC. A yearly attempt created at 22:47:56
+was canceled at 22:48:51. Monthly attempt
+`d1bb9317-65df-4ce0-9ccc-7c9a5f75149c` was created at 22:48:54 and completed at
+22:49:34. RevenueCat INITIAL_PURCHASE
+`84DCD573-F93F-4397-9E4E-06B1549AE514` records USD 4.99 and that attempt in its
+metadata. Later RENEWAL events share original transaction
+`txRcbf82d602453664fed441d75085e878b06`. The exact user confirmation and the
+matching Stripe PaymentIntent still need separate evidence.
+
+App commit `70e023ca1` on `origin/codex/build15-payment-e2e-20260921`
+automatically reconciles browser dismissal, bounds status waits, prevents
+premature success navigation when checkout merely opens, and waits for Safari
+dismissal before navigating. It preserves unresolved server payment locks.
+All 66 tests in eight focused suites pass. This is source validation; the
+original native freeze remains unconfirmed without a recorded device trace.
+The updated internal staging binary is being prepared for physical retesting.
+
+The account, provider settings, tax setup and database were preserved. The
+website success theme remains the previously deployed version. Device
+acceptance requires a recorded cancellation/retry, deliberate purchase,
+positive New York tax receipt and Pro-themed return to the same app account.
