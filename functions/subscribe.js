@@ -1,69 +1,14 @@
-// GET /subscribe  — WEB REPO (QuestsWebpage, Cloudflare Pages Function)
-//
-// Quests Pro DIRECT web checkout (Path A = RevenueCat Web Billing; the user is
-// Merchant of Record, Stripe is the processor). This is the replacement for the
-// old /upgrade redirect to a pay.rev.cat Web Purchase Link.
-//
-// WHY THIS EXISTS / WHAT CHANGED:
-//   pay.rev.cat Web Purchase Links ALWAYS render a fixed 3-step funnel whose
-//   first step is a package-selection / "Continue" intro page that CANNOT be
-//   removed (RevenueCat docs: web/paywalls is a fixed package-selection ->
-//   checkout -> post-purchase funnel; package_id only PRE-SELECTS, it does not
-//   skip the step). The product requirement is the opposite: the user already
-//   picked the plan IN THE APP, so the web must open DIRECTLY on the Stripe card
-//   form with ZERO RevenueCat selection/intro page.
-//
-//   The only way to do that is the RevenueCat WEB SDK (@revenuecat/purchases-js)
-//   purchase() method, which renders ONLY the checkout form on our own domain
-//   (it mounts Stripe Elements into an HTML element we provide). There is no
-//   selection step because we hand the SDK the single rcPackage the user chose.
-//
-//   This Function does the server-trusted half: it verifies the signed upgrade
-//   link (so the uid cannot be forged — same HMAC contract as the old
-//   /upgrade Function and the sign-upgrade-link edge function), then server-
-//   renders a page that hands the VERIFIED uid + the publishable rcb_ key +
-//   the chosen product id to a small static module (/subscribe-app.js) which
-//   runs the SDK purchase() flow client-side.
-//
-// ENTITLEMENT PIPELINE IS UNCHANGED:
-//   A Web SDK purchase fires the SAME RevenueCat webhook event
-//   (INITIAL_PURCHASE, store=RC_BILLING) with app_user_id = the uid we pass to
-//   Purchases.configure(). The existing revenuecat-webhook Edge Function already
-//   reads event.app_user_id and writes subscription_entitlements -> Realtime ->
-//   isPro. NOTHING in the webhook or DB changes. The app must NOT flip isPro on
-//   the return deep link; it waits for the Realtime push (authoritative).
-//
-// REQUEST SHAPE (the app builds this; see src/components/UpgradeProLink.tsx):
-//   https://invite.thequestsapp.com/subscribe?uid=<uid>&exp=<exp>&sig=<sig>&plan=<monthly|yearly>&env=<staging|production>
-//   - uid/exp/sig : the SIGNED triple minted by the sign-upgrade-link edge fn.
-//                   sig = HMAC-SHA256(`${uid}.${exp}`, RC_UPGRADE_SIGNING_SECRET).
-//   - plan        : which plan the user chose in-app. Maps to a Web Billing
-//                   product id (monthly -> quests_pro_monthly,
-//                   yearly  -> quests_pro_annual).
-//   - env         : 'staging' uses the SANDBOX rcb_ key + the quests-staging
-//                   return scheme; 'production' uses the PROD rcb_ key + the
-//                   info.nothingserious.quests scheme. Anything else -> fallback.
-//
-// Required env binding (Cloudflare Pages -> Settings -> Environment variables):
-//   RC_UPGRADE_SIGNING_SECRET  - the SAME shared HMAC secret the /upgrade
-//                                Function uses and the sign-upgrade-link edge
-//                                function signs with. Server-only; NEVER in the
-//                                RN bundle, NEVER committed. Unset => every link
-//                                fails to verify and we serve the fallback page.
-//
-// The rcb_ PUBLIC API keys below are PUBLISHABLE (RevenueCat Web Billing public
-// keys are designed to ship in client bundles, exactly like Stripe publishable
-// keys). They are safe to commit and to expose in the page. The trust boundary
-// stays the webhook secret + this Function's signed-link verification.
+import { checkoutClaims, checkCheckout } from './subscribe/policy.js';
+// Build 15 checkout validates version-2 capabilities at the paired backend.
+// PAYMENT_BACKEND_ENVIRONMENT is a deployment binding: staging or production.
+// The client cannot select a different billing environment through the URL.
 
 // Canonical UUID contract — MUST match functions/upgrade.js, the RevenueCat
 // webhook, the sign-upgrade-link edge function, and UpgradeProLink.tsx.
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// A signed link is MANDATORY (matches functions/upgrade.js REQUIRE_SIGNED_UPGRADE
-// default). The plain ?uid= path is rejected to the fallback page.
-const SIGNED_LINK_MAX_AGE_S = 60 * 60; // 1 hour; keep in sync with the signer.
+// The paired backend validates the capability signature and expiry.
 
 // Plan -> RevenueCat Web Billing product store_identifier. The static module
 // resolves the matching package from getOfferings() by this identifier.
@@ -132,55 +77,6 @@ function pageHeaders(extra) {
     "X-Robots-Tag": "noindex, nofollow",
     ...extra,
   };
-}
-
-// --- signed-link verification (mirrors functions/upgrade.js exactly) ---------
-
-function timingSafeEqualHex(a, b) {
-  if (typeof a !== "string" || typeof b !== "string") return false;
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return diff === 0;
-}
-
-function bytesToHex(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let hex = "";
-  for (let i = 0; i < bytes.length; i++) {
-    hex += bytes[i].toString(16).padStart(2, "0");
-  }
-  return hex;
-}
-
-async function computeSig(uid, exp, secret) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const mac = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(`${uid}.${exp}`)
-  );
-  return bytesToHex(mac);
-}
-
-async function verifySignedLink(uid, exp, sig, secret) {
-  if (!secret || !exp || !sig) return false;
-  if (!/^[0-9a-f]{64}$/i.test(sig)) return false; // 32-byte HMAC-SHA256, hex
-  const expNum = Number(exp);
-  if (!Number.isFinite(expNum) || !Number.isInteger(expNum)) return false;
-  const nowS = Math.floor(Date.now() / 1000);
-  if (expNum < nowS) return false;
-  if (expNum - nowS > SIGNED_LINK_MAX_AGE_S) return false;
-  const expected = await computeSig(uid, exp, secret);
-  return timingSafeEqualHex(expected.toLowerCase(), sig.toLowerCase());
 }
 
 // --- pages -------------------------------------------------------------------
@@ -291,13 +187,13 @@ function headStyles() {
   `;
 }
 
-function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
+function checkoutHtml({ uid, productId, apiKey, env, scheme, claims, sig }) {
   // The per-request config is emitted as NON-executable application/json so it
   // is not gated by the script-src CSP. /subscribe-app.js reads + parses it.
   // Escape '<' so the JSON can never terminate the <script> block or be parsed
   // as markup (all values are already allowlisted/UUID-validated; this is
   // defense-in-depth for the embedded application/json data island).
-  const config = JSON.stringify({ uid, productId, apiKey, env, scheme }).replace(
+  const config = JSON.stringify({ uid, productId, apiKey, env, scheme, claims, sig }).replace(
     /</g,
     "\\u003c"
   );
@@ -407,7 +303,7 @@ export async function onRequestGet(context) {
   const env = (url.searchParams.get("env") || "").trim().toLowerCase();
   const appScheme = (url.searchParams.get("appscheme") || "").trim().toLowerCase();
 
-  const signingSecret = context.env.RC_UPGRADE_SIGNING_SECRET;
+  const claims = checkoutClaims(url.searchParams);
 
   // uid must be a well-formed UUID.
   if (!UUID_RE.test(uid)) return fallbackResponse();
@@ -420,8 +316,8 @@ export async function onRequestGet(context) {
   const envCfg = ENV_CONFIG[env];
   if (!envCfg) return fallbackResponse();
 
-  // Signed link is mandatory: verify sig over `${uid}.${exp}` and freshness.
-  const signedOk = await verifySignedLink(uid, exp, sig, signingSecret);
+  // The backend validates every signed claim, freshness and the live kill switch.
+  const signedOk = await checkCheckout(context.env, claims, sig, 'inspect_web');
   if (!signedOk) return fallbackResponse();
 
   // The BUILD's registered scheme can differ from the env-derived guess (a
@@ -436,6 +332,8 @@ export async function onRequestGet(context) {
   return new Response(
     checkoutHtml({
       uid,
+      claims,
+      sig,
       productId,
       apiKey: envCfg.apiKey,
       env,

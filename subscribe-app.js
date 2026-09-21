@@ -32,7 +32,7 @@
 // which writes subscription_entitlements -> Realtime -> isPro. This page only
 // drives the UI; on success it deep-links back into the app. The app must NOT
 // trust the redirect for entitlement — it waits for the Realtime push.
-import { Purchases } from "https://esm.sh/@revenuecat/purchases-js@1.42.1";
+import { Purchases, ErrorCode } from "https://esm.sh/@revenuecat/purchases-js@1.42.1";
 
 const cfgEl = document.getElementById("rc-config");
 const mount = document.getElementById("rc-checkout");
@@ -168,7 +168,7 @@ function showSuccess() {
   if (noticeTitle) noticeTitle.textContent = "You're Quests Pro!";
   if (noticeText) {
     noticeText.textContent =
-      "Your Pro features are unlocked. Return to the Quests app to continue.";
+      "Payment received, return to Quests while we confirm your Pro access";
   }
   if (primaryBtn) {
     primaryBtn.textContent = "Return to Quests";
@@ -337,6 +337,13 @@ async function run() {
     // container is sized, so the inline form renders correctly.
     if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
     if (mount) mount.classList.add("is-open");
+    // Re-read the kill switch and atomically claim this checkout immediately
+    // before creating the provider checkout. A stale page cannot bypass it.
+    const guard = await fetch('/subscribe/check', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'validate_web', claims: cfg.claims, sig: cfg.sig }),
+    });
+    if (!guard.ok) throw new Error('Checkout is unavailable or already in progress');
     await purchases.purchase({
       rcPackage: pkg,
       htmlTarget: mount,
@@ -349,12 +356,20 @@ async function run() {
     dbg("purchase resolved OK");
     showSuccess();
   } catch (e) {
-    // purchase() rejects on user cancel as well as on real errors. Either way no
-    // entitlement was granted; offer retry + a path back into the app.
+    // Only an explicit SDK cancellation releases the account attempt. An
+    // ambiguous rejection retains it for provider/entitlement reconciliation.
+    if (e?.errorCode === ErrorCode.UserCancelledError) {
+      try {
+        await fetch('/subscribe/check', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'finish_web', outcome: 'cancelled', claims: cfg.claims, sig: cfg.sig }),
+        });
+      } catch { /* Retain the pending attempt when confirmation is unavailable. */ }
+    }
     dbg("purchase ended: " + errStr(e));
     showError(
       "Checkout closed",
-      "No charge was made. You can try again or head back to the app."
+      "Return to Quests to check your purchase status before trying again"
     );
   }
 }
