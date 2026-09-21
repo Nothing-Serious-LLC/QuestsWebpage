@@ -429,3 +429,46 @@ this approach; no workaround was implemented.
 [Apple redacted billing contact](https://developer.apple.com/documentation/applepayontheweb/applepaypaymentmethod/billingcontact),
 [Stripe Express Checkout public event types](https://github.com/stripe/stripe-js/blob/master/types/stripe-js/elements/express-checkout.d.ts),
 [RevenueCat wallet wrapper](https://github.com/RevenueCat/purchases-js/blob/1.63.1/src/ui/molecules/stripe-express-checkout-element.svelte).
+
+## September 21 monthly reconciliation follow-through
+
+Read-only Chrome review matched the monthly purchase to Stripe test payment
+`pi_3UIFNuIc0E6TglSd22YeYAEw`, successful at 22:08:27 UTC for USD 4.99.
+The timeline shows one creation and one successful confirmation for that
+PaymentIntent. Stripe shows a simulated processing fee of USD 0.44 and net
+USD 4.55; this processing fee is separate from the initial USD 0.44 tax estimate
+in Elliott's screenshot. Actual live fees remain a separate financial check.
+
+Tax transaction `tax_1UIFNXIc0E6TglSdbscIgFY1` shows USD 4.99 subtotal and total,
+USD 0.00 tax, tax-exclusive behavior, personal-use SaaS `txcd_10103000`, New York
+merchant origin, and New Mexico customer billing location. State, county and
+city components each explicitly show `Not collecting`. This closes the monthly
+zero-tax provider-detail check. A positive New York tax purchase remains open.
+
+RevenueCat's sandbox customer profile shows active Pro Monthly, with the next
+period ending at 22:38 UTC when observed. A newly executed, account-scoped
+staging SELECT returned `pro`, `is_active=true`, `is_in_grace=false`,
+`will_renew=true`, `environment=SANDBOX`, and expiry
+`2026-09-21T22:38:29.106Z`. No database mutation was performed.
+
+Stripe also lists later USD 4.99 monthly payments at approximately five-minute
+intervals. That timing is consistent with accelerated sandbox renewal. The
+individual RevenueCat renewal events must still be reconciled before describing
+every later charge as a verified renewal. The event-detail dashboard stalled;
+browser extension control timed out and native query submission was unreliable.
+The purchase-attempt SELECT was prepared but no fresh result was obtained.
+Monthly webhook response and attempt-completion evidence therefore stay open.
+
+Elliott chose to retain the current checkout flow while continuing qualification.
+The tax-change reconfirmation remains a known behavior, and its elimination is a
+future provider/integration improvement. Earlier one-authorization objectives
+describe that improvement; this decision authorizes continued testing of the
+existing flow. Final Build 15, production activation, positive-tax receipt and
+physical-device Pro-themed return acceptance remain separate gates.
+
+Next physical-device check: establish current Pro status on Quests [Staging],
+then prepare an eligible sandbox state without deleting the account. Use a valid
+New York billing location for the positive-tax test. Ordinary card checkout with
+provider-documented sandbox credentials can qualify tax and return behavior
+without changing the real card's Wallet address. Capture subtotal, tax, total,
+receipt, same-account Pro access and the newly themed return screen.
