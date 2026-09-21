@@ -456,8 +456,18 @@ intervals. That timing is consistent with accelerated sandbox renewal. The
 individual RevenueCat renewal events must still be reconciled before describing
 every later charge as a verified renewal. The event-detail dashboard stalled;
 browser extension control timed out and native query submission was unreliable.
-The purchase-attempt SELECT was prepared but no fresh result was obtained.
-Monthly webhook response and attempt-completion evidence therefore stay open.
+The initial purchase-attempt SELECT was delayed. Subsequent account-scoped
+results verified monthly attempt `336e36ff-7370-429f-bb75-eb353df0b78d` as
+`web`, `monthly`, `completed`, updated at `2026-09-21T22:08:30.344221Z`.
+The result contained two attempts, with the earlier annual attempt also completed.
+
+RevenueCat sandbox INITIAL_PURCHASE event
+`14019c6d-424b-4f7e-9b6f-f150e9f8114c` matches that monthly attempt and staging
+user through its metadata. It records USD 4.99, zero tax, the Pro entitlement,
+and a five-minute initial subscription period. Its integration table shows
+both staging and production webhook deliveries as Sent at 22:08 UTC. Exact
+monthly HTTP response bodies remain unverified; the earlier annual production
+sandbox-ignore response remains separate evidence.
 
 Elliott chose to retain the current checkout flow while continuing qualification.
 The tax-change reconfirmation remains a known behavior, and its elimination is a
@@ -472,3 +482,11 @@ New York billing location for the positive-tax test. Ordinary card checkout with
 provider-documented sandbox credentials can qualify tax and return behavior
 without changing the real card's Wallet address. Capture subtotal, tax, total,
 receipt, same-account Pro access and the newly themed return screen.
+
+At approximately 22:44 UTC, after Elliott confirmed Pro was active on the phone,
+RevenueCat's sandbox profile showed Pro Monthly inactive, expired at 22:43 UTC.
+This occurred before any agent reset or refund action. The current monthly
+subscription therefore needs no manual provider reset. Staging expiration
+propagation and refreshed device purchase eligibility remain to be verified.
+No account deletion, database mutation or production subscription change was
+performed during this follow-through.
