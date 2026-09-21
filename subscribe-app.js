@@ -45,7 +45,6 @@ const statusEl = document.getElementById("status");
 const noticeEl = document.getElementById("notice");
 const noticeTitle = document.getElementById("notice-title");
 const noticeText = document.getElementById("notice-text");
-const successMark = document.getElementById("success-mark");
 const primaryBtn = document.getElementById("primary-btn");
 const secondaryBtn = document.getElementById("secondary-btn");
 
@@ -138,7 +137,7 @@ function enterCheckoutChrome() {
 
 // Restore the cream page chrome so the success/error notice renders on brand.
 function exitCheckoutChrome() {
-  document.body.classList.remove("checkout-open");
+  document.body.classList.remove("checkout-open", "checkout-success");
   if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
   if (mount) mount.classList.remove("is-open");
   if (pageEl) pageEl.hidden = false;
@@ -185,17 +184,15 @@ function withTimeout(promise, ms, label) {
 //   success -> pro-upgrade-success (routes back to the dev sandbox screen)
 //   cancel  -> home
 const scheme = (cfg && cfg.scheme) || "info.nothingserious.quests";
-const successDeepLink = scheme + "://pro-upgrade-success"; // legacy custom-scheme return (still used by /pro/success.html fallback)
 // Return without a purchase result. The server-side 302 is the transport iOS
 // honors inside SFSafariViewController. The app dismisses the sheet and checks
 // purchase state itself before it offers any billing route again.
 const returnToAppUrl =
   "/subscribe/return?scheme=" + encodeURIComponent(scheme) + "&to=home";
-// Universal-Link return target (see showSuccess). env is the server-validated
-// backend name; the landing page uses it only to surface a staging escape hatch.
-const successUniversalLink =
-  "https://thequestsapp.com/pro/success?env=" +
-  encodeURIComponent((cfg && cfg.env) || "production");
+// Both success exits use the verified app scheme and the same server redirect.
+// This preserves staging app identity when the manual fallback is needed.
+const successReturnUrl =
+  "/subscribe/return?scheme=" + encodeURIComponent(scheme) + "&to=pro-upgrade-success";
 
 function hideLoading() {
   if (loadingEl) loadingEl.hidden = true;
@@ -215,7 +212,6 @@ function showError(title, text, options) {
   // checkout surface and resets theme-color).
   exitCheckoutChrome();
   if (mount) mount.replaceChildren();
-  if (successMark) successMark.hidden = true;
   if (noticeTitle) noticeTitle.textContent = title;
   if (noticeText) noticeText.textContent = text;
   if (primaryBtn) {
@@ -281,33 +277,24 @@ function showGateRefusal(reason) {
   }
 }
 
-// Render the success state. Entitlement is already granted SERVER-SIDE by the RC
-// webhook; this screen is UX only.
-//
-// RETURN-TO-APP = UNIVERSAL LINK. The "Return to Quests" button navigates (on a
-// user tap) to https://thequestsapp.com/pro/success?env=… — the APEX domain, not
-// invite.* — because iOS suppresses Universal Links that target the domain the
-// page is already on, and checkout runs on invite.thequestsapp.com. On a build
-// whose associated domains include applinks:thequestsapp.com (TestFlight 13+),
-// iOS opens the app directly and deepLinkService routes /pro/success. Anywhere
-// else (older build, dev-client, no app) Safari loads /pro/success.html, which
-// offers a tap-to-open custom-scheme button + store fallback.
+// Payment succeeded. The app verifies entitlement from the server after return.
+// Automatic and manual return share the environment-specific server redirect.
 function showSuccess() {
   hideLoading();
-  // Restore the cream page so the success notice renders on brand (also clears
-  // the white body + white loader + checkout surface and resets theme-color).
+  // Use the same Pro graphite surface as the standalone success page.
+  // The existing app-return transport and timing remain in place.
   exitCheckoutChrome();
+  document.body.classList.add("checkout-success");
+  if (themeColorMeta) themeColorMeta.setAttribute("content", GRAPHITE);
   if (mount) mount.replaceChildren();
-  if (successMark) successMark.hidden = false;
   if (noticeTitle) noticeTitle.textContent = "You're Quests Pro!";
   if (noticeText) {
-    noticeText.textContent =
-      "Payment received, return to Quests while we confirm your Pro access";
+    noticeText.textContent = "Taking you back to Quests…";
   }
   if (primaryBtn) {
     primaryBtn.textContent = "Return to Quests";
     primaryBtn.onclick = function () {
-      window.location.href = successUniversalLink;
+      window.location.href = successReturnUrl;
     };
   }
   if (secondaryBtn) secondaryBtn.hidden = true;
@@ -319,13 +306,10 @@ function showSuccess() {
   // are "untrusted" and blocked; server redirects are not). The app receives
   // the scheme open, dismisses the in-app browser sheet, and shows the
   // ProUpgradeSuccess screen. If the hop is ever blocked, the success notice
-  // above (button -> Universal Link) is already visible as the fallback.
+  // above offers the same destination on an explicit user tap.
   setTimeout(function () {
     try {
-      window.location.href =
-        "/subscribe/return?scheme=" +
-        encodeURIComponent(scheme) +
-        "&to=pro-upgrade-success";
+      window.location.href = successReturnUrl;
     } catch (e) {
       /* blocked — fallback button is already visible */
     }

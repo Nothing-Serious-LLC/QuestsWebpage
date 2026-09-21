@@ -329,10 +329,29 @@ function headStyles() {
     #loading-white.is-open { display: flex; }
     .notice { text-align: center; display: none; }
     .notice.is-visible { display: block; }
-    .success-mark {
-      width: 64px; height: 64px; margin: 4px auto 14px; border-radius: 50%;
-      background: var(--purple-pale); color: var(--purple-deep); font-size: 34px;
-      display: flex; align-items: center; justify-content: center;
+    /* Match pro/success.html for the inline return after payment. */
+    body.checkout-success {
+      color: #FDFBF6;
+      background: #191919 linear-gradient(to top right, #565656 0%, #191919 100%);
+    }
+    body.checkout-success::before { opacity: 0.05; }
+    .checkout-success .page {
+      padding: calc(env(safe-area-inset-top, 0px) + 32px) 24px calc(env(safe-area-inset-bottom, 0px) + 32px);
+    }
+    .checkout-success .notice__title {
+      font-family: "Instrument Serif", Georgia, serif; font-weight: 400;
+      font-size: clamp(2rem, 9vw, 2.6rem); letter-spacing: 0.005em;
+      margin: 22px 0 6px; text-wrap: balance;
+    }
+    .checkout-success .notice__text {
+      margin: 0 0 30px; color: rgba(253,251,246,0.72); font-size: 1rem;
+    }
+    .checkout-success .btn {
+      min-height: 52px; padding: 14px 24px;
+      background: #FDFBF6; color: #191919; font-size: 1.05rem;
+    }
+    .checkout-success .btn:focus-visible {
+      outline: 2px solid #FDFBF6; outline-offset: 3px;
     }
     .notice__title { font-size: 1.15rem; font-weight: 700; margin: 8px 0 8px; }
     .notice__text { color: var(--text-2); font-size: 0.95rem; margin: 0 0 20px; }
@@ -530,10 +549,9 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme, plan, claims, sig }
 
       <!-- Success / canceled / error state (revealed + populated by
            /subscribe-app.js). Self-contained so we never depend on another
-           page's CSP for the return-to-app bounce. Lives on the cream .page,
-           which subscribe-app.js re-reveals on completion. -->
+           page's CSP for the return-to-app bounce. The success state uses
+           the Pro graphite surface; other notices retain the cream page. -->
       <div class="notice" id="notice">
-        <div class="success-mark" id="success-mark" hidden aria-hidden="true">&#10003;</div>
         <h2 class="notice__title" id="notice-title"></h2>
         <p class="notice__text" id="notice-text"></p>
         <button class="btn" type="button" id="primary-btn"></button>
@@ -554,7 +572,7 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme, plan, claims, sig }
   <div id="rc-checkout"></div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=15"></script>
+  <script type="module" src="/subscribe-app.js?v=15-pro-return"></script>
 </body>
 </html>`;
 }

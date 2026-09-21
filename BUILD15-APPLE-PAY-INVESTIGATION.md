@@ -218,3 +218,119 @@ USB is for diagnostics; the existing installed staging app and Safari run
 without the cable. Safari Web Inspector/device logging access must be verified
 before promising console capture. A recording of the UI and provider timestamps
 remains useful if console access is unavailable.
+
+## September 21 monthly reproduction and checkout alternatives
+
+Elliott's screenshots at 18:07 and 18:08 local time establish the exact change:
+monthly subtotal USD 4.99, New York tax 8.875% (USD 0.44), total USD 5.43,
+followed by total USD 4.99 and the updated confirmation notice above Apple Pay.
+The physical-device notice placement is now verified. The interruption remains
+reproducible. The screenshots do not capture the amount inside the Apple Pay
+sheet or establish where the initial New York location came from.
+
+RevenueCat's sandbox customer history records a new Pro Monthly purchase for
+USD 4.99 at 22:08 UTC, event `14019c6d-424b-4f7e-9b6f-f150e9f8114c`. Elliott
+reports completion and return to the app. Chrome's control connection then
+timed out repeatedly, so this pass does not add a Stripe payment-detail,
+webhook-response, or database reconciliation for that monthly event. Those
+checks remain pending. Earlier annual purchase and refund evidence remains
+separate.
+
+### What the provider documentation and source establish
+
+- Apple releases the requested full billing address after wallet authorization.
+  Its APIs can update payment-sheet totals at supported selection events, but
+  that does not make the full billing address available beforehand.
+  [Apple billing contact documentation](https://developer.apple.com/documentation/applepayontheweb/applepaypaymentrequest/requiredbillingcontactfields).
+- Stripe documents a two-step integration: collect wallet/payment details,
+  create a ConfirmationToken, calculate tax and display a review, then confirm
+  payment. This is the relevant technical foundation for Elliott's proposed
+  final confirmation screen. The exact subscription and Apple Pay experience,
+  including increases and decreases in tax, still needs device qualification.
+  [Stripe two-step confirmation](https://docs.stripe.com/payments/build-a-two-step-confirmation).
+- Our current RevenueCat `purchase()` owns the payment lifecycle. Its public
+  purchase parameters have no callback to insert that intermediate review or
+  supply an externally collected ConfirmationToken. The standard checkout in
+  SDK 1.63.1 still compares the old total with the recalculated total and raises
+  the mismatch before completing checkout.
+  [RevenueCat standard checkout source](https://github.com/RevenueCat/purchases-js/blob/1.63.1/src/ui/pages/payment-entry-page.svelte#L624-L742).
+- RevenueCat also offers Express Purchase, exposed as a public experimental
+  `presentExpressPurchaseButton` API starting in 1.45.0. Its distinct flow
+  recalculates wallet tax and confirms without the standard mismatch guard.
+  However, the 1.63.1 pricing helper explicitly constructs the wallet display
+  with the pretax amount and describes tax as visible on the invoice. This is
+  a material disclosure tradeoff and does not satisfy our final-total gate.
+  We have not enabled it or claimed its physical-device behavior is verified.
+  [Express checkout documentation](https://www.revenuecat.com/docs/web/paywalls#adding-apple-pay-or-google-pay-buttons-to-a-revenuecat-billing-paywall-with-the-express-checkout-component),
+  [Express pricing source](https://github.com/RevenueCat/purchases-js/blob/1.63.1/src/ui/express-purchase-button/stripe-helpers.ts),
+  [Express payment source](https://github.com/RevenueCat/purchases-js/blob/1.63.1/src/ui/express-purchase-button/express-purchase-button.svelte).
+- Stripe Express Checkout can update shipping-related totals from address
+  selection events. That is useful for physical-goods checkouts. A digital
+  subscription should use accurate tax-location evidence and appropriate
+  collection fields; introducing a fictitious shipping requirement is outside
+  this plan. Wallet billing details arrive through its confirmation event.
+  [Stripe Express Checkout](https://docs.stripe.com/elements/express-checkout-element/accept-a-payment?payment-ui=elements).
+- RevenueCat defines US and Canadian prices as tax-exclusive. Absorbing tax in
+  a fixed advertised total therefore is not an available documented toggle in
+  this billing engine. It would also change unit economics. Address collection
+  set to Always excludes wallets and does not remove this mismatch.
+  [RevenueCat tax](https://www.revenuecat.com/docs/web/web-billing/tax),
+  [RevenueCat address collection](https://www.revenuecat.com/docs/web/web-billing/checkout).
+
+### Airline and travel comparison
+
+Emirates describes entering passenger and payment details and displaying fees
+and taxes during booking. Its public help does not explain a Stripe or
+RevenueCat wallet-tax implementation. Stripe's Hertz case study confirms an
+Apple Pay integration using Stripe APIs; it does not document this specific
+address-mismatch resolution. Stripe's Alaska Airlines case study covers
+in-person Terminal payments. These examples establish available experiences,
+but supply no evidence of a hidden setting in our current RevenueCat flow.
+
+[Emirates booking and tax FAQ](https://www.emirates.com/english/help/faq-topics/booking-with-emirates/),
+[Stripe and Hertz](https://stripe.com/customers/hertz),
+[Stripe and Alaska Airlines](https://stripe.com/customers/alaska-airlines).
+
+### Recommendation and revised acceptance
+
+Prioritize a supported RevenueCat flow that preserves wallet details while
+presenting the corrected final total for explicit confirmation. Ask whether
+Express Purchase can display final tax before commitment, or whether standard
+checkout can expose a two-step confirmation using its existing token. The
+provider question remains a local draft; no support message has been sent.
+
+If neither is supported, qualify Stripe Billing through RevenueCat as a
+separate staging implementation, evaluating hosted Checkout first and a custom
+two-step Elements flow only if needed. Preserve user identity, server pricing,
+tax, renewal terms, durable attempts, idempotency, webhooks, refunds and app
+return. A custom PaymentIntent alone does not implement recurring billing.
+
+Elliott accepts an intentional review step after selecting Apple Pay. Acceptance
+therefore allows one wallet collection/authorization followed by a clear final
+order confirmation, provided the accurate tax-inclusive amount and recurring
+terms are disclosed before committing the purchase. Both tax increases and
+decreases must pass. There must be no error-style retry or repeated wallet
+authorization caused solely by an ordinary billing-location change. Issuer
+authentication and actual payment failures remain separate cases.
+
+## Inline Pro return correction
+
+The standalone `pro/success.html` had the approved graphite design. The active
+`showSuccess()` inside `subscribe-app.js` separately rendered a cream surface
+and purple check mark. The correction applies the same Pro graphite gradient,
+cream type, serif heading and cream action button to the inline state, removes
+the check mark, and retains the 150 ms automatic return.
+
+The manual fallback now uses the same `/subscribe/return` destination and
+server-verified app scheme as the automatic return. Previously it navigated to
+the production apex universal link even during staging. Executable tests cover
+both app schemes, both return actions, the server 302, and rejection of unknown
+destinations. The redirect grants no entitlement; the app remains responsible
+for confirming access from provider-backed state.
+
+Validation: 80 website tests pass. Local visual fixture
+`scripts/preview-checkout-success.mjs` executes the actual success renderer with
+provider calls and automatic navigation disabled. Chrome repeatedly timed out
+before visual inspection, so browser screenshot and physical-device validation
+of this correction remain open. A staging deployment receipt follows when
+deployment is complete.
