@@ -404,8 +404,12 @@ itself to certify that every state obligation has been considered.
 The wiki's August runbook already calls for New York collection and monthly
 other-state monitoring. Its certificate-pending status and tax-code label are
 stale relative to this payment workstream. This pass preserves those files and
-records the discrepancy here. Current company work locations outside New York
-were requested from Elliott to complete the initial presence assessment.
+records the discrepancy here. On September 21, Elliott confirmed that operations
+are entirely in New York, with no regular workers, offices, equipment or other
+business operations outside New York. This closes the initial owner-reported
+operating-footprint question. New York remains the established physical-presence
+obligation. Other-state economic thresholds, product-specific rules and sales
+across channels remain subject to review. Reassess when the footprint changes.
 
 [Stripe monitoring coverage and limitations](https://docs.stripe.com/tax/monitoring).
 
