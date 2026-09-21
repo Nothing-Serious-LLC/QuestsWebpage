@@ -114,3 +114,13 @@ retains `PAYMENT_BACKEND_ENVIRONMENT=staging` and excludes documentation, script
 tests, and private finance drafts. Chrome verified the stable host serves the
 expected closed state for an unsigned checkout URL. A fresh signed phone checkout
 is required for acceptance of the deployed notice inside RevenueCat.
+
+Operational deployment note: an initial archive command ran from the previous
+artifact directory and failed; the following deployment nevertheless published
+`5d09d528-c024-47e4-ab5f-d43200584df9` with zero static assets. It was immediately
+superseded by the verified clean-archive deployment
+`217dabad-4435-4ce1-b132-0b5384b003d2`. Use `217dabad` or the prior known-good
+`356e89f8` for rollback decisions; `5d09d528` is unusable. The stable-host notice
+module SHA-256 matches source exactly:
+`241f9d2a59caecb582ad3d58f4d108e09e87a86063f3e034fcad0a3445bbc83e`.
+No production project was targeted.
