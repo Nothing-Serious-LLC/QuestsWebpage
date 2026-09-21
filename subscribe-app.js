@@ -33,6 +33,7 @@
 // drives the UI; on success it deep-links back into the app. The app must NOT
 // trust the redirect for entitlement — it waits for the Realtime push.
 import { Purchases, ErrorCode } from "https://esm.sh/@revenuecat/purchases-js@1.42.1";
+import { createPriceNoticeEnhancer } from "./subscribe-notices.js";
 
 const cfgEl = document.getElementById("rc-config");
 const mount = document.getElementById("rc-checkout");
@@ -107,13 +108,17 @@ function applyRevenueCatLoader() {
 }
 
 if (mount) {
+  const updatePriceNotice = createPriceNoticeEnhancer(mount);
   const checkoutObserver = new MutationObserver(() => {
     applyProductHeading();
     applyRevenueCatLoader();
+    updatePriceNotice();
   });
   checkoutObserver.observe(mount, {
     childList: true,
     characterData: true,
+    attributes: true,
+    attributeFilter: ["class"],
     subtree: true,
   });
 }

@@ -404,6 +404,29 @@ function headStyles() {
     #rc-checkout .rcb-ui-navbar .rcb-close-button .arrow-fill { fill: #FDFBF6 !important; }
     /* Form side stays white so the Stripe fields blend. */
     #rc-checkout .rcb-main-block { background: #ffffff !important; }
+    /* Bring the SDK tax confirmation notice above the payment fields.
+       Keep it in flow so it cannot cover wallet controls or the updated total. */
+    #rc-checkout .rc-checkout-form-container {
+      display: flex !important; flex-direction: column !important;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container {
+      order: -1; margin-top: 0 !important; margin-bottom: 20px;
+      scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 16px);
+      outline: none;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container.fully-hidden {
+      margin-bottom: 0;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container .rcb-info {
+      border: 1px solid #A961CC; background: #F7F0FA !important;
+      padding: 16px !important; border-radius: 12px !important;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container .rcb-info-title {
+      font-weight: 700; color: #191919 !important;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container .rcb-info-message {
+      color: #454545 !important; line-height: 1.5;
+    }
     /* RevenueCat's payment state keeps its stable wrapper. The SDK spinner is
        hidden and subscribe-app.js inserts the same fade loader used above. */
     #rc-checkout .rc-loading .rcb-modal-loader > .rcb-ui-asset-icon {
