@@ -140,10 +140,12 @@ test('stale signed page is closed when the live kill switch is off or unavailabl
   }
 });
 
-test('existing subscriber and pending purchase close page entry', async t => {
+test('verified subscriber and pending purchase render recovery without losing signed identity', async t => {
   for (const error of ['already_subscribed', 'purchase_pending']) {
     const mock = t.mock.method(globalThis, 'fetch', async () => refuse(409, error));
-    assert.ok(isFallback(await (await onRequestGet({ request: pageRequest(), env })).text()));
+    const config = configOf(await (await onRequestGet({ request: pageRequest(), env })).text());
+    assert.equal(config.entryRefusal, error);
+    assert.deepEqual(config.claims, claims);
     mock.mock.restore();
   }
 });
@@ -154,6 +156,18 @@ test('subscribe accepts GET and HEAD only', async () => {
 });
 
 // --- initiation gate ---------------------------------------------------------
+
+test('browser recovery inspects eligibility without claiming or releasing an attempt', async t => {
+  const bodies = [];
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    bodies.push(JSON.parse(options.body));
+    return refuse(409, 'already_subscribed');
+  });
+  const response = await checkCall({ action: 'inspect_web', claims, sig, outcome: 'cancelled' });
+  assert.equal(response.status, 409);
+  assert.equal((await response.json()).reason, 'already_subscribed');
+  assert.deepEqual(bodies, [{ action: 'inspect_web', claims, sig }]);
+});
 
 test('initiation claims the attempt through the paired backend', async t => {
   t.mock.method(globalThis, 'fetch', async (url, options) => {
@@ -220,7 +234,6 @@ test('the gate rejects actions and bodies outside its contract without a backend
   let calls = 0;
   t.mock.method(globalThis, 'fetch', async () => { calls++; return allow(); });
   const bad = [
-    { action: 'inspect_web', claims, sig },
     { action: 'begin', claims, sig },
     { action: 'status', claims, sig },
     { action: 'validate_web', sig },

@@ -1,12 +1,14 @@
 // POST /subscribe/check
 //
-// Browser-side gate for the checkout page. Two actions reach the backend:
+// Browser-side gate for the checkout page. Three actions reach the backend:
+//   inspect_web   checks entitlement/provider eligibility without claiming or
+//                 releasing the attempt. An allow is not permission to retry.
 //   validate_web  claims the reserved attempt immediately before the
 //                 RevenueCat purchase call. The backend rereads the kill
 //                 switch, entitlement and provider state in the same request.
 //   finish_web    reports an explicit SDK cancellation, the only browser event
 //                 that releases an attempt.
-// Page entry (inspect_web) runs server side in functions/subscribe.js.
+// Page entry also uses inspect_web in functions/subscribe.js.
 import { askBackend, sanitizeClaims } from "./policy.js";
 
 const HEADERS = {
@@ -31,7 +33,7 @@ export async function onRequestPost({ request, env }) {
     return reply(400, { allowed: false, reason: "invalid_request" });
   }
   const { action } = body;
-  if (action !== "validate_web" && action !== "finish_web") {
+  if (!["inspect_web", "validate_web", "finish_web"].includes(action)) {
     return reply(400, { allowed: false, reason: "invalid_action" });
   }
   // Cancellation is the only outcome a browser may report.

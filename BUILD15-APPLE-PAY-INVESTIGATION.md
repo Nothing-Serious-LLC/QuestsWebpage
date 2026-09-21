@@ -617,7 +617,11 @@ The current staging build is useful for navigation regression testing; full
 abandonment recovery remains a launch blocker until the server flow is corrected.
 
 
-## Recommended next experiment: managed checkout on the existing billing rail
+## Superseded proposal: managed checkout on the existing billing rail
+
+Elliott subsequently selected the current embedded checkout with a simpler
+in-app Subscribe/reopen flow. The following proposal is historical. Follow
+`BUILD15-CHECKOUT-RETRY-HANDOFF.md` for the active scope, implementation and tests.
 
 Keep RevenueCat Billing and the existing catalog, tax configuration and
 entitlement pipeline. Test a separate sandbox Web Purchase Link as the first

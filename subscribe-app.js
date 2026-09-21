@@ -185,8 +185,8 @@ function withTimeout(promise, ms, label) {
 //   cancel  -> home
 const scheme = (cfg && cfg.scheme) || "info.nothingserious.quests";
 // Return without a purchase result. The server-side 302 is the transport iOS
-// honors inside SFSafariViewController. The app dismisses the sheet and checks
-// purchase state itself before it offers any billing route again.
+// honors inside SFSafariViewController. The app dismisses the sheet and
+// refreshes server entitlement independently of the Subscribe button.
 const returnToAppUrl =
   "/subscribe/return?scheme=" + encodeURIComponent(scheme) + "&to=home";
 // Both success exits use the verified app scheme and the same server redirect.
@@ -198,13 +198,8 @@ function hideLoading() {
   if (loadingEl) loadingEl.hidden = true;
 }
 
-// Render the closed or error state.
-//   retry: true   only before the attempt was claimed (validate_web). The
-//                 reserved attempt is intact, so reloading the link is safe.
-//   retry: false  everywhere else. A claimed attempt stays pending on the
-//                 backend until explicit cancellation or entitlement, and a
-//                 cancelled attempt cannot be reopened from this link, so the
-//                 only action is returning to the app to check status.
+// A reload retry is offered only before validate_web. Later status checks use
+// inspect_web and never start another SDK purchase operation.
 function showError(title, text, options) {
   const retry = !!(options && options.retry);
   hideLoading();
@@ -215,6 +210,7 @@ function showError(title, text, options) {
   if (noticeTitle) noticeTitle.textContent = title;
   if (noticeText) noticeText.textContent = text;
   if (primaryBtn) {
+    primaryBtn.disabled = false;
     if (retry) {
       primaryBtn.textContent = "Try again";
       primaryBtn.onclick = function () {
@@ -263,17 +259,42 @@ async function checkoutGate(action, outcome) {
 }
 
 const PENDING_TEXT =
-  "Return to Quests to check your purchase status before trying again";
+  "Your purchase hasn't been confirmed yet. Check again or return to Quests.";
+
+function showPurchaseCheck(text = PENDING_TEXT) {
+  showError("Check your purchase", text);
+  if (secondaryBtn) secondaryBtn.hidden = false;
+  if (!primaryBtn) return;
+  primaryBtn.textContent = "Check again";
+  primaryBtn.onclick = async function () {
+    if (primaryBtn.disabled) return;
+    primaryBtn.disabled = true;
+    primaryBtn.textContent = "Checking…";
+    const result = await checkoutGate("inspect_web");
+    // inspect_web allows eligibility only. It cannot establish whether an
+    // earlier SDK operation is safe to replace, even when no subscription is
+    // visible yet. Only server-confirmed access changes this recovery screen.
+    if (result.ok || result.reason === "purchase_pending") {
+      showPurchaseCheck();
+    } else if (result.reason === "checkout_unavailable") {
+      showPurchaseCheck("We couldn't check your purchase. Check your connection and try again.");
+    } else {
+      showGateRefusal(result.reason);
+    }
+  };
+}
 
 function showGateRefusal(reason) {
   if (reason === "web_checkout_disabled" || reason === "storefront_ineligible") {
     showError("Checkout is paused", "Return to Quests to see your upgrade options");
   } else if (reason === "already_subscribed") {
     showError("You already have Quests Pro", "Return to Quests to continue");
-  } else if (reason === "purchase_pending" || reason === "attempt_unavailable") {
-    showError("Purchase in progress", PENDING_TEXT);
+  } else if (reason === "purchase_pending") {
+    showPurchaseCheck();
+  } else if (reason === "attempt_unavailable" || reason === "invalid_checkout") {
+    showError("Reopen checkout", "Return to Quests and select Subscribe to open checkout again.");
   } else {
-    showError("Checkout unavailable", PENDING_TEXT);
+    showError("Checkout unavailable", "Return to Quests and select Subscribe to try again.");
   }
 }
 
@@ -380,6 +401,11 @@ async function run() {
       "Something went wrong",
       "This checkout link is invalid or expired. Please reopen Quests and try again."
     );
+    return;
+  }
+
+  if (cfg.entryRefusal) {
+    showGateRefusal(cfg.entryRefusal);
     return;
   }
 
@@ -491,12 +517,12 @@ async function run() {
       if (released.ok) {
         showError(
           "Checkout closed",
-          "No charge was made, return to Quests to choose how to upgrade"
+          "Return to Quests and select Subscribe when you're ready."
         );
         return;
       }
     }
-    showError("Checkout closed", PENDING_TEXT);
+    showPurchaseCheck();
   }
 }
 

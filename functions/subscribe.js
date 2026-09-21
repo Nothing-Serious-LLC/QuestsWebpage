@@ -1,4 +1,4 @@
-import { checkoutClaims, checkCheckout, deploymentEnvironment } from './subscribe/policy.js';
+import { checkoutClaims, askBackend, deploymentEnvironment } from './subscribe/policy.js';
 
 // GET /subscribe  — WEB REPO (QuestsWebpage, Cloudflare Pages Function)
 //
@@ -6,19 +6,9 @@ import { checkoutClaims, checkCheckout, deploymentEnvironment } from './subscrib
 // Merchant of Record, Stripe is the processor). This is the replacement for the
 // old /upgrade redirect to a pay.rev.cat Web Purchase Link.
 //
-// WHY THIS EXISTS / WHAT CHANGED:
-//   pay.rev.cat Web Purchase Links ALWAYS render a fixed 3-step funnel whose
-//   first step is a package-selection / "Continue" intro page that CANNOT be
-//   removed (RevenueCat docs: web/paywalls is a fixed package-selection ->
-//   checkout -> post-purchase funnel; package_id only PRE-SELECTS, it does not
-//   skip the step). The product requirement is the opposite: the user already
-//   picked the plan IN THE APP, so the web must open DIRECTLY on the Stripe card
-//   form with ZERO RevenueCat selection/intro page.
-//
-//   The only way to do that is the RevenueCat WEB SDK (@revenuecat/purchases-js)
-//   purchase() method, which renders ONLY the checkout form on our own domain
-//   (it mounts Stripe Elements into an HTML element we provide). There is no
-//   selection step because we hand the SDK the single rcPackage the user chose.
+//   Keep the existing embedded RevenueCat checkout. The user chooses a plan
+//   in the app and purchase() mounts that package directly on our domain.
+//   Build 15 retry work preserves this checkout and its billing integration.
 //
 //   This Function does the server-trusted half: it has the paired backend
 //   verify the signed capability (so the uid cannot be forged), then server-
@@ -513,13 +503,13 @@ function headStyles() {
   `;
 }
 
-function checkoutHtml({ uid, productId, apiKey, env, scheme, plan, claims, sig }) {
+function checkoutHtml({ uid, productId, apiKey, env, scheme, plan, claims, sig, entryRefusal }) {
   // The per-request config is emitted as NON-executable application/json so it
   // is not gated by the script-src CSP. /subscribe-app.js reads + parses it.
   // Escape '<' so the JSON can never terminate the <script> block or be parsed
   // as markup (all values are already allowlisted/UUID-validated; this is
   // defense-in-depth for the embedded application/json data island).
-  const config = JSON.stringify({ uid, productId, apiKey, env, scheme, plan, claims, sig }).replace(
+  const config = JSON.stringify({ uid, productId, apiKey, env, scheme, plan, claims, sig, entryRefusal }).replace(
     /</g,
     "\\u003c"
   );
@@ -572,7 +562,7 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme, plan, claims, sig }
   <div id="rc-checkout"></div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=15-pro-return"></script>
+  <script type="module" src="/subscribe-app.js?v=15-checkout-recovery"></script>
 </body>
 </html>`;
 }
@@ -636,8 +626,14 @@ export async function onRequestGet(context) {
 
   // Page-entry gate: signature, expiry, entitlement, provider state, storefront
   // and the live kill switch, all read fresh by the paired backend.
-  const allowed = await checkCheckout(context.env, claims, sig, "inspect_web");
-  if (!allowed) return fallbackResponse();
+  const gate = await askBackend(context.env, claims, sig, "inspect_web");
+  // These refusals follow signature verification in the paired backend. Show
+  // their recovery state without mounting a payment form. Invalid capabilities
+  // and unavailable backends continue to use the generic fallback.
+  const entryRefusal = gate.allowed ? null : gate.reason;
+  if (!gate.allowed && !["already_subscribed", "purchase_pending"].includes(entryRefusal)) {
+    return fallbackResponse();
+  }
 
   return new Response(
     checkoutHtml({
@@ -650,6 +646,7 @@ export async function onRequestGet(context) {
       plan: claims.plan,
       claims,
       sig,
+      entryRefusal,
     }),
     {
       status: 200,
