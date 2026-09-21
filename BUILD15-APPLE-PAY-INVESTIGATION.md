@@ -615,3 +615,37 @@ monthly/yearly switching, delayed webhook, and one completed purchase. Require
 successful reopening and at most one paid subscription for each intended order.
 The current staging build is useful for navigation regression testing; full
 abandonment recovery remains a launch blocker until the server flow is corrected.
+
+
+## Recommended next experiment: managed checkout on the existing billing rail
+
+Keep RevenueCat Billing and the existing catalog, tax configuration and
+entitlement pipeline. Test a separate sandbox Web Purchase Link as the first
+supported alternative to the custom checkout coordinator's indefinite lock.
+The current official Web Purchase Links documentation says `package_id` skips
+package selection and goes directly to checkout. This contradicts the older
+comment in `functions/subscribe.js`, which states that the intro is unavoidable.
+Treat direct-to-checkout behavior as a device test gate before changing routing.
+
+Configure the sandbox candidate for the existing identified App User ID,
+selected monthly/yearly package, USD, returning subscribers sent to success,
+and our Pro-themed success/return URL. Preserve account verification and the
+server entitlement check. Opening the native browser should not itself create
+an indefinite payment-processing state. Hosted checkout's pending-payment and
+concurrent-plan behavior still needs evidence before replacing existing guards.
+
+Compare immediate dismissal/reopen, dismissal after form load, wallet cancel,
+interrupted authentication, simultaneous tabs with different plans, and delayed
+webhooks. Verify one intended subscription, correct tax and app return. Retain
+the current deployment until the candidate passes these checks. This is a
+proposed staging experiment, with no provider configuration or routing changes
+made during this research pass.
+
+Keeping the exact embedded SDK page is also possible with further integration
+work, but the reviewed public interface lacks a pre-confirmation gate and resume
+parameter. An SDK fork or undocumented network interception would add maintenance
+and launch risk. Evaluate the managed flow before selecting that implementation.
+This experiment is substantially narrower than migrating to Stripe Billing;
+exact backend/schema changes remain dependent on the qualified session design.
+
+[RevenueCat Web Purchase Links, package selection, returning customers and success redirects](https://www.revenuecat.com/docs/web/web-billing/web-purchase-links)
