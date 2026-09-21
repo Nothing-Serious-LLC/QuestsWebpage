@@ -80,6 +80,12 @@ Merging PR 12 ends v1 link support on `invite.thequestsapp.com`. No shipped prod
 
 Source maps `monthly` to `quests_pro_monthly` and `yearly` to `quests_pro_annual`, and requests USD offerings. The app package verified both read-only in RevenueCat on 2026-09-21: USD 4.99 monthly, USD 29.99 yearly, both attached to `pro`, no trial. This package made no provider request. Exact rendered price, currency, renewal disclosure and wallet availability need the deployed checkout and stay pending. Apple Pay needs each checkout domain registered with Stripe.
 
+## Approvals and payment methods
+
+Elliott approved the website changes and the integrated checkout UI on 2026-09-21 after a local preview of every surface. Payment method availability is being handled by a separate agent. Deployment gates are unchanged.
+
+Stripe test mode, read-only, 2026-09-21: RevenueCat's payment method configuration has card, Apple Pay and Google Pay on. Link is off and locked in the Web Billing configuration. PayPal is not offered. `invite.thequestsapp.com` is a registered payment method domain with Apple Pay and Google Pay active. `quests-payment-review.pages.dev` is unregistered, so wallets stay hidden there. Live mode domain registration is unverified.
+
 ## Validation
 
 - `npm test`: 73 pass, 0 fail (50 existing, 23 payment routing).
