@@ -328,9 +328,18 @@ both app schemes, both return actions, the server 302, and rejection of unknown
 destinations. The redirect grants no entitlement; the app remains responsible
 for confirming access from provider-backed state.
 
-Validation: 80 website tests pass. Local visual fixture
-`scripts/preview-checkout-success.mjs` executes the actual success renderer with
-provider calls and automatic navigation disabled. Chrome repeatedly timed out
-before visual inspection, so browser screenshot and physical-device validation
-of this correction remain open. A staging deployment receipt follows when
-deployment is complete.
+Validation: 80 website tests pass and the Pages Worker compiles. Local visual
+fixture `scripts/preview-checkout-success.mjs` executes the actual success
+renderer with provider calls and automatic navigation disabled. After recovering
+Chrome control, desktop visual inspection confirmed the graphite background,
+cream text, serif heading and cream return button. Physical-device validation
+of the brief success state and app return remains open.
+
+Staging deployment: source commit `cabb48ce31e88bdc5eb5eebdf068fd3de063d1c0`,
+immutable URL https://02ba5e26.quests-payment-review.pages.dev, stable URL
+https://quests-payment-review.pages.dev. Wrangler reported successful upload
+and deployment from a clean committed artifact with staging backend bindings.
+Chrome loaded the stable site's `subscribe-app.js?v=15-pro-return` and displayed
+the new shared `successReturnUrl` implementation. The deployed module's full
+hash was not independently compared. No production checkout activation or
+payment SDK change was included.
