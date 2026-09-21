@@ -343,3 +343,85 @@ Chrome loaded the stable site's `subscribe-app.js?v=15-pro-return` and displayed
 the new shared `successReturnUrl` implementation. The deployed module's full
 hash was not independently compared. No production checkout activation or
 payment SDK change was included.
+
+## September 21 tax-obligation clarification
+
+Elliott requested a further obligation review and chose to retain the current
+checkout implementation for now. This research changes no tax registrations,
+provider settings, application code, or production activation state.
+
+### Why the New Mexico test collected zero
+
+The inspected annual sandbox transaction used New Mexico wallet billing data,
+product code `txcd_10103000`, and the reason `not_collecting`. Stripe documents
+this reason for an absent active registration or the explicit nontaxable product
+code. The observed product code excludes that second explanation. The evidence
+therefore supports a registration configuration explanation for that test.
+It does not establish that Quests has no legal New Mexico obligation. The later
+monthly screenshots show the same tax drop; their separate Stripe transaction
+reconciliation remains pending.
+
+[Stripe zero-tax reasons](https://docs.stripe.com/tax/zero-tax).
+
+### Collection scope
+
+- Federal: the US has no general national sales tax or VAT. Federal income,
+  estimated, self-employment and employment taxes are separate business/owner
+  obligations, depending on entity treatment and activity. They are handled
+  through accounting and filings rather than a general federal checkout tax.
+  [US Commerce tax guide](https://www.trade.gov/sites/default/files/2025-03/2025%20SelectUSA%20Investor%20Guide.pdf),
+  [IRS business taxes](https://www.irs.gov/businesses/business-taxes).
+- New York: Quests' New York operations and taxable software sales support the
+  registration and collection obligation. Elliott confirms receipt of the
+  Certificate of Authority. Tax sourcing concerns the customer's applicable use
+  location; citizenship is irrelevant. New York treats remotely accessed
+  prewritten software as taxable and sources it to where the purchaser uses or
+  directs its use. A wallet billing address is checkout evidence and can be
+  outdated. A current New York use location paired with an old New Mexico card
+  address requires sourcing review. The screenshot's 8.875% is a particular
+  local rate, rather than a rate to apply to all US customers.
+  [NY software bulletin](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/computer_software.htm),
+  [NY registration guidance](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/do_i_need_to_register_for_sales_tax.htm).
+- Other states: determine physical/business presence, each state's economic
+  thresholds, product taxability, and sourcing rules. Register and activate
+  collection where required. Selling nationwide alone does not establish a
+  blanket all-state collection rule. New Mexico's remote-seller threshold is
+  at least USD 100,000 of taxable gross receipts in the previous calendar year
+  for a seller without physical presence. Its presence rules also require
+  review. No complete company-wide sales or operating-footprint audit was
+  performed in this research pass.
+  [New Mexico nexus rules](https://www.tax.newmexico.gov/businesses/determining-nexus/).
+
+### Operational follow-through
+
+Keep the New York collection setup, verify its live purchase and assigned
+filing calendar, and review other-state triggers monthly and whenever work
+locations change. Reconcile sales across channels and apply each state's rules
+for marketplace sales. Stripe monitors live Stripe-processed/imported sales;
+its dashboard supplies evidence with coverage limits. It is insufficient by
+itself to certify that every state obligation has been considered.
+
+The wiki's August runbook already calls for New York collection and monthly
+other-state monitoring. Its certificate-pending status and tax-code label are
+stale relative to this payment workstream. This pass preserves those files and
+records the discrepancy here. Current company work locations outside New York
+were requested from Elliott to complete the initial presence assessment.
+
+[Stripe monitoring coverage and limitations](https://docs.stripe.com/tax/monitoring).
+
+### Additional wallet research finding
+
+Apple's `ApplePayPaymentMethod.billingContact` documentation describes redacted
+billing information before authorization for tasks such as calculating tax.
+This refines the earlier observation about the full address arriving after
+authorization. A provider-supported implementation may be able to refresh the
+wallet total using that earlier information. Stripe's reviewed public Express
+Checkout event types expose shipping-address changes and post-authorization
+confirmation, with no corresponding billing-contact selection event. RevenueCat
+1.63.1's wrapper registers ready, confirm, loaderror, click and cancel handlers.
+Provider support and device qualification remain necessary before relying on
+this approach; no workaround was implemented.
+
+[Apple redacted billing contact](https://developer.apple.com/documentation/applepayontheweb/applepaypaymentmethod/billingcontact),
+[Stripe Express Checkout public event types](https://github.com/stripe/stripe-js/blob/master/types/stripe-js/elements/express-checkout.d.ts),
+[RevenueCat wallet wrapper](https://github.com/RevenueCat/purchases-js/blob/1.63.1/src/ui/molecules/stripe-express-checkout-element.svelte).
