@@ -525,3 +525,93 @@ The account, provider settings, tax setup and database were preserved. The
 website success theme remains the previously deployed version. Device
 acceptance requires a recorded cancellation/retry, deliberate purchase,
 positive New York tax receipt and Pro-themed return to the same app account.
+
+
+## September 21 early-dismissal research and revised recommendation
+
+The next phone reproduction establishes a server-side abandonment gap.
+Staging yearly attempt `241487d0-70b0-487b-838e-1a09fb72d8ef` was created at
+23:19:52.365 UTC and moved to `started` at 23:19:54.701 UTC. Elliott reports
+immediately dismissing the Safari sheet. No later RevenueCat webhook for the
+account was present at the research snapshot. This does not independently
+prove the absence of an in-flight provider payment.
+
+The installed phone app is still Quests [Staging] 3.0.1(14). Recovery build
+`da59c145-b68e-443a-9348-af7cfa38f43f`, source `70e023ca1`, was still IN_PROGRESS
+at the check and has not been installed. That patch also deliberately retains
+`started` locks, so it cannot fully resolve this newly evidenced scenario.
+
+### Confirmed cause in our implementation
+
+`subscribe-app.js` calls `validate_web` before `purchases.purchase()` mounts the
+payment form. The coordinator changes `reserved` to `started` at this point.
+Its status action releases only `reserved` attempts. A `started` attempt can
+remain locked indefinitely when the Safari sheet closes without the SDK's
+explicit cancellation callback. The native app then offers Check purchase
+status. This policy is our integration behavior, with its lock applied during
+checkout presentation.
+
+### Official-source findings
+
+- RevenueCat starts the subscription after initial payment confirmation. A
+  canceled form or failed initial payment can produce no subscription events.
+  Waiting only for a webhook therefore cannot settle every abandoned form.
+  [Subscription lifecycle](https://www.revenuecat.com/docs/web/web-billing/subscription-lifecycle)
+- The Web SDK documents success results and UserCancelledError. Closing the
+  containing browser is a separate lifecycle path. The pinned 1.42.1 public
+  PurchaseParams interface exposes no confirmation gate or provider-session
+  resume parameter. Its paywall onPurchaseStarted listener surrounds entry to
+  the checkout flow and cannot establish that a payment was submitted.
+  [Web SDK](https://www.revenuecat.com/docs/web/web-billing/web-sdk),
+  [pinned interface](https://github.com/RevenueCat/purchases-js/blob/1.42.1/src/entities/purchase-params.ts),
+  [pinned implementation](https://github.com/RevenueCat/purchases-js/blob/1.42.1/src/main.ts)
+- Stripe recommends reusing the same PaymentIntent after an interruption, with
+  idempotency preventing duplicate creation. Its Checkout API also supports
+  expiring an open session so it cannot complete. These are patterns for an
+  integration that controls those objects; our RevenueCat Billing wrapper does
+  not currently expose that lifecycle through its public purchase method.
+  [PaymentIntent lifecycle guidance](https://docs.stripe.com/payments/payment-intents),
+  [expire Checkout Session](https://docs.stripe.com/api/checkout/sessions/expire)
+- Browser unload events are unreliable on mobile. A page-close beacon alone
+  cannot be the authority for releasing a potentially chargeable session.
+  [MDN beforeunload](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event)
+
+### Recommended behavior and implementation gate
+
+The normal retry action should open or resume checkout. Website verification
+should determine whether the customer can pay, should resume a pending payment,
+or already has Pro. Model presentation separately from payment submission:
+
+1. Before payment submission, closing checkout should allow a straightforward
+   reopen. Retain a server-owned attempt/session identity for safe resumption.
+2. After submission or during authentication/processing, reconcile that same
+   provider operation. Display a processing state only when evidence supports it.
+3. On success, verify entitlement and return to the app. On confirmed provider
+   cancellation/failure, permit a new operation. Support expiry and recovery.
+4. Preserve protection for concurrent devices, old tabs, and monthly/yearly
+   switching. Merely allowing validate_web to run again would create another
+   SDK checkout; reusing our attempt ID alone does not prove payment idempotency.
+
+Next technical decision: establish a supported RevenueCat session-resume,
+pre-confirmation gate, or server cancellation/status mechanism. The public
+interfaces reviewed do not establish one. Avoid undocumented endpoint hooks,
+DOM button interception, arbitrary delays, and automatic release based solely
+on missing entitlement. If RevenueCat cannot support the necessary lifecycle
+in our wrapper, evaluate its managed Web Purchase Links with package_id and
+returning-subscriber handling before considering a billing-engine migration.
+Managed-link behavior must still be tested for concurrent attempts and plan
+changes; documentation about existing subscribers does not prove atomic
+cross-product duplicate prevention.
+[Web Purchase Links](https://www.revenuecat.com/docs/web/web-billing/web-purchase-links)
+
+This requires coordinated app, website and checkout-coordinator work. Exact
+schema changes depend on how provider session identity can be obtained and
+stored. Tax rules and payment-method expansion stay outside this fix. This is
+an integration correction with a provider capability question still open.
+
+Acceptance: immediate X before load, X after the form renders, Wallet cancel,
+close during payment authentication, slow/offline retry, duplicate taps/tabs,
+monthly/yearly switching, delayed webhook, and one completed purchase. Require
+successful reopening and at most one paid subscription for each intended order.
+The current staging build is useful for navigation regression testing; full
+abandonment recovery remains a launch blocker until the server flow is corrected.
