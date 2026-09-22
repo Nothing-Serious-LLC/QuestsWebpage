@@ -16,7 +16,7 @@ The payment-routing app branch was based on `c40518cf6` before its two final com
 
 An unused review worktree, `Quests-worktrees/build15-checkout-retry-review-20260921`, remains clean at `c40518cf6`. It contains no additional implementation and has no runtime lease. Use the payment-routing branch above as the app candidate.
 
-App source, candidate instructions and text test receipts are committed. The originating app worktree still has untracked `candidate/`, `paywall-review/` and `routing-evidence/` archive directories. Preserve those local visual artifacts; this verification package does not claim that their images are on GitHub. The earlier candidate archive also predates the latest dismissal-replacement revision, so the committed source is authoritative.
+App source, candidate instructions and text test receipts are committed. The originating app worktree still has untracked `candidate/`, `paywall-review/` and `routing-evidence/` archive directories. Preserve those local visual artifacts; this verification package does not claim that their images are on GitHub. The candidate manifest was rechecked September 22: it now names `21ebdf19d`, implementation `5029d2724`, and all listed source hashes match the worktree. The committed source remains the integration authority.
 
 ## Critical change since the previous handoff
 
@@ -60,9 +60,9 @@ This is source review plus separate local test suites using mocked provider/data
 
 ## Deployment and operational state
 
-Website staging runtime: `4f2cf11`, Cloudflare deployment `ec74f3e0-020f-4b23-9f33-e1d6a51f36a7`, stable host `quests-payment-review.pages.dev`. Previous Chrome readback confirmed the new recovery code and invalid-link fallback. Downloaded binding was staging. This final documentation package does not change that runtime.
+Website staging runtime: `4f2cf11`, Cloudflare deployment `ec74f3e0-020f-4b23-9f33-e1d6a51f36a7`, stable host `quests-payment-review.pages.dev`. Cloudflare deployment listing was rechecked September 22 and still identifies this deployment as latest in the staging project's Production slot. Previous Chrome readback confirmed the new recovery code and invalid-link fallback. Downloaded binding was staging. This final documentation package does not change that runtime.
 
-The latest retry backend has no deployment receipt or signed device artifact in this package. Prior installed staging software carried 3.0.1 build 14 metadata and earlier source. It cannot qualify this final retry candidate.
+The reviewed app handoff supplies no deployment receipt or signed-device acceptance for the latest retry revision; the main testing agent must reconcile any subsequent deployment/build activity. Prior installed staging software carried 3.0.1 build 14 metadata and earlier source. It cannot qualify this final retry candidate.
 
 Website PR 12 merges deploy production through GitHub main. Preserve its paired-backend deployment gate. Native purchase routing also uses the coordinator, so web-off alone does not establish compatibility with an old production signer.
 

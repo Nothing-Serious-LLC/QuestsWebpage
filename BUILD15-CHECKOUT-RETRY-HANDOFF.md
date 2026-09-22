@@ -1,117 +1,90 @@
 # Build 15: Subscribe, dismiss, reopen
 
-September 22 closeout: read `BUILD15-FINAL-MERGE-PACKAGE.md` first. The app agent's latest committed candidate adds replacement after an observed dismissal, which changes the earlier retained-lock contract below. The final package records source verification, exact commits and the unresolved provider-safety release hold.
+Updated September 22, 2026. Final app candidate: `21ebdf19d6777ce16b0b44f5c3ade3a56545b713`; implementation: `5029d2724`. Source is prepared for staging integration. Provider and signed-device acceptance remain open. See [the final merge package](BUILD15-FINAL-MERGE-PACKAGE.md) for the release disposition and merge-agent prompt.
 
-Status: website recovery changes implemented, locally tested and deployed to staging from `4f2cf11`. App and backend changes below are pending. Full abandonment recovery still needs staging device proof.
+## Verified scope and authority
 
-## Agreed scope
+The existing embedded RevenueCat Web Billing checkout, Apple Pay/card, selected plan, tax behavior, Pro theme and success-return transport remain. This retry path requires no additional website UI change or schema migration. The earlier payment-routing migration remains a deployment prerequisite.
 
-Elliott's decision on September 21, 2026: keep the current embedded RevenueCat Web Billing checkout, Apple Pay/card, selected plan, tax calculation, and entitlement pipeline. Keep the app's Subscribe button available after closing the website. Upgrade to Pro only after server entitlement confirmation. This decision supersedes the managed Web Purchase Link experiment in `BUILD15-APPLE-PAY-INVESTIGATION.md`.
-
-The app owns browser presentation and access refresh. The website owns checkout and purchase recovery messaging. A return URL can trigger a refresh; server entitlement remains the authority for Pro access.
-
-## Verified cause
-
-`subscribe-app.js` calls `validate_web` immediately before `purchases.purchase()` mounts the form. The backend changes `purchase_attempts.state` from `reserved` to `started` at that point. Closing the containing Safari sheet with X can leave that state untouched. The app sets `webPending` and replaces Subscribe with Check purchase status. Backend `status` releases only `reserved` attempts; repeated `validate_web` refuses a `started` attempt.
-
-Observed staging example: attempt `241487d0-70b0-487b-838e-1a09fb72d8ef` became started at 2026-09-21 23:19:54.701 UTC after an immediate-dismissal test. A started row establishes that the form was opened. It does not establish payment submission. Absence of a webhook cannot settle a potentially chargeable provider operation.
-
-## Ownership and checkout authority
-
-Website lane:
+App source and all four handoff documents were reviewed directly in:
 
 ```text
-/Users/elliottthornburgsmac/Developer/QuestsWebsite-worktrees/build15-payment-routing-20260921
+/Users/elliottthornburgsmac/Developer/Quests-worktrees/build15-payment-routing-20260921
 codex/build15-payment-routing-20260921
-GitHub remote: github, Nothing-Serious-LLC/QuestsWebpage
-Starting HEAD for this change: eebbddda35df
+handoff/build15-payments-20260921/WEBSITE-VERIFY-HANDOFF.md
+handoff/build15-payments-20260921/MERGE-HANDOFF.md
+handoff/build15-payments-20260921/CHECKOUT-RETRY-CANDIDATE.md
+handoff/build15-payments-20260921/OPEN-ITEMS.md
 ```
 
-App/backend reference lane, inspected read-only for this handoff:
+GitHub remote `origin` was rechecked September 22 and points to `21ebdf19d6777ce16b0b44f5c3ade3a56545b713`. The implementation was checked in `UpgradeProLink.tsx`, `UpgradeProScreen.tsx`, `purchaseRoutingRepository.ts`, and `sign-upgrade-link/handler.ts`. The prior same-attempt-only handoff is superseded by the behavior below.
 
-```text
-/Users/elliottthornburgsmac/Developer/Quests-worktrees/build15-payment-e2e-20260921
-codex/build15-payment-e2e-20260921
-HEAD: b8acfb5d9912dfc1043730eecc0265ea2bfe789c
-Earlier recovery implementation: 70e023ca19a675294e02420f3b5f6d3383894cf5
-```
+Website worktree: `/Users/elliottthornburgsmac/Developer/QuestsWebsite-worktrees/build15-payment-routing-20260921`, branch `codex/build15-payment-routing-20260921`, authoritative remote `github`. Earlier documentation and financial research were preserved in `87c5604`; this reconciliation changes documentation only.
 
-The app agent must establish its current branch and integration authority before editing. Preserve other agents' changes and runtime leases. The app reference lane contains payment work that needs deliberate integration with the current Build 15 branch.
+## Final source behavior
 
-## Website changes prepared
+1. Dismissing the Safari checkout immediately restores Subscribe and plan selection. Entitlement refresh runs in the background with bounded, serialized reads. The app continues to grant Pro from authoritative server entitlement.
+2. `UpgradeProLink` records the exact signed attempt only when `openBrowserAsync` returns CANCEL or DISMISS. The marker is held in memory and keyed by account and environment. Signing timeout or presentation error does not invent a dismissal.
+3. The next explicit Subscribe tap passes that identifier as `dismissed_attempt` on the authenticated app-to-backend `begin` request. There is no automatic payment or backend retirement at the moment of dismissal.
+4. The backend checks account, entitlement, fresh RevenueCat subscriptions, routing, storefront and scheme. If the provider shows no outstanding subscription, it can retire that account's exact matching open web attempt, including a started attempt.
+5. The backend creates or reuses the unique next open attempt and signs the selected plan. A plan change is permitted after the exact dismissal. Concurrent insertion conflicts reread the winning row; `validate_web` permits one reserved-to-started transition.
+6. Old links are rejected by attempt-state inspection/validation. Entitlement, provider-pending, native-purchase, account, environment and concurrent-initiation guards remain. When a concurrent attempt has a different plan, the explicit plan conflict prevents silently substituting it.
+7. Without a usable dismissal marker, a started attempt continues into website recovery. A process restart loses the in-memory marker and can initially leave that recovery path in place. Provider read failures preserve the attempt and return feedback.
 
-- Verified `purchase_pending` and `already_subscribed` page-entry responses render an appropriate recovery notice. Previously they rendered the generic invalid-link page.
-- Uncertain payment outcomes offer Check again on the website. This calls `inspect_web`, with one request in flight. It neither mounts another SDK checkout nor reports cancellation.
-- An `already_subscribed` response offers Return to Quests. An eligibility allow leaves the uncertainty visible because `inspect_web` currently provides no provider-operation resume decision.
-- Remove the instruction to use the app's Check purchase status action and the unsupported blanket claim that cancellation means no charge occurred.
-- Keep the existing Pro-themed success screen, 150 ms automatic return, manual return, signed identity, environment binding, provider gate and tax behavior.
+Ordinary same-session form dismissal therefore has a deliberate replacement path in the final source. Its usable-form behavior on the paired signed app still needs physical-device evidence.
 
-Files: `subscribe-app.js`, `functions/subscribe.js`, `functions/subscribe/check.js`, `tests/checkout-recovery.test.mjs`, `tests/payment-routing.test.mjs`.
+## Unchanged website contract
 
-Compatibility: the backend already supports `inspect_web`. The website proxy now exposes that existing signed action. Existing version 2 claims and response shapes are unchanged. These changes can be staged independently. They do not release the existing started-attempt lock.
+`/subscribe?version=2&uid=&attempt=&exp=&plan=&env=&appscheme=&storefront=&sig=` remains the signed URL. `dismissed_attempt` belongs to the authenticated app-to-signer request and is not a new signed URL claim or website action.
 
-Deployment evidence: `ec74f3e0-020f-4b23-9f33-e1d6a51f36a7`, source `4f2cf11`, [immutable staging deployment](https://ec74f3e0.quests-payment-review.pages.dev). The stable host is `quests-payment-review.pages.dev`. Cloudflare's Production slot for this staging project has `PAYMENT_BACKEND_ENVIRONMENT=staging`, confirmed by downloaded configuration. Chrome readback showed the new recovery function and the unsigned-link fallback. Pages Worker compilation passed. Authenticated recovery and device behavior remain pending.
+| Action | Website behavior |
+| --- | --- |
+| `inspect_web` at page entry | Reserved attempt may render checkout; `purchase_pending` renders recovery; `already_subscribed` offers Return to Quests; unavailable or invalid capabilities fail closed |
+| `validate_web` before SDK purchase | Recheck the capability and attempt; one reserved-to-started winner can mount the form |
+| `inspect_web` from Check again | Check eligibility/entitlement without starting another SDK purchase; an allow alone does not resolve uncertainty or initiate payment |
+| `finish_web`, outcome cancelled | Report an explicit SDK cancellation through the existing bounded endpoint |
+| Success return | Existing Pro-themed screen, automatic/manual `/subscribe/return` transport and originating app scheme remain |
 
-Deployment incident: an archive-extraction incompatibility led to a brief empty staging deployment (`11c45610`). The complete artifact replaced it approximately 23 seconds later at the deployment above. Production billing/site were untouched. Future deployment scripts must stop on packaging errors and assert the expected assets before invoking Wrangler. CLI HTTP probes received Cloudflare 403, so deployed content verification used Chrome.
+The website has no browser-close beacon or unload transition. A fresh link from the final backend uses the same contract and selected-product mapping. The return redirect prompts app refresh and grants no entitlement by itself.
 
-## App implementation
+## Provider safety limit
 
-1. In `src/screens/UpgradeProScreen.tsx`, keep Subscribe as the web CTA until server-confirmed Pro. Use a short Opening checkout state only while obtaining/presenting the link. Suppress concurrent presentation taps.
-2. In the browser close/dismiss/error `finally` path, clear the presentation flags and restore interaction. Closing X should leave Subscribe immediately usable. Refresh entitlement in the background with bounded, serialized requests.
-3. Remove the status-only `webPending` CTA branch for web checkout. Avoid running the current mutating `status` cleanup as a prerequisite to every reopen. Audit `heldRail`, plan-selection disabling, polling and `checkPurchaseEligibility` so another guard does not preserve the same lock under a different name.
-4. Keep the server-confirmed active subscription behavior and existing native purchase guards. A web pending operation should route to website recovery through a signed link once the backend supports that contract.
-5. In `src/components/UpgradeProLink.tsx`, preserve the bounded link request and single browser presentation. A link or network error returns control to Subscribe with concise feedback.
-6. Preserve the existing awaited browser dismissal in `src/services/deepLinkService.ts`. On success return, refresh entitlement and display final Pro access only after confirmation. A delayed webhook must not invite a second charge. Ignore stale async results after unmount, sign-out or account switch.
+The coordinator row's `cancelled` state means the old capability was retired. It does not establish cancellation of a provider operation already mounted or processing. During initial payment or 3DS, RevenueCat may not yet expose a subscription. A later empty subscription read cannot conclusively exclude that in-flight charge.
 
-No new signup email or billing address field is part of this app change. No tax or payment-method settings change is required.
+The current candidate provides no documented provider idempotency or provider-session cancellation guarantee for that window. An old mounted tab can also outlive coordinator retirement. Keep this case explicitly unresolved until documented provider support and sandbox/device evidence establish a tested disposition. Preserving guards around known subscriptions does not prove duplicate-charge prevention before provider visibility.
 
-## Backend integration contract and remaining decision
+The earlier research into the pinned Web SDK 1.42.1 found no public pre-confirmation gate or session-resume parameter. Keep the current integration; hosted checkout, Stripe Billing migration, private API interception and an SDK fork remain outside this documentation task.
 
-Owner: app/backend agent. Relevant files: `supabase/functions/sign-upgrade-link/handler.ts`, `policy.ts`, `handler_test.ts`, and the purchase-attempt schema if needed.
+## Source, deployment and device evidence
 
-Required externally visible behavior:
-
-| Situation | App | Website/backend |
+| Layer | Evidence | Limit |
 | --- | --- | --- |
-| First Subscribe | Open signed checkout | Validate identity, storefront, routing, plan and provider state |
-| X before or after form render | Restore Subscribe immediately | Reopen a payable form when supported provider evidence establishes safety |
-| Existing web attempt with uncertain outcome | Open its recovery link | Show recovery without creating another chargeable operation |
-| Provider processing or delayed webhook | Refresh access in background | Reconcile the existing operation and prevent a second payment |
-| Server-confirmed Pro | Show Pro access | Offer return to app |
-| Network failure | Restore Subscribe with feedback | Preserve uncertainty and permit bounded status checks |
+| App source | Candidate `21ebdf19d`, implementation `5029d2724`, matching GitHub branch verified September 22 | Source identity alone establishes no installed app or backend deployment |
+| Website source | Runtime `4f2cf11`; earlier tested documentation head `333a7f9d`; runtime files unchanged through documentation head `87c5604` | Later documentation commits do not change the deployed runtime |
+| Website staging deployment | Cloudflare deployment listing rechecked September 22: latest Production-slot deployment of staging project `quests-payment-review` is `ec74f3e0-020f-4b23-9f33-e1d6a51f36a7`, source `4f2cf11` | This is the staging project's slot. Previous binding readback was staging; no fresh checkout or payment was executed in this pass |
+| Local website tests | 86 passing, rerun September 22 | Mocked browser/provider/backend behavior |
+| Local app tests | 26 focused retry/link/return tests rerun September 22; app owner records 101 tests across nine suites | Broader owner receipt and this verification are separate runs |
+| Local backend tests | 25 passing, rerun September 22 with Deno `--no-config --no-lock` | Mocked database/provider behavior |
+| Final backend and signed device | Reviewed app handoff provides no deployment/build acceptance receipt for this retry revision | Main Build 15 testing agent must supply exact function version/source, merged SHA and signed build ID |
 
-A narrow first backend change can reissue a signed capability for an existing web attempt, allowing the app to open website recovery instead of returning `purchase_pending` before opening the browser. Reuse the stored account, route, plan and attempt identity. Handle concurrent `begin` insertion conflicts by rereading the authoritative attempt. Preserve guards for native attempts. A selected-plan change must be explicit; silently signing the previous plan would create a price mismatch. Extend the response/UI contract if the existing attempt requires choosing between plans.
+Receipts: `handoff/build15-final-verification-20260922/`. Earlier successful Apple Pay payments, refunds, returns and tax observations remain historical evidence for their older source/artifacts. They do not close the final retry candidate's acceptance rows.
 
-That first change permits browser reopening. Completing the abandoned-form fix additionally requires a supported way to establish that the previous provider operation can be resumed, replaced, or safely invalidated. The pinned Web SDK 1.42.1 public `PurchaseParams` reviewed in this workstream exposes no provider-session resume parameter or pre-confirmation callback. Repeated `.purchase()` calls and repeated metadata attempt IDs do not establish provider idempotency.
+## Staging verification and evidence handoff
 
-Before relaxing `validate_web`, establish and test the provider's supported behavior for an unfinished checkout, a payment in flight, two tabs, and different plans. Scope this investigation to the current SDK/integration. Do not introduce hosted checkout, Stripe Billing migration, an SDK fork, or private API interception as part of this handoff. Report an unresolved provider capability with evidence if the current integration cannot satisfy safe resumption.
+The main Build 15 testing agent owns the integrated source, paired function deployment and signed app. Record each outcome against the existing B15-PAY IDs in the app ledger. Share the deployed website ID, function version/source, app SHA/build ID, environment, timestamps and private provider/attempt references in one readout. Provider identifiers and signed links stay in private evidence.
 
-Avoid automatic release based on browser close, elapsed time alone, an empty entitlement row, or missing webhook. Those signals cannot exclude a payment in flight. Keep signature/expiry/environment checks, live routing controls, and authoritative entitlement checks on every relevant request.
+1. Verify the staging backend, sandbox Web Billing key, registered domain, selected product and exact price/period disclosures. Confirm production sandbox-web isolation before generating payment events.
+2. Open checkout, X immediately, then explicitly Subscribe again. Repeat after the form renders. Verify a usable form, fresh attempt where retirement applies, and rejection of the old URL.
+3. Change monthly/annual after X. Verify the selected plan, price and period. Test rapid taps, concurrent devices/tabs and a previously mounted old form.
+4. Exercise Wallet cancel, interrupted 3DS, offline return/reconnect, delayed provider visibility and a process restart. Known provider-pending/active subscriptions must prevent another initiation. Record the pre-visibility window separately.
+5. Complete one deliberate sandbox payment. Verify exactly one intended payment/subscription, authoritative entitlement, reward fulfillment once, Pro-themed success, automatic/manual app return, persistence after restart and management.
+6. Verify positive New York tax with a valid billing address and matching receipt/tax record. Preserve the existing New Mexico zero-tax evidence separately.
+7. Repeat the required checks on the exact integrated Build 15 artifact. Retain production migration, signer/website, activation, live-payment and store-release gates. Native catalog/restore, Freeze fulfillment and reviewer deliverables remain in the app's OPEN-ITEMS ledger.
 
-Database impact: the app presentation and website changes require no schema migration. The backend's attempt-reuse change may fit the existing schema. Durable provider-session identity or additional lifecycle states could require a migration, depending on the supported mechanism found. Confirm that design before claiming database work is unnecessary. Keep database inspection read-only during diagnosis; handle migrations through the release workflow.
+This pass coordinates through the shared source/verification package. No separate main testing agent is reachable through this conversation's agent mailbox, and no provider/device case is marked complete on its behalf.
 
-## Tests and release order
+## Merge-agent disposition
 
-1. Website source tests: `npm test`. Current result: 86 passing, including actual browser-module execution with a mocked SDK, duplicate status clicks, uncertain payment, offline recovery, existing subscriber, and both return schemes. These tests do not prove real provider duplicate protection.
-2. App agent updates `webCheckoutDismissal.test.ts` and `webCheckoutRecovery.test.ts`, then reruns `checkoutDeepLinkDismissal.test.ts` and `proCheckoutReturn.test.ts`. Add immediate X, slow opening, double-tap, background refresh and account-switch coverage.
-3. Backend agent adds tests for repeated `begin`, stale signed URLs, concurrent devices/tabs, plan changes, provider timeout, payment in flight and delayed webhook. Keep cross-environment and kill-switch tests. A missing subscription event alone must not pass a safe-to-retry assertion.
-4. Deploy the backward-compatible website recovery changes to `quests-payment-review`, paired only with staging. Deploy qualified backend changes to staging, then install the updated native staging app. Expo Go can exercise presentation mocks; the real browser, native purchase SDK and return flow need the payment-capable build.
-5. On Elliott's same phone/account: open checkout and immediately X, then Subscribe again; repeat after the form renders; cancel Wallet; reopen. Require an interactive app, the selected plan, and a usable checkout without repeated status-button taps. Then test interrupted authentication, offline recovery and slow webhook handling.
-6. Complete one deliberate sandbox purchase. Verify one intended provider subscription/payment, authoritative entitlement, Pro-themed web success, automatic return, persisted Pro after app restart, and subscription management. Exercise manual return separately. Record provider and attempt IDs privately with timestamps; avoid logging signed links, card data or credentials.
-7. Integrate the qualified changes into Build 15 and repeat the relevant phone tests against that artifact. Production rollout and Elliott's deliberate live purchase remain separately coordinated release steps. Verify the production domain, live billing/tax mode and production return scheme before payment.
+Source is ready for reconciliation into the staging candidate. Preserve the final app behavior and unchanged website contract, and keep the provider visibility window explicit. A public-release disposition requires the remaining provider/device evidence or an explicit tested deferral. Website PR 12 merges deploy production and retain their existing gate. Preserve settlement webhooks during rollback and coordinate function/app compatibility.
 
-Acceptance: reopening the browser alone is insufficient. The ordinary abandoned-form case must reach a usable checkout, and uncertain prior payments must stay reconciled to the same intended purchase. Until both pass, report the app UX and full retry recovery as separate completion states.
-
-Rollback: revert this website change to its preceding staging deployment if needed. Keep backend changes compatible with older signed links and the installed app during rollout. If a coordinated rollback cannot preserve payment safety, use the existing server routing control before reverting the backend. Production remains behind its release gate.
-
-## Research references
-
-- [RevenueCat Web SDK](https://www.revenuecat.com/docs/web/web-billing/web-sdk)
-- [RevenueCat subscription lifecycle](https://www.revenuecat.com/docs/web/web-billing/subscription-lifecycle)
-- [Pinned SDK purchase parameters](https://github.com/RevenueCat/purchases-js/blob/1.42.1/src/entities/purchase-params.ts)
-- [Stripe PaymentIntent lifecycle and reuse](https://docs.stripe.com/payments/payment-intents)
-- [Expo WebBrowser lifecycle](https://docs.expo.dev/versions/v54.0.0/sdk/webbrowser/)
-
-## Copyable app-agent handoff
-
-Implement the Build 15 Subscribe/dismiss/reopen change using this document. Elliott approved keeping the existing embedded RevenueCat checkout and simplifying the app button. Own the app presentation change and the paired sign-upgrade-link backend work. Keep Subscribe available after X; refresh entitlement in the background; grant Pro only from server confirmation. Preserve the awaited browser-dismissal fix. The website has local recovery checks and preserves its Pro-themed success return. Establish safe existing-attempt recovery before relaxing the server's started lock. Keep hosted checkout and billing migration outside scope. Verify your worktree authority, preserve concurrent work, test locally and on staging, then provide a device-test candidate and exact remaining gaps. Do not claim the retry issue fixed merely because the button reappears.
+[RevenueCat lifecycle](https://www.revenuecat.com/docs/web/web-billing/subscription-lifecycle), [pinned purchase parameters](https://github.com/RevenueCat/purchases-js/blob/1.42.1/src/entities/purchase-params.ts).

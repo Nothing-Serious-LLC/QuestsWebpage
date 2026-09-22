@@ -1,6 +1,6 @@
 # Build 15 signed checkout: website package
 
-September 22 closeout: [final merge package](BUILD15-FINAL-MERGE-PACKAGE.md) owns the latest retry-candidate review and release disposition. The dated receipts below describe earlier deployments. The final retry backend remains undeployed in this package and its provider replacement safety remains unresolved.
+September 22 closeout: [final merge package](BUILD15-FINAL-MERGE-PACKAGE.md) owns the latest retry-candidate review and release disposition. The dated receipts below describe earlier deployments. Final app candidate `21ebdf19d` (implementation `5029d2724`) is verified in source and on GitHub. Its handoff has no paired retry-backend deployment or signed-device acceptance receipt. Provider replacement safety during initial payment remains unresolved. [The reconciled retry contract](BUILD15-CHECKOUT-RETRY-HANDOFF.md) records the final behavior and staging checklist.
 
 Status 2026-09-21: reviewed website source is deployed to staging. Paired staging functions and the production sandbox-web exclusion are deployed. The annual Apple Pay staging purchase and production web-sandbox exclusion are verified. Positive New York tax, remaining failure cases, and final Build 15 acceptance remain pending. Production checkout activation and real charges or refunds retain their own gates. The Build 15 Ledger owner keeps app integration and release authority.
 
@@ -31,18 +31,23 @@ Request: `/subscribe?version=2&uid=&attempt=&exp=&plan=&env=&appscheme=&storefro
 
 | Gate | Where | Backend action | Closed result |
 |---|---|---|---|
-| Page entry | `GET /subscribe`, server side | `inspect_web` | Approved fallback page, no checkout config in the HTML |
-| Immediately before the provider call | `POST /subscribe/check` from the browser, last step before `purchases.purchase()` | `validate_web`, moves the attempt from reserved to started atomically | Notice with one action, Return to Quests |
-| Explicit SDK cancellation | `POST /subscribe/check` | `finish_web` with `outcome: cancelled` | Attempt released |
+| Page entry | `GET /subscribe`, server side | `inspect_web` | Pending/already-subscribed recovery notice for verified capabilities; generic fallback for invalid/unavailable links |
+| Immediately before provider call | `POST /subscribe/check`, before `purchases.purchase()` | `validate_web`, atomic reserved-to-started claim | Recovery or refusal notice; no additional SDK purchase |
+| Website status check | Check again through `POST /subscribe/check` | `inspect_web` | Preserve uncertainty; confirmed entitlement offers app return |
+| Explicit SDK cancellation | `POST /subscribe/check` | `finish_web`, outcome cancelled | Backend cancellation handling; other browser-reported outcomes rejected |
 
-The backend (`sign-upgrade-link`) owns signature, expiry, entitlement, provider subscription state, storefront and the `payments.routing` kill switch, all read fresh on each action. A timeout, network error, non-2xx reply or unknown reply is closed.
+The paired backend owns signature, expiry, entitlement, provider subscription state, storefront and routing checks. The website fails closed on transport errors and refusals. Version-2 URL claims and website inspect/validate/finish contracts remain unchanged by the final app retry candidate.
 
-Pending-state rules in the browser:
+Final dismissal/retry behavior:
 
-- Only `ErrorCode.UserCancelledError` from the RevenueCat SDK releases an attempt. `/subscribe/check` rejects any other reported outcome with 400.
-- Browser closure, timeout and every other rejection report nothing. The attempt stays pending and the notice sends the user back to the app to check status. The module has no `pagehide`, `beforeunload` or beacon path.
-- Try again appears only for failures before the attempt is claimed (SDK configure, offerings load, plan lookup). After the claim, and after a cancellation, the only action is Return to Quests.
-- Every return uses `/subscribe/return` (server 302). Success goes to `pro-upgrade-success`, everything else to `home`. The app dismisses the sheet on both and checks purchase state before it offers a billing route. The redirect grants nothing.
+- Browser CANCEL or DISMISS immediately restores Subscribe and plan interaction. Entitlement refresh runs in the background. The app remembers the exact attempt in memory, scoped to account and environment.
+- On the next explicit Subscribe tap, the authenticated app-to-signer request includes `dismissed_attempt`. After fresh entitlement/provider and routing checks, the backend may retire that exact open web attempt and create or reuse the next unique reserved attempt for the selected plan. This signal is outside the website URL contract.
+- Old links fail state inspection/validation. Existing entitlement, known provider-pending, native-purchase and concurrent-initiation guards remain. A different concurrent plan yields an explicit conflict.
+- Without an observed dismissal marker, existing started attempts still open recovery. A process restart loses the marker. Provider read failures preserve uncertainty.
+- Website Check again performs inspection only. It never creates another SDK operation. Pre-claim failures can offer Try again; ambiguous post-claim outcomes show recovery. The website has no `pagehide`, `beforeunload` or beacon cancellation path.
+- All returns use `/subscribe/return`. Success targets `pro-upgrade-success`; other exits target `home`. The app awaits browser dismissal and refreshes entitlement. The redirect itself grants no Pro access.
+
+Coordinator retirement does not cancel an already mounted provider operation or establish provider idempotency. Closing during initial payment/3DS before RevenueCat exposes a subscription remains an unresolved duplicate-charge window. Ordinary dismissal is addressed by the final source's deliberate retry path; safe provider behavior still needs sandbox and signed-device qualification. No website UI change is required for this retry path.
 
 ## Deployment bindings
 
@@ -58,14 +63,14 @@ Set it as a plain text variable on the Production environment of each project. T
 
 ## Coordinated deployment order
 
-Keep `payments.routing.web_checkout_enabled` false through every step.
+Keep production web activation behind its existing release gate. Staging web was enabled for the earlier authorized phone qualification; preserve environment-specific settings and verify them before further tests.
 
 | Step | Action | Owner | State |
 |---|---|---|---|
 | 1 | Staging migration `20260921162033_payment_routing_configuration` | Ledger owner | Applied |
-| 2 | Deploy staging `sign-upgrade-link` and `revenuecat-webhook` from the reviewed app commit | Ledger owner | Deployed September 21 from app c40518cf6: signer v30, webhook v31. Downloaded source matches; unauthenticated requests rejected. Authenticated flow pending |
-| 3 | Deploy production `revenuecat-webhook` with the sandbox-web exclusion, or approve equivalent provider isolation | Ledger owner | Deployed September 21, webhook v22, from app c40518cf6. Downloaded source matches. Authenticated sandbox-event rejection and native sandbox regression remain pending before sandbox purchases |
-| 4 | Set `PAYMENT_BACKEND_ENVIRONMENT=staging` on `quests-payment-review`, then `npx wrangler pages deploy . --project-name quests-payment-review --branch main` from this exact commit | Website | Deployed September 21: 356e89f8-03e2-4d9a-bb41-7f79b811a116, source 18a3107, staging binding read back |
+| 2 | Deploy the paired staging backend from the integrated candidate | Ledger owner | Historical signer v30/webhook v31 from c40518cf6 were deployed September 21. Deployment proof for retry candidate 21ebdf19d remains to be supplied by the testing agent |
+| 3 | Deploy production `revenuecat-webhook` with the sandbox-web exclusion, or approve equivalent provider isolation | Ledger owner | Deployed September 21, webhook v22, from app c40518cf6. Downloaded source matches. Later Apple Pay evidence confirms a sandbox web event was ignored in production. Reverify isolation and retain native sandbox regression before candidate tests |
+| 4 | Pair `quests-payment-review` with staging and deploy the reviewed website runtime | Website | Deployment listing reverified September 22: ec74f3e0-020f-4b23-9f33-e1d6a51f36a7, source 4f2cf11. Earlier 18a3107 deployment is historical. This documentation pass deploys nothing |
 | 5 | Staging acceptance: signed monthly and annual links from the paired signer, gates, cancellation, returns, then sandbox lifecycle once step 3 is verified | Website with Ledger owner | Pending |
 | 6 | Production migration, then production signer and webhook | Ledger owner | Pending separate approval |
 | 7 | Set `PAYMENT_BACKEND_ENVIRONMENT=production` on `quests-invite`, then merge PR 12. `quests-invite` builds from GitHub `main`, so the merge is the production deployment. The apex `thequestsapp.com/pro/success` page ships from the same merge through GitHub Pages | Website | Pending separate approval |
@@ -80,7 +85,7 @@ Merging PR 12 ends v1 link support on `invite.thequestsapp.com`. No shipped prod
 1. Set `payments.routing` to the emergency object in the app package (`ios_primary: apple`, `web_checkout_enabled: false`). Page entry and initiation both close within one request. Verify with a stale signed link and with `POST /subscribe/check`.
 2. Keep webhooks running so in-flight payments settle. Never clear a pending attempt on elapsed time.
 3. Website rollback: Cloudflare Pages, roll `quests-invite` back to deployment `12d626a0-2460-4331-939a-b0f99e91d9da` (source `cca024b`), or revert the merge on `main`. The v1 website cannot serve v2 links, so rolling the website back while the flag is on strands web checkout. Flip the flag first.
-4. `quests-payment-review` rolls back to `19561270-3beb-46f7-9b3c-4848a74e36b4`.
+4. For staging, select the reviewed compatible prior deployment. The immediate prior complete recovery baseline is `02ba5e26-e7e8-482f-9292-264ffcb9e2be`, source `cabb48c`. Exclude the briefly empty `11c45610` deployment. Verify backend/app compatibility before rollback.
 
 ## Catalog
 
@@ -96,6 +101,10 @@ RevenueCat automatic tax is now enabled with Stripe and personal-use SaaS code `
 
 ## Validation
 
+September 22 source verification: 86 website tests pass. Runtime code is unchanged from `333a7f9d` through documentation head `87c5604`. The app retry/return subset passes 26 tests and the backend passes 25. These local suites use mocked dependencies. Deployment identity and signed-device proof remain separate. See the retry handoff and `handoff/build15-final-verification-20260922/` for evidence.
+
+Historical initial package validation:
+
 - `npm test`: 73 pass, 0 fail (50 existing, 23 payment routing).
 - `wrangler pages functions build`: compiles.
 - Local `wrangler pages dev` with the staging binding: fallback on bare `/subscribe`; `/subscribe/check` routed (405 on GET, 400 on bad body, 409 `environment_mismatch` with no backend call, 503 closed against the live staging v1 signer); `/subscribe/return` answers 302 to `quests-staging://home`.
@@ -107,6 +116,8 @@ Found and fixed in the prepared patch: `/subscribe/check` was absent from `_rout
 
 Evidence layers stay separate: W is website behavior, P is provider processing, B is backend entitlement, D is physical device.
 
+The matrix below tracks qualification of the final paired retry candidate. Earlier successful payments and app returns remain in the dated receipts below; they do not establish final-candidate acceptance.
+
 | Case | W, local | W, deployed | P | B | D |
 |---|---|---|---|---|---|
 | Invalid, legacy v1, unsigned link | Pass | Pending | n/a | n/a | Pending |
@@ -117,13 +128,13 @@ Evidence layers stay separate: W is website behavior, P is provider processing, 
 | Duplicate initiation, second tab, double tap | Pass | Pending | Pending | Pending | Pending |
 | Explicit cancellation releases the attempt | Pass, source contract | Pending | Pending | Pending | Pending |
 | Ambiguous failure keeps pending state | Pass, source contract | Pending | Pending | Pending | Pending |
-| Browser closure keeps pending state | Pass, no reporting path exists | Pending | Pending | Pending | Pending |
+| Observed browser dismissal, then explicit retry | Website contract unchanged; final backend retires exact attempt after fresh checks | Final candidate pending | Provider visibility window open | Final candidate pending | Pending |
 | Monthly and annual product, price, currency, renewal text | Mapping pass | Pending | Pending | n/a | Pending |
 | Supported wallets | n/a | Pending | Pending | n/a | Pending |
 | Return to the originating app flow | 302 pass | Pending | n/a | n/a | Pending |
 | Entitlement after payment | n/a | n/a | Pending | Pending | Pending |
 
-## September 21 environment preparation receipt
+## Historical September 21 environment preparation receipt
 
 The new isolated app worktree is `Quests-worktrees/build15-payment-e2e-20260921`, branch `codex/build15-payment-e2e-20260921`, at reviewed commit `c40518cf60f52efc9eb2a28f9dab3a1132b6f26a`. Existing app UI work, Metro and simulator leases were preserved.
 
@@ -133,7 +144,7 @@ Readback: Cloudflare deployment `356e89f8-03e2-4d9a-bb41-7f79b811a116`; download
 
 Fresh local validation: 73 website tests and 19 backend tests pass; both backend entrypoints pass Deno type checks; deployment compiled the Pages Worker successfully. These results leave authenticated checkout, provider permissions, sandbox-event isolation, wallet rendering, tax records and device acceptance open.
 
-### Physical-device preparation
+### Historical physical-device preparation
 
 The connected iPhone is paired, trusted, and has Developer Mode enabled. Both staging ad hoc profiles include this device. Internal build `77382807-807b-49a0-98b6-e2597ba27fc9` finished at September 21, 20:11:57 UTC. The downloaded app passed signature and embedded staging-configuration checks, then installed and launched successfully. Follow-up inventory confirms both Quests and Quests [Staging] are installed. This QA artifact retains source metadata 3.0.1 build 14 in the separate staging bundle; final Build 15 acceptance remains open.
 
