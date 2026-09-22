@@ -1,5 +1,7 @@
 # Build 15: Subscribe, dismiss, reopen
 
+September 22 closeout: read `BUILD15-FINAL-MERGE-PACKAGE.md` first. The app agent's latest committed candidate adds replacement after an observed dismissal, which changes the earlier retained-lock contract below. The final package records source verification, exact commits and the unresolved provider-safety release hold.
+
 Status: website recovery changes implemented, locally tested and deployed to staging from `4f2cf11`. App and backend changes below are pending. Full abandonment recovery still needs staging device proof.
 
 ## Agreed scope

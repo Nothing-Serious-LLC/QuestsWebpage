@@ -1,8 +1,14 @@
 # Build 15 signed checkout: website package
 
-Status 2026-09-21: source complete and locally tested. Nothing in this package is deployed. Deployment, production activation and real charges or refunds each keep their own approval gate. The Build 15 Ledger owner keeps app integration and release authority.
+September 22 closeout: [final merge package](BUILD15-FINAL-MERGE-PACKAGE.md) owns the latest retry-candidate review and release disposition. The dated receipts below describe earlier deployments. The final retry backend remains undeployed in this package and its provider replacement safety remains unresolved.
+
+Status 2026-09-21: reviewed website source is deployed to staging. Paired staging functions and the production sandbox-web exclusion are deployed. The annual Apple Pay staging purchase and production web-sandbox exclusion are verified. Positive New York tax, remaining failure cases, and final Build 15 acceptance remain pending. Production checkout activation and real charges or refunds retain their own gates. The Build 15 Ledger owner keeps app integration and release authority.
 
 Pairs with Quests app branch `codex/build15-payment-routing-20260921` (PR 122) and its `handoff/build15-payments-20260921` acceptance ledger.
+
+Separate investigation: [Stripe Billing migration assessment](STRIPE-BILLING-ASSESSMENT.md) covers Link and Cash App Pay, account-verified fees and tax gaps, client/database impact, and the proposed staging/production qualification matrix. The migration remains unimplemented and has its own acceptance gates.
+
+Launch priority approved by Elliott: retain RevenueCat Billing, cards and Apple Pay; complete actual sales-tax collection and Build 15 acceptance. [Tax readiness and address collection](BUILD15-TAX-READINESS.md) records the saved provider changes, pending proof, and finance handoff. Future payment-method expansion is deferred.
 
 ## What this package contains
 
@@ -57,9 +63,9 @@ Keep `payments.routing.web_checkout_enabled` false through every step.
 | Step | Action | Owner | State |
 |---|---|---|---|
 | 1 | Staging migration `20260921162033_payment_routing_configuration` | Ledger owner | Applied |
-| 2 | Deploy staging `sign-upgrade-link` and `revenuecat-webhook` from the reviewed app commit | Ledger owner | Pending. Staging signer last deployed 2026-08-27 and still answers `unauthorized` to web actions |
-| 3 | Deploy production `revenuecat-webhook` with the sandbox-web exclusion, or approve equivalent provider isolation | Ledger owner | Pending. Production webhook v21 was deployed 2026-09-17, before the exclusion was written. Blocks every sandbox web purchase |
-| 4 | Set `PAYMENT_BACKEND_ENVIRONMENT=staging` on `quests-payment-review`, then `npx wrangler pages deploy . --project-name quests-payment-review --branch main` from this exact commit | Website | Pending approval |
+| 2 | Deploy staging `sign-upgrade-link` and `revenuecat-webhook` from the reviewed app commit | Ledger owner | Deployed September 21 from app c40518cf6: signer v30, webhook v31. Downloaded source matches; unauthenticated requests rejected. Authenticated flow pending |
+| 3 | Deploy production `revenuecat-webhook` with the sandbox-web exclusion, or approve equivalent provider isolation | Ledger owner | Deployed September 21, webhook v22, from app c40518cf6. Downloaded source matches. Authenticated sandbox-event rejection and native sandbox regression remain pending before sandbox purchases |
+| 4 | Set `PAYMENT_BACKEND_ENVIRONMENT=staging` on `quests-payment-review`, then `npx wrangler pages deploy . --project-name quests-payment-review --branch main` from this exact commit | Website | Deployed September 21: 356e89f8-03e2-4d9a-bb41-7f79b811a116, source 18a3107, staging binding read back |
 | 5 | Staging acceptance: signed monthly and annual links from the paired signer, gates, cancellation, returns, then sandbox lifecycle once step 3 is verified | Website with Ledger owner | Pending |
 | 6 | Production migration, then production signer and webhook | Ledger owner | Pending separate approval |
 | 7 | Set `PAYMENT_BACKEND_ENVIRONMENT=production` on `quests-invite`, then merge PR 12. `quests-invite` builds from GitHub `main`, so the merge is the production deployment. The apex `thequestsapp.com/pro/success` page ships from the same merge through GitHub Pages | Website | Pending separate approval |
@@ -82,9 +88,11 @@ Source maps `monthly` to `quests_pro_monthly` and `yearly` to `quests_pro_annual
 
 ## Approvals and payment methods
 
-Elliott approved the website changes and the integrated checkout UI on 2026-09-21 after a local preview of every surface. Payment method availability is being handled by a separate agent. Deployment gates are unchanged.
+Elliott approved the website changes and the integrated checkout UI on 2026-09-21 after a local preview of every surface. Subsequent billing research and authorized provider tax changes are recorded in the tax-readiness document. Elliott subsequently authorized test-environment preparation. Deployment receipts are recorded above; app source integration and final release/device gates remain open.
 
-Stripe test mode, read-only, 2026-09-21: RevenueCat's payment method configuration has card, Apple Pay and Google Pay on. Link is off and locked in the Web Billing configuration. PayPal is not offered. `invite.thequestsapp.com` is a registered payment method domain with Apple Pay and Google Pay active. `quests-payment-review.pages.dev` is unregistered, so wallets stay hidden there. Live mode domain registration is unverified.
+September 21 provider review: RevenueCat's payment method configuration has card, Apple Pay and Google Pay on. Link is off and locked in the current Web Billing configuration. PayPal is not offered. `invite.thequestsapp.com` was verified registered with wallets enabled in test and live modes. Staging-domain status and subsequent tax configuration are tracked in the tax-readiness document. Actual wallet presentation and processing still require eligible-device acceptance.
+
+RevenueCat automatic tax is now enabled with Stripe and personal-use SaaS code `txcd_10103000`. Only when required is selected and saved for ordinary checkout, following Elliott's September 21 instruction. Wallets supply their own billing address; IP prefills the country. The live NY registration was added after Elliott confirmed receipt of the Certificate of Authority. Merchant origin is verified as New York in both modes. Tax rendering, receipts, renewal/refund treatment and financial reconciliation remain acceptance gates.
 
 ## Validation
 
@@ -114,3 +122,30 @@ Evidence layers stay separate: W is website behavior, P is provider processing, 
 | Supported wallets | n/a | Pending | Pending | n/a | Pending |
 | Return to the originating app flow | 302 pass | Pending | n/a | n/a | Pending |
 | Entitlement after payment | n/a | n/a | Pending | Pending | Pending |
+
+## September 21 environment preparation receipt
+
+The new isolated app worktree is `Quests-worktrees/build15-payment-e2e-20260921`, branch `codex/build15-payment-e2e-20260921`, at reviewed commit `c40518cf60f52efc9eb2a28f9dab3a1132b6f26a`. Existing app UI work, Metro and simulator leases were preserved.
+
+The staging website was built from a clean archive of `18a3107316072dcc5c726678995ebbe91eb2aa3b`. The artifact adds a deployment-only Wrangler config with `PAYMENT_BACKEND_ENVIRONMENT=staging` and asset exclusions for documentation, tests and scripts. The untracked tax and finance documents were excluded. The Pages Production slot belongs to the staging project `quests-payment-review`; its billing backend remains staging. No production website merge occurred.
+
+Readback: Cloudflare deployment `356e89f8-03e2-4d9a-bb41-7f79b811a116`; downloaded config shows the staging binding. Chrome on the registered stable host serves the expected unsigned-link fallback. Python HTTP probes received Cloudflare 403/code 1010 before application validation, so those probes supply no website gate result. The staging signer itself returns 401 `invalid_checkout` for an invalid v2 signature.
+
+Fresh local validation: 73 website tests and 19 backend tests pass; both backend entrypoints pass Deno type checks; deployment compiled the Pages Worker successfully. These results leave authenticated checkout, provider permissions, sandbox-event isolation, wallet rendering, tax records and device acceptance open.
+
+### Physical-device preparation
+
+The connected iPhone is paired, trusted, and has Developer Mode enabled. Both staging ad hoc profiles include this device. Internal build `77382807-807b-49a0-98b6-e2597ba27fc9` finished at September 21, 20:11:57 UTC. The downloaded app passed signature and embedded staging-configuration checks, then installed and launched successfully. Follow-up inventory confirms both Quests and Quests [Staging] are installed. This QA artifact retains source metadata 3.0.1 build 14 in the separate staging bundle; final Build 15 acceptance remains open.
+
+The profile enables the RevenueCat native SDK and pins the app/database to staging. Existing shared EAS variables and build profiles are unchanged. Resolved configuration and 20 focused build-contract tests pass. Broader app checks have unrelated failures, recorded in the app worktree's `docs/testing/build15-payment-device-test.md` with the complete device acceptance sequence. The phone-authenticated staging account has a distinct UUID from production and an expired Pro record; RevenueCat shows no current sandbox or live entitlements. Elliott confirmed Home after phone sign-in. The reviewed staging routing update then returned exactly one row with `ios_primary=web` and `web_checkout_enabled=true`. Source and restore SQL were pushed to `origin/codex/build15-payment-e2e-20260921` at `16a79651d` before execution. Fresh SDK state, signed checkout, tax, wallet rendering and payment acceptance remain open. Production routing is unchanged.
+
+## September 21 Apple Pay device result and tax notice
+
+See [the Apple Pay investigation](BUILD15-APPLE-PAY-INVESTIGATION.md) for matched
+Stripe, RevenueCat, staging entitlement and purchase-attempt proof. The annual
+sandbox payment succeeded once for USD 29.99. Wallet billing location resolved to
+New Mexico and Stripe returned zero tax with `Not collecting`; positive New York
+tax acceptance remains open. The production webhook correctly ignored this web
+sandbox event. The clearer, automatically revealed tax-update notice is deployed
+to staging from website commit `2257da0`. Existing production activation and
+final Build 15 gates remain open.
