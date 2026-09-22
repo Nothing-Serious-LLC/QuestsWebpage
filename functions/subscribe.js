@@ -1,26 +1,17 @@
+import { checkoutClaims, askBackend, deploymentEnvironment } from './subscribe/policy.js';
+
 // GET /subscribe  — WEB REPO (QuestsWebpage, Cloudflare Pages Function)
 //
 // Quests Pro DIRECT web checkout (Path A = RevenueCat Web Billing; the user is
 // Merchant of Record, Stripe is the processor). This is the replacement for the
 // old /upgrade redirect to a pay.rev.cat Web Purchase Link.
 //
-// WHY THIS EXISTS / WHAT CHANGED:
-//   pay.rev.cat Web Purchase Links ALWAYS render a fixed 3-step funnel whose
-//   first step is a package-selection / "Continue" intro page that CANNOT be
-//   removed (RevenueCat docs: web/paywalls is a fixed package-selection ->
-//   checkout -> post-purchase funnel; package_id only PRE-SELECTS, it does not
-//   skip the step). The product requirement is the opposite: the user already
-//   picked the plan IN THE APP, so the web must open DIRECTLY on the Stripe card
-//   form with ZERO RevenueCat selection/intro page.
+//   Keep the existing embedded RevenueCat checkout. The user chooses a plan
+//   in the app and purchase() mounts that package directly on our domain.
+//   Build 15 retry work preserves this checkout and its billing integration.
 //
-//   The only way to do that is the RevenueCat WEB SDK (@revenuecat/purchases-js)
-//   purchase() method, which renders ONLY the checkout form on our own domain
-//   (it mounts Stripe Elements into an HTML element we provide). There is no
-//   selection step because we hand the SDK the single rcPackage the user chose.
-//
-//   This Function does the server-trusted half: it verifies the signed upgrade
-//   link (so the uid cannot be forged — same HMAC contract as the old
-//   /upgrade Function and the sign-upgrade-link edge function), then server-
+//   This Function does the server-trusted half: it has the paired backend
+//   verify the signed capability (so the uid cannot be forged), then server-
 //   renders a page that hands the VERIFIED uid + the publishable rcb_ key +
 //   the chosen product id to a small static module (/subscribe-app.js) which
 //   runs the SDK purchase() flow client-side.
@@ -33,37 +24,32 @@
 //   isPro. NOTHING in the webhook or DB changes. The app must NOT flip isPro on
 //   the return deep link; it waits for the Realtime push (authoritative).
 //
-// REQUEST SHAPE (the app builds this; see src/components/UpgradeProLink.tsx):
-//   https://invite.thequestsapp.com/subscribe?uid=<uid>&exp=<exp>&sig=<sig>&plan=<monthly|yearly>&env=<staging|production>
-//   - uid/exp/sig : the SIGNED triple minted by the sign-upgrade-link edge fn.
-//                   sig = HMAC-SHA256(`${uid}.${exp}`, RC_UPGRADE_SIGNING_SECRET).
-//   - plan        : which plan the user chose in-app. Maps to a Web Billing
-//                   product id (monthly -> quests_pro_monthly,
-//                   yearly  -> quests_pro_annual).
-//   - env         : 'staging' uses the SANDBOX rcb_ key + the quests-staging
-//                   return scheme; 'production' uses the PROD rcb_ key + the
-//                   info.nothingserious.quests scheme. Anything else -> fallback.
+// REQUEST SHAPE (Build 15, the app builds this; see src/components/UpgradeProLink.tsx):
+//   /subscribe?version=2&uid=&attempt=&exp=&plan=&env=&appscheme=&storefront=&sig=
+//   Every parameter except sig is a signed claim. The paired Supabase
+//   sign-upgrade-link function owns signature validation, expiry, purchase
+//   state, storefront eligibility and the live payments.routing kill switch.
+//   This Function forwards the claims unchanged and renders checkout only on
+//   an explicit allow. Version 1 and unsigned links reach the fallback page.
 //
-// Required env binding (Cloudflare Pages -> Settings -> Environment variables):
-//   RC_UPGRADE_SIGNING_SECRET  - the SAME shared HMAC secret the /upgrade
-//                                Function uses and the sign-upgrade-link edge
-//                                function signs with. Server-only; NEVER in the
-//                                RN bundle, NEVER committed. Unset => every link
-//                                fails to verify and we serve the fallback page.
+// Required deployment binding (Cloudflare Pages -> Settings -> Variables):
+//   PAYMENT_BACKEND_ENVIRONMENT = staging     on quests-payment-review
+//   PAYMENT_BACKEND_ENVIRONMENT = production  on quests-invite
+//   The binding selects the backend, the publishable Web Billing key and the
+//   Stripe mode. The signed env claim must equal it. A missing, unknown or
+//   mismatched value serves the fallback page, so a URL can never select the
+//   sandbox route on a production deployment. This Function holds no signing
+//   secret.
 //
 // The rcb_ PUBLIC API keys below are PUBLISHABLE (RevenueCat Web Billing public
 // keys are designed to ship in client bundles, exactly like Stripe publishable
 // keys). They are safe to commit and to expose in the page. The trust boundary
-// stays the webhook secret + this Function's signed-link verification.
+// stays the webhook secret + the backend's signed-capability verification.
 
 // Canonical UUID contract — MUST match functions/upgrade.js, the RevenueCat
 // webhook, the sign-upgrade-link edge function, and UpgradeProLink.tsx.
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-// A signed link is MANDATORY (matches functions/upgrade.js REQUIRE_SIGNED_UPGRADE
-// default). The plain ?uid= path is rejected to the fallback page.
-const SIGNED_LINK_MAX_AGE_S = 60 * 60; // 1 hour; keep in sync with the signer.
 
 // Plan -> RevenueCat Web Billing product store_identifier. The static module
 // resolves the matching package from getOfferings() by this identifier.
@@ -90,6 +76,7 @@ const ENV_CONFIG = {
 
 const APP_STORE_URL =
   "https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553";
+const KNOWN_SCHEMES = ["info.nothingserious.quests", "quests-staging"];
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=info.nothingserious.quests";
 
@@ -134,68 +121,46 @@ function pageHeaders(extra) {
   };
 }
 
-// --- signed-link verification (mirrors functions/upgrade.js exactly) ---------
-
-function timingSafeEqualHex(a, b) {
-  if (typeof a !== "string" || typeof b !== "string") return false;
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return diff === 0;
-}
-
-function bytesToHex(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let hex = "";
-  for (let i = 0; i < bytes.length; i++) {
-    hex += bytes[i].toString(16).padStart(2, "0");
-  }
-  return hex;
-}
-
-async function computeSig(uid, exp, secret) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const mac = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(`${uid}.${exp}`)
-  );
-  return bytesToHex(mac);
-}
-
-async function verifySignedLink(uid, exp, sig, secret) {
-  if (!secret || !exp || !sig) return false;
-  if (!/^[0-9a-f]{64}$/i.test(sig)) return false; // 32-byte HMAC-SHA256, hex
-  const expNum = Number(exp);
-  if (!Number.isFinite(expNum) || !Number.isInteger(expNum)) return false;
-  const nowS = Math.floor(Date.now() / 1000);
-  if (expNum < nowS) return false;
-  if (expNum - nowS > SIGNED_LINK_MAX_AGE_S) return false;
-  const expected = await computeSig(uid, exp, secret);
-  return timingSafeEqualHex(expected.toLowerCase(), sig.toLowerCase());
-}
-
 // --- pages -------------------------------------------------------------------
+
+// CSS port of the app's CategoryFadeLoader (src/components/loaders/
+// CategoryFadeLoader.tsx): ONE brand glyph at a time fading through the
+// canonical category ladder (questCategoryOrder.ts: mindfulness, recharge,
+// creativity, growth, social), 320ms in / 360ms hold / 260ms out per glyph.
+// The SVG masks preserve the exact onboarding silhouettes while letting Safari
+// show the same clean gradients as the native renderer. Reduced motion holds
+// the first glyph still, exactly like the app.
+const CAT_LOADER_KEYS = [
+  'mindfulness',
+  'recharge',
+  'creativity',
+  'growth',
+  'social',
+];
+
+const CAT_LOADER_HTML =
+  '<div class="cat-loader" role="img" aria-label="Loading">' +
+  CAT_LOADER_KEYS
+    .map(
+      (category) =>
+        `<span class="cat-loader__icon cat-loader__icon--${category}" aria-hidden="true"></span>`
+    )
+    .join('') +
+  '</div>';
 
 // Shared <head> brand styling for both the checkout page and the fallback. Kept
 // inline + self-contained (this Function generates the response), mirroring the
-// dark-navy tokens used by success.html for visual consistency.
+// V2 cream/purple tokens in css/site.css (sand page, cream card, ink text,
+// signature purple) so this page reads as the app's own brand.
 function headStyles() {
   return `
     :root {
-      color-scheme: dark;
-      --blue-900: #04102a; --blue-800: #14213c; --accent: #3366cc;
-      --accent-light: #5c85d6; --text-strong: #ffffff; --text-muted: #a7b1d0;
-      --text-soft: rgba(167,177,208,0.6); --surface-strong: rgba(32,44,79,0.92);
-      --border-strong: rgba(48,61,98,0.95); --shadow-md: 0 24px 60px -30px rgba(6,22,58,0.55);
+      color-scheme: light;
+      --page: #F3F1E7; --surface: #FDFBF6; --text: #191919; --text-2: #696969;
+      --text-soft: rgba(25,25,25,0.45);
+      --hairline: rgba(25,25,25,0.07); --edge: rgba(25,25,25,0.14); --veil: rgba(25,25,25,0.05);
+      --purple: #A961CC; --purple-deep: #9354B3; --purple-pale: #F1E2F8;
+      --sh-card: 0 1px 2px rgba(25,25,25,0.04), 0 8px 24px rgba(25,25,25,0.06);
     }
     /* box-sizing only on the universal selector. We deliberately do NOT zero
        margin/padding on * — RevenueCat mounts its checkout DOM inside this page,
@@ -204,20 +169,27 @@ function headStyles() {
        elements instead. */
     *,*::before,*::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; background: #04102a; }
+    html { -webkit-text-size-adjust: 100%; background: #F3F1E7; }
     body {
       font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text-strong);
-      background: linear-gradient(145deg, var(--blue-900) 0%, var(--blue-800) 60%, #1a3a7d 100%);
-      background-attachment: fixed; min-height: 100vh; min-height: 100dvh; line-height: 1.5;
+      color: var(--text);
+      background: var(--page);
+      min-height: 100vh; min-height: 100dvh; line-height: 1.5;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
+    /* Fine grain over the cream, same recipe as the share pages
+       (css/site.css --grain). Hidden while the white checkout chrome is up. */
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: 0.045; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    body.checkout-open::before { display: none; }
     /* While the checkout is open (and while offerings load just before it),
        the body goes solid WHITE so RevenueCat's light checkout surface reads as
-       one continuous full-screen page — no navy gradient bleeding around it and
-       no blue loading flash. subscribe-app.js toggles .checkout-open on <body>
+       one continuous full-screen page — no cream band bleeding around it and no
+       flash between loaders. subscribe-app.js toggles .checkout-open on <body>
        (and also flips the <meta name=theme-color> to white so iOS browser chrome
-       matches). On success/cancel/error it removes the class to reveal the navy
+       matches). On success/cancel/error it removes the class to reveal the cream
        notice page again. */
     body.checkout-open { background: #ffffff; }
     .page {
@@ -227,77 +199,317 @@ function headStyles() {
       padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
     }
     .card {
-      background: var(--surface-strong); border: 1px solid var(--border-strong);
-      border-radius: 28px; padding: 32px 28px; box-shadow: var(--shadow-md);
+      background: var(--surface); border: 1px solid var(--hairline);
+      border-radius: 24px; padding: 32px 28px; box-shadow: var(--sh-card);
       max-width: 480px; width: 100%;
+    }
+    .fallback-page { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 92px); }
+    .fallback-card { text-align: center; }
+    .fallback-hero { display: flex; justify-content: center; margin: 0 0 24px; }
+    .fallback-hero img { width: 64px; height: 64px; border-radius: 16px; }
+    .fallback-card .title {
+      font-family: "Instrument Serif", Georgia, serif; font-size: clamp(2rem, 8vw, 2.5rem);
+      font-weight: 400; line-height: 1.08; letter-spacing: 0.005em; margin-bottom: 12px;
+    }
+    .fallback-card .subtitle { max-width: 350px; margin-left: auto; margin-right: auto; }
+    .fallback-footer {
+      position: fixed; left: 20px; right: 20px;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+      z-index: 2; margin: 0;
     }
     .brand { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 22px; }
     .brand img { width: 34px; height: 34px; border-radius: 9px; }
-    .brand span { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.01em; }
+    .brand span { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.01em; color: var(--text); }
     .title { font-size: clamp(1.4rem, 5vw, 1.8rem); font-weight: 800; letter-spacing: -0.02em; text-align: center; margin: 0 0 6px; }
-    .subtitle { font-size: 0.95rem; color: var(--text-muted); text-align: center; margin: 0 0 22px; }
+    .subtitle { font-size: 0.95rem; color: var(--text-2); text-align: center; margin: 0 0 22px; }
     #status { text-align: center; }
     .loader { max-width: 360px; width: 100%; text-align: center; }
-    .subtext { font-size: 0.9rem; color: var(--text-muted); margin: 18px 0 0; }
-    /* The RC checkout mounts here. When open it is a full-viewport surface. The
-       background is WHITE (not navy) so RevenueCat's light checkout card blends
-       into one continuous full-screen page instead of looking like a window
-       floating on the blue loading screen. */
+    .subtext { font-size: 0.9rem; color: var(--text-2); margin: 18px 0 0; }
+    /* Both checkout loading moments use the Pro graphite surface. The first
+       loader sits inside .page so it owns the viewport until the SDK is ready. */
+    #loading {
+      position: fixed; inset: 0; z-index: 850;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; text-align: center;
+      padding: env(safe-area-inset-top, 0px) 20px env(safe-area-inset-bottom, 0px);
+      color: #FDFBF6;
+      background: linear-gradient(to top right, #565656 0%, #191919 100%);
+    }
+    #loading::before,
+    #loading-white::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    #loading > *,
+    #loading-white > * { position: relative; z-index: 1; }
+    #loading .subtext,
+    #loading-white .subtext { color: rgba(253,251,246,0.72); }
+    /* The RC checkout mounts here. When open it is a full-viewport surface with
+       a WHITE background so RevenueCat's light checkout card blends into one
+       continuous full-screen page instead of looking like a window floating on
+       the cream loading screen. */
     #rc-checkout { display: none; }
     #rc-checkout.is-open {
       display: block; position: fixed; inset: 0; z-index: 1000;
       overflow-y: auto; background: #ffffff;
       padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
     }
-    .spinner {
-      width: 30px; height: 30px; margin: 0 auto; border-radius: 50%;
-      border: 3px solid rgba(167,177,208,0.25); border-top-color: var(--accent-light);
-      animation: spin 0.8s linear infinite;
+    /* CategoryFadeLoader port: the five glyphs stack in one spot; each is
+       visible for its fifth of the 4700ms loop (940ms = 320 in + 360 hold +
+       260 out, the app's exact timings). Each onboarding SVG is used as an
+       alpha mask. This preserves its shape and removes the browser-rendered
+       feTurbulence layer that the native SVG renderer omits. */
+    .cat-loader { position: relative; width: 28px; height: 28px; margin: 0 auto; }
+    .cat-loader__icon {
+      position: absolute; inset: 0; display: block; width: 28px; height: 28px;
+      opacity: 0; transform: none;
+      -webkit-mask-position: center; mask-position: center;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      -webkit-mask-size: contain; mask-size: contain;
+      animation: catFade 4700ms infinite;
+      will-change: opacity;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    /* WHITE loading state shown once the SDK is configured and offerings are
-       being fetched (up to ~20s), so the user never sees the navy spinner flash
-       right before the white checkout opens. subscribe-app.js reveals this (and
-       hides the navy .page) as soon as Purchases.configure() succeeds. */
+    .cat-loader__icon--mindfulness {
+      background: linear-gradient(180deg, #D5AFE8 38.46%, #FFB18F 100%);
+      -webkit-mask-image: url('/assets/img/icon-mindfulness.svg');
+      mask-image: url('/assets/img/icon-mindfulness.svg');
+    }
+    .cat-loader__icon--recharge {
+      background: linear-gradient(180deg, #92A8EC 19.23%, #C796DF 100%);
+      -webkit-mask-image: url('/assets/img/icon-recharge.svg');
+      mask-image: url('/assets/img/icon-recharge.svg');
+    }
+    .cat-loader__icon--creativity {
+      background: linear-gradient(180deg, #FF8F5E 31.73%, #DBB66B 100%);
+      -webkit-mask-image: url('/assets/img/icon-creativity.svg');
+      mask-image: url('/assets/img/icon-creativity.svg');
+    }
+    .cat-loader__icon--growth {
+      background: linear-gradient(184deg, #D1AA56 47.6%, #D6E746 100%);
+      -webkit-mask-image: url('/assets/img/icon-growth.svg');
+      mask-image: url('/assets/img/icon-growth.svg');
+    }
+    .cat-loader__icon--social {
+      background: linear-gradient(180deg, #D6E746 3.36%, #92A8EC 100%);
+      -webkit-mask-image: url('/assets/img/icon-social.svg');
+      mask-image: url('/assets/img/icon-social.svg');
+    }
+    .cat-loader__icon:nth-child(2) { animation-delay: 940ms; }
+    .cat-loader__icon:nth-child(3) { animation-delay: 1880ms; }
+    .cat-loader__icon:nth-child(4) { animation-delay: 2820ms; }
+    .cat-loader__icon:nth-child(5) { animation-delay: 3760ms; }
+    @keyframes catFade {
+      0% { opacity: 0; animation-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1); }
+      6.8% { opacity: 1; animation-timing-function: linear; }
+      14.5% { opacity: 1; animation-timing-function: cubic-bezier(0.47, 0, 0.745, 0.715); }
+      20% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cat-loader__icon { animation: none; }
+      .cat-loader__icon:first-child { opacity: 1; }
+    }
+    /* Full-screen loading state shown once the SDK is configured and offerings
+       are being fetched, continuing the graphite transition into checkout. */
     #loading-white { display: none; position: fixed; inset: 0; z-index: 900;
-      background: #ffffff; align-items: center; justify-content: center;
+      background: linear-gradient(to top right, #565656 0%, #191919 100%);
+      align-items: center; justify-content: center;
       flex-direction: column; text-align: center;
       padding: env(safe-area-inset-top, 0px) 20px env(safe-area-inset-bottom, 0px); }
     #loading-white.is-open { display: flex; }
-    #loading-white .spinner {
-      border: 3px solid rgba(51,102,204,0.18); border-top-color: var(--accent);
-    }
-    #loading-white .subtext { color: #5a6480; }
-    #loading-white .brand span { color: var(--blue-900); }
     .notice { text-align: center; display: none; }
     .notice.is-visible { display: block; }
-    .success-mark {
-      width: 64px; height: 64px; margin: 4px auto 14px; border-radius: 50%;
-      background: rgba(92,133,214,0.16); color: #5c85d6; font-size: 34px;
-      display: flex; align-items: center; justify-content: center;
+    /* Match pro/success.html for the inline return after payment. */
+    body.checkout-success {
+      color: #FDFBF6;
+      background: #191919 linear-gradient(to top right, #565656 0%, #191919 100%);
+    }
+    body.checkout-success::before { opacity: 0.05; }
+    .checkout-success .page {
+      padding: calc(env(safe-area-inset-top, 0px) + 32px) 24px calc(env(safe-area-inset-bottom, 0px) + 32px);
+    }
+    .checkout-success .notice__title {
+      font-family: "Instrument Serif", Georgia, serif; font-weight: 400;
+      font-size: clamp(2rem, 9vw, 2.6rem); letter-spacing: 0.005em;
+      margin: 22px 0 6px; text-wrap: balance;
+    }
+    .checkout-success .notice__text {
+      margin: 0 0 30px; color: rgba(253,251,246,0.72); font-size: 1rem;
+    }
+    .checkout-success .btn {
+      min-height: 52px; padding: 14px 24px;
+      background: #FDFBF6; color: #191919; font-size: 1.05rem;
+    }
+    .checkout-success .btn:focus-visible {
+      outline: 2px solid #FDFBF6; outline-offset: 3px;
     }
     .notice__title { font-size: 1.15rem; font-weight: 700; margin: 8px 0 8px; }
-    .notice__text { color: var(--text-muted); font-size: 0.95rem; margin: 0 0 20px; }
+    .notice__text { color: var(--text-2); font-size: 0.95rem; margin: 0 0 20px; }
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 14px 24px; border-radius: 16px; border: none; cursor: pointer;
-      font-family: inherit; font-size: 1rem; font-weight: 600; color: var(--text-strong);
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      width: 100%; min-height: 44px; padding: 12px 24px; border-radius: 999px;
+      border: none; cursor: pointer;
+      font-family: inherit; font-size: 1rem; font-weight: 700; letter-spacing: 0.01em;
+      color: var(--page); background: var(--text);
       text-decoration: none; margin-bottom: 10px;
+      transition: opacity 0.15s ease;
     }
-    .btn--ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--text-muted); }
+    .btn:hover { opacity: 0.86; }
+    .btn:active { opacity: 1; }
+    .btn--ghost {
+      background: transparent; border: none; color: var(--text);
+      box-shadow: inset 0 0 0 1.5px var(--edge);
+    }
+    .btn--ghost:hover { background: var(--veil); opacity: 1; box-shadow: inset 0 0 0 1.5px var(--text-2); }
     .footer__meta { margin-top: 22px; text-align: center; font-size: 11px; color: var(--text-soft); letter-spacing: 0.08em; }
     [hidden] { display: none !important; }
+    /* --- Quests-aligned overrides for the RevenueCat-mounted checkout -------
+       RC mounts its DOM inline into #rc-checkout (no iframe except the Stripe
+       fields), so scoped overrides on its rcb-* classes restyle the chrome.
+       Sanctioned dashboard Appearance can replace most of this; these rules
+       make the checkout wear the brand regardless, and !important is required
+       to beat the SDK's injected styles. SDK pinned at 1.42.1; re-verify on
+       any SDK bump. The Stripe iframes (card fields, wallet buttons) and
+       their internals are unreachable by design. */
+    #rc-checkout .rcb-ui-root,
+    #rc-checkout .rcb-ui-root *:not(iframe) { font-family: "Manrope", system-ui, -apple-system, sans-serif !important; }
+    /* Retheme RevenueCat through its OWN variable system: the SDK sets these
+       inline (from dashboard branding, still carrying the legacy #3366cc
+       blue), and stylesheet !important beats inline for custom properties.
+       Buttons, links, focus rings, and the product panel all read these. */
+    #rc-checkout .rcb-ui-root,
+    #rc-checkout .rcb-ui-layout,
+    #rc-checkout .rcb-ui-main,
+    #rc-checkout .rcb-ui-container {
+      --rc-color-primary: #191919 !important;
+      --rc-color-primary-hover: #3a3a3a !important;
+      --rc-color-primary-pressed: #000000 !important;
+      --rc-color-accent: #A961CC !important;
+      --rc-color-focus: #A961CC !important;
+      --rc-color-background: #F3F1E7 !important;
+      --rc-color-input-background: #FFFFFF !important;
+      --rc-color-grey-text-dark: #191919 !important;
+      --rc-color-grey-text-light: #696969 !important;
+      --rc-shape-input-border-radius: 12px !important;
+      --rc-shape-input-button-border-radius: 999px !important;
+    }
+    /* Product summary wears the app's Pro graphite surface. RevenueCat nests
+       cream backgrounds across three verified layout wrappers, so each layer
+       becomes transparent and the gradient stays continuous. */
+    #rc-checkout .rcb-ui-navbar {
+      background: linear-gradient(to top right, #565656 0%, #191919 100%) !important;
+      color: #FDFBF6 !important;
+    }
+    #rc-checkout .rcb-ui-navbar .layout-wrapper-outer,
+    #rc-checkout .rcb-ui-navbar .layout-wrapper,
+    #rc-checkout .rcb-ui-navbar .layout-content,
+    #rc-checkout .rcb-ui-navbar .rcb-header-wrapper,
+    #rc-checkout .rcb-ui-navbar .rcb-header,
+    #rc-checkout .rcb-ui-navbar .rcb-navbar {
+      background: transparent !important; color: #FDFBF6 !important;
+    }
+    #rc-checkout .rcb-ui-navbar [class*="rcb-typography"] { color: #FDFBF6 !important; }
+    #rc-checkout .rcb-ui-navbar .rcb-product-description { color: rgba(253,251,246,0.68) !important; }
+    #rc-checkout .rcb-ui-navbar .rcb-close-button .arrow-fill { fill: #FDFBF6 !important; }
+    /* Form side stays white so the Stripe fields blend. */
+    #rc-checkout .rcb-main-block { background: #ffffff !important; }
+    /* Bring the SDK tax confirmation notice above the payment fields.
+       Keep it in flow so it cannot cover wallet controls or the updated total. */
+    #rc-checkout .rc-checkout-form-container {
+      display: flex !important; flex-direction: column !important;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container {
+      order: -1; margin-top: 0 !important; margin-bottom: 20px;
+      scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 16px);
+      outline: none;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container.fully-hidden {
+      margin-bottom: 0;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container .rcb-info {
+      border: 1px solid #A961CC; background: #F7F0FA !important;
+      padding: 16px !important; border-radius: 12px !important;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container .rcb-info-title {
+      font-weight: 700; color: #191919 !important;
+    }
+    #rc-checkout .rc-checkout-price-update-info-container .rcb-info-message {
+      color: #454545 !important; line-height: 1.5;
+    }
+    /* RevenueCat's payment state keeps its stable wrapper. The SDK spinner is
+       hidden and subscribe-app.js inserts the same fade loader used above. */
+    #rc-checkout .rc-loading .rcb-modal-loader > .rcb-ui-asset-icon {
+      width: 28px !important; height: 28px !important; color: transparent !important;
+      animation: none !important; transform: none !important;
+    }
+    #rc-checkout .rc-loading .rcb-modal-loader > .rcb-ui-asset-icon > svg {
+      display: none !important;
+    }
+    #rc-checkout .rc-loading .rcb-modal-loader > .rcb-ui-asset-icon::before {
+      content: ""; display: block; width: 28px; height: 28px;
+      background: linear-gradient(180deg, #D5AFE8 38.46%, #FFB18F 100%);
+      -webkit-mask: center / contain no-repeat url('/assets/img/icon-mindfulness.svg');
+      mask: center / contain no-repeat url('/assets/img/icon-mindfulness.svg');
+    }
+    #rc-checkout .rc-loading .rcb-modal-loader > .rcb-ui-asset-icon.quests-category-loader::before { display: none; }
+    #rc-checkout .rc-loading .rcb-modal-loader > .rcb-ui-asset-icon > .cat-loader { margin: 0; }
+    /* Seller row: use the established Quests wordmark as one quiet mark. */
+    #rc-checkout .rcb-title {
+      display: flex; align-items: center; width: 105px; height: 28px;
+    }
+    #rc-checkout .rcb-title > * { display: none !important; }
+    #rc-checkout .rcb-title::before {
+      content: ""; width: 105px; height: 28px; flex: 0 0 105px;
+      background: url('/assets/img/quests-wordmark-ink.svg') center / contain no-repeat;
+      filter: brightness(0) invert(1);
+    }
+    /* The product name carries the hierarchy on its own. */
+    #rc-checkout .rcb-subscribe-to {
+      display: none !important;
+    }
+    /* Product title in the brand serif (the *:not(iframe) form matches the
+       universal Manrope rule's specificity; source order settles it). */
+    #rc-checkout .rcb-product-title,
+    #rc-checkout .rcb-product-title *:not(iframe) {
+      font-family: "Instrument Serif", Georgia, serif !important;
+      font-weight: 400 !important; font-size: clamp(28px, 4vw, 40px) !important;
+      letter-spacing: 0.005em; color: #FDFBF6 !important;
+    }
+    /* Total row: hairline separation, app ink. */
+    #rc-checkout .rcb-pricing-table {
+      border-top: 1px solid rgba(253,251,246,0.16); padding-top: 14px;
+    }
+    /* Panel texture: quiet grain over the graphite half on wide screens. */
+    @media (min-width: 900px) {
+      #rc-checkout.is-open::before {
+        content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 50%;
+        pointer-events: none; opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+    }
+    /* Pay button: the app's ink pill (RC renders it as button.intent-primary). */
+    #rc-checkout button.intent-primary,
+    #rc-checkout [data-testid="PayButton"] {
+      background: #191919 !important; color: #F3F1E7 !important;
+      border-radius: 999px !important; border: none !important;
+      font-family: "Manrope", system-ui, sans-serif !important; font-weight: 700 !important;
+      letter-spacing: 0.01em;
+    }
+    #rc-checkout button.intent-primary:hover:not(:disabled) { opacity: 0.88; }
+    #rc-checkout button.intent-primary:disabled,
+    #rc-checkout [data-testid="PayButton"]:disabled { opacity: 0.35 !important; }
+    /* Small print in the app's secondary ink. */
+    #rc-checkout .rcb-modal-footer, #rc-checkout .rcb-modal-footer * { color: #696969 !important; }
   `;
 }
 
-function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
+function checkoutHtml({ uid, productId, apiKey, env, scheme, plan, claims, sig, entryRefusal }) {
   // The per-request config is emitted as NON-executable application/json so it
   // is not gated by the script-src CSP. /subscribe-app.js reads + parses it.
   // Escape '<' so the JSON can never terminate the <script> block or be parsed
   // as markup (all values are already allowlisted/UUID-validated; this is
   // defense-in-depth for the embedded application/json data island).
-  const config = JSON.stringify({ uid, productId, apiKey, env, scheme }).replace(
+  const config = JSON.stringify({ uid, productId, apiKey, env, scheme, plan, claims, sig, entryRefusal }).replace(
     /</g,
     "\\u003c"
   );
@@ -308,31 +520,28 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Quests Pro checkout</title>
   <meta name="robots" content="noindex,nofollow" />
-  <meta name="theme-color" content="#04102a" />
-  <link rel="icon" type="image/png" href="/icon.png" />
+  <meta name="theme-color" content="#191919" />
+  <link rel="icon" type="image/png" href="/assets/img/app-icon-sunset.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>${headStyles()}</style>
 </head>
 <body>
   <div class="page">
     <main class="loader" role="main">
-      <!-- Minimal NAVY interstitial: logo + spinner + one line, shown only for
-           the brief moment before the SDK configures. Once configured,
-           subscribe-app.js hides .page and shows the WHITE loader below. -->
+      <!-- Graphite interstitial with the category sequence, shown for the
+           brief moment before the SDK configures. -->
       <div id="loading">
-        <div class="brand"><span>Quests Pro</span></div>
-        <div class="spinner" aria-hidden="true"></div>
+        ${CAT_LOADER_HTML}
         <p class="subtext" id="status">Taking you to secure checkout…</p>
       </div>
 
       <!-- Success / canceled / error state (revealed + populated by
            /subscribe-app.js). Self-contained so we never depend on another
-           page's CSP for the return-to-app bounce. Lives on the navy .page,
-           which subscribe-app.js re-reveals on completion. -->
+           page's CSP for the return-to-app bounce. The success state uses
+           the Pro graphite surface; other notices retain the cream page. -->
       <div class="notice" id="notice">
-        <div class="success-mark" id="success-mark" hidden aria-hidden="true">&#10003;</div>
         <h2 class="notice__title" id="notice-title"></h2>
         <p class="notice__text" id="notice-text"></p>
         <button class="btn" type="button" id="primary-btn"></button>
@@ -341,12 +550,9 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
     </main>
   </div>
 
-  <!-- WHITE loading state, shown while offerings load (after SDK configure,
-       before the checkout opens) so there is no navy flash before the white
-       checkout. position:fixed; toggled by subscribe-app.js. -->
+  <!-- Graphite loading state shown while offerings load after SDK configure. -->
   <div id="loading-white" aria-hidden="true">
-    <div class="brand"><span>Quests Pro</span></div>
-    <div class="spinner" aria-hidden="true"></div>
+    ${CAT_LOADER_HTML}
     <p class="subtext">Taking you to secure checkout…</p>
   </div>
 
@@ -356,7 +562,7 @@ function checkoutHtml({ uid, productId, apiKey, env, scheme }) {
   <div id="rc-checkout"></div>
 
   <script type="application/json" id="rc-config">${config}</script>
-  <script type="module" src="/subscribe-app.js?v=10"></script>
+  <script type="module" src="/subscribe-app.js?v=15-checkout-recovery"></script>
 </body>
 </html>`;
 }
@@ -367,26 +573,26 @@ function fallbackHtml() {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Quests Pro – Quests</title>
+  <title>Quests Pro</title>
   <meta name="robots" content="noindex,nofollow" />
-  <meta name="theme-color" content="#04102a" />
-  <link rel="icon" type="image/png" href="/icon.png" />
+  <meta name="theme-color" content="#F3F1E7" />
+  <link rel="icon" type="image/png" href="/assets/img/app-icon-sunset.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>${headStyles()}</style>
 </head>
 <body>
-  <div class="page">
-    <main class="card" role="main" style="text-align:center;">
-      <div class="brand"><img src="/icon.png" alt="" /><span>Quests Pro</span></div>
+  <div class="page fallback-page">
+    <main class="card fallback-card" role="main">
+      <div class="fallback-hero"><img src="/assets/img/app-icon-sunset.png" alt="Quests" /></div>
       <h1 class="title">Open the app to upgrade</h1>
-      <p class="subtitle">This checkout link is invalid or has expired. Reopen the Quests app and tap Upgrade to Pro again.</p>
+      <p class="subtitle">This checkout link is invalid or expired, reopen Quests and tap Upgrade to Pro again</p>
       <a href="${APP_STORE_URL}" class="btn">Get Quests on the App Store</a>
       <a href="${PLAY_STORE_URL}" class="btn btn--ghost">Get Quests on Google Play</a>
-      <p class="footer__meta">© 2026 Nothing Serious LLC</p>
     </main>
   </div>
+  <p class="footer__meta fallback-footer">© 2026 Nothing Serious LLC</p>
 </body>
 </html>`;
 }
@@ -400,46 +606,47 @@ function fallbackResponse() {
 
 export async function onRequestGet(context) {
   const url = new URL(context.request.url);
-  const uid = (url.searchParams.get("uid") || "").trim().toLowerCase();
-  const exp = (url.searchParams.get("exp") || "").trim();
+  const claims = checkoutClaims(url.searchParams);
   const sig = (url.searchParams.get("sig") || "").trim();
-  const plan = (url.searchParams.get("plan") || "").trim().toLowerCase();
-  const env = (url.searchParams.get("env") || "").trim().toLowerCase();
-  const appScheme = (url.searchParams.get("appscheme") || "").trim().toLowerCase();
 
-  const signingSecret = context.env.RC_UPGRADE_SIGNING_SECRET;
+  // The deployment binding selects the billing environment. URL parameters
+  // never do: the signed env claim only has to agree with the binding.
+  const backendEnv = deploymentEnvironment(context.env);
+  const envCfg = ENV_CONFIG[backendEnv];
+  if (!envCfg || claims.env !== backendEnv) return fallbackResponse();
 
-  // uid must be a well-formed UUID.
-  if (!UUID_RE.test(uid)) return fallbackResponse();
-
-  // plan must map to a known Web Billing product.
-  const productId = PLAN_TO_PRODUCT[plan];
+  // Shape checks before any backend call. The backend repeats all of them
+  // against the signature; these only keep malformed links off the network.
+  if (!UUID_RE.test(claims.uid || "") || !UUID_RE.test(claims.attempt || "")) {
+    return fallbackResponse();
+  }
+  const productId = PLAN_TO_PRODUCT[claims.plan];
   if (!productId) return fallbackResponse();
+  if (!KNOWN_SCHEMES.includes(claims.appscheme)) return fallbackResponse();
 
-  // env must be one we recognise (picks the publishable key + return scheme).
-  const envCfg = ENV_CONFIG[env];
-  if (!envCfg) return fallbackResponse();
-
-  // Signed link is mandatory: verify sig over `${uid}.${exp}` and freshness.
-  const signedOk = await verifySignedLink(uid, exp, sig, signingSecret);
-  if (!signedOk) return fallbackResponse();
-
-  // The BUILD's registered scheme can differ from the env-derived guess (a
-  // prod-scheme TestFlight build checking out against the staging backend).
-  // The app passes its own scheme as `appscheme`; honor it when it is one of
-  // the two known schemes, else keep the env default. This is what makes the
-  // in-app auth session auto-dismiss: the success page must fire the EXACT
-  // scheme the session is watching for.
-  const KNOWN_SCHEMES = ["info.nothingserious.quests", "quests-staging"];
-  const scheme = KNOWN_SCHEMES.includes(appScheme) ? appScheme : envCfg.scheme;
+  // Page-entry gate: signature, expiry, entitlement, provider state, storefront
+  // and the live kill switch, all read fresh by the paired backend.
+  const gate = await askBackend(context.env, claims, sig, "inspect_web");
+  // These refusals follow signature verification in the paired backend. Show
+  // their recovery state without mounting a payment form. Invalid capabilities
+  // and unavailable backends continue to use the generic fallback.
+  const entryRefusal = gate.allowed ? null : gate.reason;
+  if (!gate.allowed && !["already_subscribed", "purchase_pending"].includes(entryRefusal)) {
+    return fallbackResponse();
+  }
 
   return new Response(
     checkoutHtml({
-      uid,
+      uid: claims.uid,
       productId,
       apiKey: envCfg.apiKey,
-      env,
-      scheme,
+      env: backendEnv,
+      // The signed return scheme of the build that opened checkout.
+      scheme: claims.appscheme,
+      plan: claims.plan,
+      claims,
+      sig,
+      entryRefusal,
     }),
     {
       status: 200,

@@ -1,0 +1,75 @@
+PASS src/screens/upgradePro/__tests__/webCheckoutDismissal.test.ts
+PASS src/screens/upgradePro/__tests__/webCheckoutLink.test.ts
+PASS src/services/__tests__/checkoutDeepLinkDismissal.test.ts
+  ● Console
+
+    console.warn
+      [DeepLinkService] Handling deep link: { urlLength: 21, scheme: 'quests-staging' }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:249:21)
+      at src/services/__tests__/checkoutDeepLinkDismissal.test.ts:40:28
+
+    console.warn
+      [DeepLinkService] Parsed deep link: { namespace: 'home', pathLength: 4, hasQueryParams: false }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:265:21)
+      at src/services/__tests__/checkoutDeepLinkDismissal.test.ts:40:28
+
+    console.warn
+      [ProCheckout] checkout closed, returning to its caller
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:320:29)
+      at src/services/__tests__/checkoutDeepLinkDismissal.test.ts:42:14
+
+    console.warn
+      [DeepLinkService] Handling deep link: { urlLength: 36, scheme: 'quests-staging' }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:249:21)
+      at src/services/__tests__/checkoutDeepLinkDismissal.test.ts:40:28
+
+    console.warn
+      [DeepLinkService] Parsed deep link: {
+        namespace: 'pro-upgrade-success',
+        pathLength: 19,
+        hasQueryParams: false
+      }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:265:21)
+      at src/services/__tests__/checkoutDeepLinkDismissal.test.ts:40:28
+
+    console.warn
+      [ProCheckout] return link received via deep link { normalizedPath: 'pro-upgrade-success' }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:338:25)
+      at src/services/__tests__/checkoutDeepLinkDismissal.test.ts:40:28
+
+    console.warn
+      [DeepLinkService] Handling deep link: { urlLength: 36, scheme: 'quests-staging' }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:249:21)
+      at Object.<anonymous> (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:48:19)
+
+    console.warn
+      [DeepLinkService] Parsed deep link: {
+        namespace: 'pro-upgrade-success',
+        pathLength: 19,
+        hasQueryParams: false
+      }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:265:21)
+      at Object.<anonymous> (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:48:19)
+
+    console.warn
+      [ProCheckout] return link received via deep link { normalizedPath: 'pro-upgrade-success' }
+
+      at DeepLinkService.handleDeepLink (eval at fixture (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:30:3), <anonymous>:338:25)
+      at Object.<anonymous> (src/services/__tests__/checkoutDeepLinkDismissal.test.ts:48:19)
+
+PASS src/screens/upgradePro/__tests__/webCheckoutRecovery.test.ts
+PASS src/navigation/__tests__/proCheckoutReturn.test.ts
+
+Test Suites: 5 passed, 5 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+Time:        0.6 s
+Ran all test suites matching /src\/screens\/upgradePro\/__tests__\/webCheckoutDismissal.test.ts|src\/screens\/upgradePro\/__tests__\/webCheckoutLink.test.ts|src\/screens\/upgradePro\/__tests__\/webCheckoutRecovery.test.ts|src\/services\/__tests__\/checkoutDeepLinkDismissal.test.ts|src\/navigation\/__tests__\/proCheckoutReturn.test.ts/i.
