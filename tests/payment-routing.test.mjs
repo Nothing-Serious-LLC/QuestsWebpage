@@ -279,10 +279,14 @@ test('browser module gates before purchase and retains pending state on ambiguou
   const purchase = source.indexOf('purchases.purchase(');
   assert.ok(gate > 0 && purchase > gate, 'validate_web must precede purchases.purchase');
   assert.equal(source.slice(gate, purchase).includes('getOfferings'), false, 'nothing slow between the gate and the provider call');
-  // Cancellation is the single release path and is tied to the SDK error code.
-  assert.equal(source.split('checkoutGate("finish_web"').length - 1, 1);
+  // Release happens only where no provider form can still submit: the SDK's
+  // own cancellation, and the liveness watch after it has removed an idle,
+  // never-submitted form. Both are tied to explicit conditions.
+  assert.equal(source.split('checkoutGate("finish_web"').length - 1, 2);
   assert.ok(/ErrorCode\.UserCancelledError[\s\S]{0,120}checkoutGate\("finish_web", "cancelled"\)/.test(source));
-  // No lifecycle or timer path reports an outcome.
+  assert.ok(/if \(release\) \{[\s\S]{0,400}checkoutGate\("finish_web", "cancelled"\)/.test(source));
+  assert.ok(/if \(closed \|\| submitted\) return;[\s\S]{0,200}onClosed\(reason, release\)/.test(source));
+  // No page lifecycle event reports an outcome.
   assert.equal(/pagehide|beforeunload|visibilitychange|sendBeacon/.test(source), false);
   // Retry is offered only before the attempt is claimed.
   assert.equal(source.slice(gate).includes('retry: true'), false);

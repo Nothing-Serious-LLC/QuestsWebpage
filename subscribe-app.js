@@ -298,6 +298,89 @@ function showGateRefusal(reason) {
   }
 }
 
+// Liveness watch for a mounted provider form. The SDK exposes no checkout
+// expiry or cancellation, and a mounted form stays payable for as long as the
+// page lives. While purchase() is pending we re-read this attempt through the
+// existing inspect_web capability. A started row answers purchase_pending; any
+// other refusal means the coordinator retired or completed this attempt (for
+// example a second device dismissed and reopened checkout, or Pro arrived from
+// another payment), so the form is removed before it can submit. A form that
+// has never been submitted is also released after CHECKOUT_MOUNT_DEADLINE_MS.
+// Once the customer presses Pay the watch stands down: a charge may already be
+// in flight and only the provider and webhook can resolve it.
+const LIVENESS_POLL_MS = 10000;
+const CHECKOUT_MOUNT_DEADLINE_MS = 10 * 60 * 1000;
+
+function watchCheckoutLiveness(onClosed) {
+  let closed = false;
+  let submitted = false;
+  let pollId = null;
+  let deadlineId = null;
+  function clearTimers() {
+    if (pollId) clearTimeout(pollId);
+    if (deadlineId) clearTimeout(deadlineId);
+    pollId = null;
+    deadlineId = null;
+  }
+  function detach() {
+    if (mount && typeof mount.removeEventListener === "function") {
+      mount.removeEventListener("submit", markSubmitted, true);
+      mount.removeEventListener("click", onClick, true);
+    }
+  }
+  function markSubmitted() {
+    if (submitted || closed) return;
+    submitted = true;
+    dbg("checkout submitted; liveness watch standing down");
+    clearTimers();
+    detach();
+  }
+  function onClick(event) {
+    const target = event && event.target;
+    if (target && typeof target.closest === "function" && target.closest('button[type="submit"]')) {
+      markSubmitted();
+    }
+  }
+  function close(reason, release) {
+    if (closed || submitted) return;
+    closed = true;
+    clearTimers();
+    detach();
+    onClosed(reason, release);
+  }
+  async function poll() {
+    if (closed || submitted) return;
+    const result = await checkoutGate("inspect_web");
+    if (closed || submitted) return;
+    if (result.ok || result.reason === "purchase_pending" || result.reason === "checkout_unavailable") {
+      pollId = setTimeout(poll, LIVENESS_POLL_MS);
+      return;
+    }
+    close(result.reason, false);
+  }
+  if (mount && typeof mount.addEventListener === "function") {
+    mount.addEventListener("submit", markSubmitted, true);
+    mount.addEventListener("click", onClick, true);
+  }
+  pollId = setTimeout(poll, LIVENESS_POLL_MS);
+  deadlineId = setTimeout(function () {
+    close("checkout_expired", true);
+  }, CHECKOUT_MOUNT_DEADLINE_MS);
+  return {
+    stop: function () {
+      closed = true;
+      clearTimers();
+      detach();
+    },
+    isClosed: function () {
+      return closed;
+    },
+    isSubmitted: function () {
+      return submitted;
+    },
+  };
+}
+
 // Payment succeeded. The app verifies entitlement from the server after return.
 // Automatic and manual return share the environment-specific server redirect.
 function showSuccess() {
@@ -487,6 +570,20 @@ async function run() {
   // mounts the checkout INLINE into our full-viewport #rc-checkout container
   // (not RC's default centered modal window). There is no package-selection or
   // intro step. skipSuccessPage:true returns control to us on completion.
+  const watch = watchCheckoutLiveness(async function (reason, release) {
+    dbg("liveness watch closed checkout: " + reason);
+    if (release) {
+      // Never submitted, so nothing is in flight. Release the row the same way
+      // an explicit SDK cancellation does; the next Subscribe tap starts fresh.
+      await checkoutGate("finish_web", "cancelled");
+      showError(
+        "Checkout timed out",
+        "Return to Quests and select Subscribe to open a fresh checkout."
+      );
+      return;
+    }
+    showGateRefusal(reason);
+  });
   try {
     dbg("opening checkout (purchase)…");
     if (loadingWhiteEl) loadingWhiteEl.classList.remove("is-open");
@@ -506,12 +603,21 @@ async function run() {
     // The provider accepted payment. Entitlement arrives through the webhook;
     // the app confirms it after the return.
     dbg("purchase resolved OK");
+    watch.stop();
     showSuccess();
   } catch (e) {
     // Only an explicit SDK cancellation releases the attempt. Every other
     // rejection is ambiguous (the charge may have gone through), so the
     // attempt stays pending for provider and entitlement reconciliation.
     dbg("purchase ended: " + errStr(e));
+    if (watch.isClosed()) return;
+    watch.stop();
+    if (e && e.errorCode !== undefined && e.errorCode === ErrorCode.ProductAlreadyPurchasedError) {
+      // The provider refused a repeat of an already-held product. Server
+      // entitlement remains authoritative; show the same copy as the gate.
+      showGateRefusal("already_subscribed");
+      return;
+    }
     if (e && e.errorCode === ErrorCode.UserCancelledError) {
       const released = await checkoutGate("finish_web", "cancelled");
       if (released.ok) {
