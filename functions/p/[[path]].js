@@ -1,3 +1,4 @@
+import { profileAndroidTargets } from './androidTargets.js';
 /**
  * Profile share routes (additive; quest /q/* routes are untouched).
  *
@@ -29,7 +30,6 @@ import {
 
 const CODE_PATTERN = /^[0-9a-f]{32}$/;
 const REVISION_PATTERN = /^[1-9][0-9]{0,9}$/;
-const APP_STORE_URL = 'https://apps.apple.com/app/id6745767553';
 const APP_STORE_ID = '6745767553';
 
 // Foundation surface + inks (SHARED_TEMPLATE_LAYOUT / share card constants).
@@ -60,6 +60,7 @@ function htmlResponse(markup, status) {
       'Cache-Control': 'no-store',
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'no-referrer',
+      'Vary': 'User-Agent',
     },
   });
 }
@@ -108,7 +109,7 @@ function avatarMarkup({ avatarUrl, ringImageUrl, ringColors, displayName }) {
   return `<div class="avatar-cluster">${photo}${ring}</div>`;
 }
 
-function unavailablePage() {
+function unavailablePage(targets) {
   return htmlResponse(
     `<!DOCTYPE html>
 <html lang="en">
@@ -144,7 +145,7 @@ function unavailablePage() {
       <span class="wordmark">${WORDMARK}</span>
       <h1>This Profile link is unavailable</h1>
       <p>The link may have been reset or turned off by its owner.</p>
-      <a class="cta" href="${APP_STORE_URL}">Get Quests</a>
+      <a class="cta" href="${targets.storeUrl}">Get Quests</a>
     </main>
   </body>
 </html>`,
@@ -173,7 +174,7 @@ async function callProfileShareWeb(env, action, shareCode, revision) {
   return { status: response.status, response };
 }
 
-function profilePage({ origin, shareCode, revision, metadata }) {
+function profilePage({ origin, shareCode, revision, metadata, targets }) {
   const safeName = escapeHtml(String(metadata.displayName || '').trim());
   const canonicalUrl = `${origin}/p/${shareCode}?r=${revision}`;
   const imageUrl = `${origin}/p/${shareCode}/og.png?r=${revision}`;
@@ -287,8 +288,8 @@ function profilePage({ origin, shareCode, revision, metadata }) {
         </div>
       </div>
       <div class="actions">
-        <a class="cta" href="${APP_STORE_URL}">Get Quests</a>
-        <a class="secondary" href="info.nothingserious.quests://p/${shareCode}">Open in the app</a>
+        <a class="cta" href="${targets.storeUrl}">Get Quests</a>
+        <a class="secondary" href="${escapeHtml(targets.openUrl || `info.nothingserious.quests://p/${shareCode}`)}">Open in the app</a>
       </div>
     </main>
   </body>
@@ -299,6 +300,7 @@ function profilePage({ origin, shareCode, revision, metadata }) {
 
 export async function onRequest(context) {
   const { request, env, params } = context;
+  const targets = profileAndroidTargets(request);
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response('Method not allowed', {
       status: 405,
@@ -313,17 +315,17 @@ export async function onRequest(context) {
       : [];
 
   if (segments.length < 1 || segments.length > 2) {
-    return unavailablePage();
+    return unavailablePage(targets);
   }
 
   const shareCode = String(segments[0] || '').toLowerCase();
   if (!CODE_PATTERN.test(shareCode)) {
-    return unavailablePage();
+    return unavailablePage(targets);
   }
 
   const wantsImage = segments.length === 2;
   if (wantsImage && segments[1] !== 'og.png') {
-    return unavailablePage();
+    return unavailablePage(targets);
   }
 
   const url = new URL(request.url);
@@ -332,7 +334,7 @@ export async function onRequest(context) {
     ? revisionParam
     : null;
   if (revisionParam && !revision) {
-    return unavailablePage();
+    return unavailablePage(targets);
   }
 
   if (wantsImage) {
@@ -361,19 +363,19 @@ export async function onRequest(context) {
         headers: { 'Cache-Control': 'no-store' },
       });
     }
-    return unavailablePage();
+    return unavailablePage(targets);
   }
 
   let metadata;
   try {
     metadata = await response.json();
   } catch {
-    return unavailablePage();
+    return unavailablePage(targets);
   }
   const displayName = String(metadata.displayName || '').trim();
   const resolvedRevision = String(metadata.revision || '');
   if (!displayName || !REVISION_PATTERN.test(resolvedRevision)) {
-    return unavailablePage();
+    return unavailablePage(targets);
   }
 
   return profilePage({
@@ -381,5 +383,6 @@ export async function onRequest(context) {
     shareCode,
     revision: resolvedRevision,
     metadata,
+    targets: profileAndroidTargets(request, shareCode, resolvedRevision),
   });
 }
