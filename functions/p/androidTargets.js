@@ -1,4 +1,5 @@
 import { isStagingShareHost } from '../q/appHandoffTargets.js';
+import { androidInstallStoreUrl } from '../androidInstallReferrer.js';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/id6745767553';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=info.nothingserious.quests';
@@ -12,9 +13,12 @@ export function profileAndroidTargets(request, shareCode, revision) {
   const packageName = staging ? 'info.nothingserious.quests.staging' : 'info.nothingserious.quests';
   const scheme = staging ? 'quests-staging' : 'info.nothingserious.quests';
   // Staging installs are distributed by the test lane; the public download is Play.
-  const targets = { storeUrl: PLAY_STORE_URL };
+  const storeUrl = shareCode
+    ? androidInstallStoreUrl(PLAY_STORE_URL, `${new URL(request.url).origin}/p/${shareCode}?r=${revision}`)
+    : PLAY_STORE_URL;
+  const targets = { storeUrl };
   if (shareCode) {
-    targets.openUrl = `intent://p/${shareCode}?r=${revision}#Intent;scheme=${scheme};package=${packageName};S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
+    targets.openUrl = `intent://p/${shareCode}?r=${revision}#Intent;scheme=${scheme};package=${packageName};S.browser_fallback_url=${encodeURIComponent(storeUrl)};end`;
   }
   return targets;
 }

@@ -14,10 +14,13 @@ for (const host of ['invite.thequestsapp.com', 'invite-staging.thequestsapp.com'
       const html = await response.text();
       assert.ok(html.includes(`https://${host}/p/${code}?r=2`));
       if (platform === 'Android') {
-        assert.ok(html.includes(`href="${play}"`));
+        const store = host === 'invite.thequestsapp.com'
+          ? `${play}&referrer=${encodeURIComponent(`quests_link_v1=${encodeURIComponent(`https://${host}/p/${code}?r=2`)}`)}`
+          : play;
+        assert.ok(html.includes(`href="${store}"`));
         const staging = host.includes('staging');
         assert.ok(html.includes(`intent://p/${code}?r=2#Intent;scheme=${staging ? 'quests-staging' : 'info.nothingserious.quests'};package=info.nothingserious.quests${staging ? '.staging' : ''};`));
-        assert.ok(html.includes(`S.browser_fallback_url=${encodeURIComponent(play)};end`));
+        assert.ok(html.includes(`S.browser_fallback_url=${encodeURIComponent(store)};end`));
       } else {
         assert.ok(html.includes('href="https://apps.apple.com/app/id6745767553"'));
         assert.ok(html.includes(`href="info.nothingserious.quests://p/${code}"`));

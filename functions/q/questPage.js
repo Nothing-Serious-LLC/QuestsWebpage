@@ -12,6 +12,7 @@ import {
 } from "./questIconSvgTemplates.js";
 import { QUEST_ICON_PATHS } from "./questIconPaths.js";
 import { questPhoneClaimScript } from "./phoneClaimScript.js";
+import { androidInstallStoreUrl } from "../androidInstallReferrer.js";
 
 const SURFACE = "#f3f1e7";
 const TITLE_INK = "#191919";
@@ -314,7 +315,10 @@ export function questSharePage({
     ? questPhoneClaimScript({
       shareCode,
       turnstileSiteKey,
-      appHandoff: handoff,
+      appHandoff: {
+        ...handoff,
+        playStoreUrl: androidInstallStoreUrl(handoff.playStoreUrl, universalLink),
+      },
       demoMode: interactionMode === "phone-demo",
     })
     : "";
