@@ -8,7 +8,7 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog.html</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -162,4 +162,5 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url><loc>https://thequestsapp.com/blog/sober-october-with-friends.html</loc><lastmod>2026-09-29</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

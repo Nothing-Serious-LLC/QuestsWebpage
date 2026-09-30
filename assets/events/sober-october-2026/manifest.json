@@ -1,0 +1,33 @@
+{
+  "status": "approved for website publication by Elliott on September 29, 2026",
+  "figmaFile": "H3IvuAJWwNQ1v1GGmHJ59w",
+  "sourceNode": "185:19",
+  "sourceDimensions": [
+    1416,
+    736
+  ],
+  "sourceSha256": "7fd6cf380013195b408568e1bd3977772c746b1149344886e314461f321e8064",
+  "canonical": "https://thequestsapp.com/blog/sober-october-with-friends.html",
+  "invite": "https://invite.thequestsapp.com/q/kqkHT9GV",
+  "cutoff": "2026-10-29T00:00:00Z",
+  "cutoffBasis": "conservative cutoff from user-provided 30-day lifetime; backend timestamp unverified",
+  "files": [
+    {
+      "file": "drink-no-drink.svg",
+      "bytes": 1471,
+      "sha256": "21ce044a0556f4a707cf3ecfe3a0b95b9066d6aede12b38846f4a2027095da73"
+    },
+    {
+      "file": "sober-october-cover.png",
+      "bytes": 1541031,
+      "sha256": "7fd6cf380013195b408568e1bd3977772c746b1149344886e314461f321e8064"
+    },
+    {
+      "file": "sober-october-cover.webp",
+      "bytes": 166646,
+      "sha256": "940fe557762f0ad09f801c6dacfbf37c24095d12fc88a6969713cd58c174fa5c"
+    }
+  ],
+  "sourceRevision": "Approved Community mid-crop, synchronized September 29, 2026",
+  "sourceReviewNode": "195:108"
+}
