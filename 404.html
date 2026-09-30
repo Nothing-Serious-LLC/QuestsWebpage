@@ -11,12 +11,12 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="robots" content="noindex">
 <meta name="description" content="This page wandered off. Head back home, or download Quests and start a healthy challenge with friends.">
-<link rel="canonical" href="https://thequestsapp.com/404.html">
+<link rel="canonical" href="https://thequestsapp.com/404">
 
 <meta property="og:title" content="Page not found | Quests">
 <meta property="og:description" content="This page wandered off. Head back home, or download Quests and start a healthy challenge with friends.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://thequestsapp.com/404.html">
+<meta property="og:url" content="https://thequestsapp.com/404">
 <meta property="og:image" content="https://thequestsapp.com/og-image.png">
 
 <meta name="twitter:card" content="summary_large_image">
@@ -44,6 +44,7 @@
   ]
 }
 </script>
+<script src="/js/clean-urls.js?v=1" data-clean-path="/404" defer></script>
 </head>
 <body>
 
@@ -109,7 +110,7 @@
       <!-- Invite fallback: shown only when the path is a broken /q/CODE deep link
            that reached the apex domain's 404 instead of the Cloudflare invite
            renderer. Deliberately plain: the "invited to a quest" persona and
-           its copy belong to q/index.html only, so this is just a download
+           its copy belong to q/ only, so this is just a download
            prompt, not a copy of that card. -->
       <div class="notfound__state is-hidden" id="invite-card">
         <span class="notfound__mark cat-mindfulness" aria-hidden="true">
@@ -138,10 +139,10 @@
 
     <footer class="notfound__footer">
       <nav class="notfound__footer-links" aria-label="Footer">
-        <a href="/blog.html">Blog</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
         <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
         <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
         <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener" aria-label="Quests on YouTube">YouTube</a>
@@ -156,11 +157,11 @@
     <div class="footer__top">
       <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
       <nav class="footer__links" aria-label="Footer">
-        <a href="/blog.html">Blog</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
-        <a href="/health-privacy.html">Health Data</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/health-privacy">Health Data</a>
         <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
         <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
         <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener">YouTube</a>
@@ -174,7 +175,7 @@
   // This page is the GitHub Pages catch-all for the apex domain, so a broken
   // /q/CODE universal link that misses the Cloudflare invite renderer still
   // lands here. It still needs a deep-link fallback in that case, just with
-  // its own plain copy, not q/index.html's "invited to a quest" persona.
+  // its own plain copy, not q/'s "invited to a quest" persona.
   (function () {
     var path = window.location.pathname || "/";
     var isInvite = path === "/q" || path === "/q/" || path.indexOf("/q/") === 0;
