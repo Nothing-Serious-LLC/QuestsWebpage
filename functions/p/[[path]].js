@@ -153,6 +153,20 @@ function unavailablePage(targets) {
   );
 }
 
+// A card is fixed for its revision (/p/{code}/og.png?r={n}), so repeat
+// fetches during a share (the app's check, the share sheet's link preview,
+// Messages) come from this location's cache instead of a Supabase round trip
+// of 0.5 to 2.8 s (staging, 2026-10-02). Five minutes bounds how long a card
+// stays reachable here after its owner disables or rotates the link.
+const CARD_CACHE_SECONDS = 300;
+
+function cardCache() {
+  const cache = globalThis.caches && globalThis.caches.default;
+  return cache && typeof cache.match === 'function' && typeof cache.put === 'function'
+    ? cache
+    : null;
+}
+
 async function callProfileShareWeb(env, action, shareCode, revision) {
   const supabaseUrl = (env.PROFILE_SHARE_SUPABASE_URL || '').trim().replace(/\/+$/, '');
   const secret = (env.PROFILE_SHARE_WEB_SECRET || '').trim();
@@ -338,6 +352,18 @@ export async function onRequest(context) {
   }
 
   if (wantsImage) {
+    const cache = revision ? cardCache() : null;
+    const cacheKey = cache
+      ? new Request(`${url.origin}/p/${shareCode}/og.png?r=${revision}`, { method: 'GET' })
+      : null;
+    if (cache) {
+      const cached = await cache.match(cacheKey);
+      if (cached) {
+        const headers = new Headers(cached.headers);
+        headers.set('X-Quests-Card-Cache', 'HIT');
+        return new Response(cached.body, { status: 200, headers });
+      }
+    }
     const { status, response } = await callProfileShareWeb(env, 'image', shareCode, revision);
     if (status !== 200 || !response) {
       return new Response('Not found', {
@@ -345,13 +371,31 @@ export async function onRequest(context) {
         headers: { 'Cache-Control': 'no-store' },
       });
     }
-    return new Response(response.body, {
+    if (!cache) {
+      return new Response(response.body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      });
+    }
+    const image = await response.arrayBuffer();
+    const headers = {
+      'Content-Type': 'image/png',
+      'Cache-Control': `public, max-age=${CARD_CACHE_SECONDS}`,
+      'X-Content-Type-Options': 'nosniff',
+    };
+    const store = cache.put(cacheKey, new Response(image, { status: 200, headers }));
+    if (typeof context.waitUntil === 'function') {
+      context.waitUntil(store);
+    } else {
+      await store;
+    }
+    return new Response(image, {
       status: 200,
-      headers: {
-        'Content-Type': 'image/png',
-        'Cache-Control': 'no-store',
-        'X-Content-Type-Options': 'nosniff',
-      },
+      headers: { ...headers, 'X-Quests-Card-Cache': 'MISS' },
     });
   }
 
