@@ -156,7 +156,10 @@ function unavailablePage(targets) {
 // A card is fixed for its revision (/p/{code}/og.png?r={n}), so repeat
 // fetches during a share (the app's check, the share sheet's link preview,
 // Messages) come from this location's cache instead of a Supabase round trip
-// of 0.5 to 2.8 s (staging, 2026-10-02). Five minutes bounds how long a card
+// of 0.5 to 2.8 s (staging, 2026-10-02). The page's details for a revision
+// (name, stats, avatar, card size) are fixed the same way and share the
+// lifetime; the page itself still renders per request, since its app links
+// follow the visitor's platform. Five minutes bounds how long a card or page
 // stays reachable here after its owner disables or rotates the link.
 const CARD_CACHE_SECONDS = 300;
 
@@ -399,34 +402,76 @@ export async function onRequest(context) {
     });
   }
 
-  const { status, response } = await callProfileShareWeb(env, 'metadata', shareCode, revision);
-  if (status !== 200 || !response) {
-    if (status === 503) {
-      return new Response('Service unavailable', {
-        status: 503,
-        headers: { 'Cache-Control': 'no-store' },
-      });
+  const detailsCache = revision ? cardCache() : null;
+  const detailsKey = detailsCache
+    ? new Request(`${url.origin}/p/${shareCode}/details.json?r=${revision}`, { method: 'GET' })
+    : null;
+  let metadata = null;
+  let detailsCacheStatus = null;
+  if (detailsCache) {
+    const cached = await detailsCache.match(detailsKey);
+    if (cached) {
+      try {
+        metadata = await cached.json();
+        detailsCacheStatus = 'HIT';
+      } catch {
+        metadata = null;
+      }
     }
-    return unavailablePage(targets);
   }
 
-  let metadata;
-  try {
-    metadata = await response.json();
-  } catch {
-    return unavailablePage(targets);
+  if (!metadata) {
+    const { status, response } = await callProfileShareWeb(env, 'metadata', shareCode, revision);
+    if (status !== 200 || !response) {
+      if (status === 503) {
+        return new Response('Service unavailable', {
+          status: 503,
+          headers: { 'Cache-Control': 'no-store' },
+        });
+      }
+      return unavailablePage(targets);
+    }
+    try {
+      metadata = await response.json();
+    } catch {
+      return unavailablePage(targets);
+    }
+    detailsCacheStatus = detailsCache ? 'MISS' : null;
   }
-  const displayName = String(metadata.displayName || '').trim();
-  const resolvedRevision = String(metadata.revision || '');
+
+  const displayName = String(metadata?.displayName || '').trim();
+  const resolvedRevision = String(metadata?.revision || '');
   if (!displayName || !REVISION_PATTERN.test(resolvedRevision)) {
     return unavailablePage(targets);
   }
 
-  return profilePage({
+  if (detailsCacheStatus === 'MISS') {
+    const store = detailsCache.put(
+      detailsKey,
+      new Response(JSON.stringify(metadata), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': `public, max-age=${CARD_CACHE_SECONDS}`,
+        },
+      }),
+    );
+    if (typeof context.waitUntil === 'function') {
+      context.waitUntil(store);
+    } else {
+      await store;
+    }
+  }
+
+  const page = profilePage({
     origin: url.origin,
     shareCode,
     revision: resolvedRevision,
     metadata,
     targets: profileAndroidTargets(request, shareCode, resolvedRevision),
   });
+  if (detailsCacheStatus) {
+    page.headers.set('X-Quests-Page-Cache', detailsCacheStatus);
+  }
+  return page;
 }
