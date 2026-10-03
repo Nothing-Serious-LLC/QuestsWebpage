@@ -6,6 +6,8 @@ import { profileAndroidTargets } from './androidTargets.js';
  *                              Open Graph metadata for messaging crawlers
  *   GET /p/{code}/og.png    -> 640x800 PNG proxied from the Supabase
  *                              profile-share-web Edge Function
+ *   POST /p/{code}/purge    -> drops the link's cached cards and page details
+ *                              (Supabase only, x-profile-share-secret)
  *
  * The share code is a 32-character lowercase hex string. The optional ?r=
  * query parameter pins an immutable artwork revision so messaging crawlers
@@ -15,7 +17,10 @@ import { profileAndroidTargets } from './androidTargets.js';
  * SUPABASE_* bindings so /p/* can target staging while /q/* stays on
  * production):
  *   PROFILE_SHARE_SUPABASE_URL   e.g. https://<project-ref>.supabase.co
- *   PROFILE_SHARE_WEB_SECRET     shared secret for profile-share-web
+ *   PROFILE_SHARE_WEB_SECRET     shared secret for profile-share-web and purges
+ * Optional, for purges that reach every Cloudflare location:
+ *   PROFILE_SHARE_CACHE_PURGE_TOKEN  API token with Zone > Cache Purge
+ *   PROFILE_SHARE_CACHE_ZONE_ID      the zone that serves this host
  */
 import {
   ICON_CREATIVITY,
@@ -170,6 +175,117 @@ function cardCache() {
     : null;
 }
 
+// Cached copies carry these tags so a link's entries can also be purged by
+// tag from the dashboard; the copies served to visitors drop them.
+function profileShareCacheTags(shareCode) {
+  return `profile-share,profile-share-${shareCode}`;
+}
+
+function withoutCacheTag(headers) {
+  const copy = new Headers(headers);
+  copy.delete('Cache-Tag');
+  return copy;
+}
+
+// When a link stops being public (turned off, replaced, invalidated by a
+// profile change, or its account deleted), Supabase posts here and the link's
+// cached cards and page details stop answering at once, everywhere, instead
+// of after CARD_CACHE_SECONDS. Global purges need PROFILE_SHARE_CACHE_PURGE_TOKEN
+// (a Cloudflare API token with Cache Purge on the zone) and
+// PROFILE_SHARE_CACHE_ZONE_ID; without them only this location's copies go.
+const PURGE_MAX_REVISIONS = 500;
+const PURGE_LOCAL_REVISIONS = 10;
+const PURGE_FILES_PER_CALL = 100;
+const ZONE_ID_PATTERN = /^[0-9a-f]{32}$/;
+
+function constantTimeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) {
+    return false;
+  }
+  let diff = 0;
+  for (let index = 0; index < a.length; index += 1) {
+    diff |= a.charCodeAt(index) ^ b.charCodeAt(index);
+  }
+  return diff === 0;
+}
+
+function purgeJson(status, body) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  });
+}
+
+function revisionCacheUrls(origin, shareCode, fromRevision, throughRevision) {
+  const urls = [];
+  for (let revision = throughRevision; revision >= fromRevision; revision -= 1) {
+    urls.push(`${origin}/p/${shareCode}/og.png?r=${revision}`);
+    urls.push(`${origin}/p/${shareCode}/details.json?r=${revision}`);
+  }
+  return urls;
+}
+
+async function purgeProfileShareCache(context, shareCode) {
+  const { request, env } = context;
+  const expected = (env.PROFILE_SHARE_WEB_SECRET || '').trim();
+  const supplied = request.headers.get('x-profile-share-secret') || '';
+  if (!expected || !constantTimeEqual(supplied, expected)) {
+    return purgeJson(401, { code: 'unauthorized' });
+  }
+  if (!CODE_PATTERN.test(shareCode)) {
+    return purgeJson(400, { code: 'invalid_request' });
+  }
+  let throughRevision;
+  try {
+    throughRevision = Number((await request.json())?.throughRevision);
+  } catch {
+    return purgeJson(400, { code: 'invalid_request' });
+  }
+  if (!Number.isSafeInteger(throughRevision) || throughRevision < 1) {
+    return purgeJson(400, { code: 'invalid_request' });
+  }
+
+  // Newest revisions first: they are the ones most likely to be cached.
+  const origin = new URL(request.url).origin;
+  const fromRevision = Math.max(1, throughRevision - PURGE_MAX_REVISIONS + 1);
+  const urls = revisionCacheUrls(origin, shareCode, fromRevision, throughRevision);
+
+  const cache = cardCache();
+  let localDeleted = 0;
+  if (cache && typeof cache.delete === 'function') {
+    const local = urls.slice(0, PURGE_LOCAL_REVISIONS * 2);
+    const results = await Promise.all(local.map((cacheUrl) =>
+      cache.delete(new Request(cacheUrl, { method: 'GET' })).catch(() => false)));
+    localDeleted = results.filter(Boolean).length;
+  }
+
+  const token = (env.PROFILE_SHARE_CACHE_PURGE_TOKEN || '').trim();
+  const zoneId = (env.PROFILE_SHARE_CACHE_ZONE_ID || '').trim().toLowerCase();
+  if (!token || !ZONE_ID_PATTERN.test(zoneId)) {
+    return purgeJson(202, { purged: 'local', urls: urls.length, localDeleted });
+  }
+
+  for (let start = 0; start < urls.length; start += PURGE_FILES_PER_CALL) {
+    let accepted = false;
+    try {
+      const response = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: urls.slice(start, start + PURGE_FILES_PER_CALL) }),
+      });
+      const payload = await response.json().catch(() => null);
+      accepted = response.ok && payload?.success === true;
+    } catch {
+      accepted = false;
+    }
+    if (!accepted) {
+      console.error('[profile-share] global cache purge failed');
+      return purgeJson(502, { purged: 'local', urls: urls.length, localDeleted });
+    }
+  }
+  return purgeJson(200, { purged: 'global', urls: urls.length, localDeleted });
+}
+
 async function callProfileShareWeb(env, action, shareCode, revision) {
   const supabaseUrl = (env.PROFILE_SHARE_SUPABASE_URL || '').trim().replace(/\/+$/, '');
   const secret = (env.PROFILE_SHARE_WEB_SECRET || '').trim();
@@ -318,6 +434,10 @@ function profilePage({ origin, shareCode, revision, metadata, targets }) {
 export async function onRequest(context) {
   const { request, env, params } = context;
   const targets = profileAndroidTargets(request);
+  const routeSegments = Array.isArray(params.path) ? params.path : [];
+  if (request.method === 'POST' && routeSegments.length === 2 && routeSegments[1] === 'purge') {
+    return purgeProfileShareCache(context, String(routeSegments[0] || '').toLowerCase());
+  }
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response('Method not allowed', {
       status: 405,
@@ -362,7 +482,7 @@ export async function onRequest(context) {
     if (cache) {
       const cached = await cache.match(cacheKey);
       if (cached) {
-        const headers = new Headers(cached.headers);
+        const headers = withoutCacheTag(cached.headers);
         headers.set('X-Quests-Card-Cache', 'HIT');
         return new Response(cached.body, { status: 200, headers });
       }
@@ -390,7 +510,10 @@ export async function onRequest(context) {
       'Cache-Control': `public, max-age=${CARD_CACHE_SECONDS}`,
       'X-Content-Type-Options': 'nosniff',
     };
-    const store = cache.put(cacheKey, new Response(image, { status: 200, headers }));
+    const store = cache.put(cacheKey, new Response(image, {
+      status: 200,
+      headers: { ...headers, 'Cache-Tag': profileShareCacheTags(shareCode) },
+    }));
     if (typeof context.waitUntil === 'function') {
       context.waitUntil(store);
     } else {
@@ -453,6 +576,7 @@ export async function onRequest(context) {
         headers: {
           'Content-Type': 'application/json',
           'Cache-Control': `public, max-age=${CARD_CACHE_SECONDS}`,
+          'Cache-Tag': profileShareCacheTags(shareCode),
         },
       }),
     );
