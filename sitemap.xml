@@ -163,4 +163,6 @@
     <priority>0.3</priority>
   </url>
   <url><loc>https://thequestsapp.com/blog/sober-october-with-friends</loc><lastmod>2026-10-05</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://thequestsapp.com/blog/challenge-planner</loc><lastmod>2026-10-05</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://thequestsapp.com/blog/habit-science</loc><lastmod>2026-10-05</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
