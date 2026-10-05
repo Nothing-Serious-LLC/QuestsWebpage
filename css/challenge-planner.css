@@ -1,0 +1,43 @@
+.planner-page .container--narrow { max-width: 1120px; }
+.planner-page [hidden] { display: none !important; }
+.planner-intro { max-width: 72ch; }
+.planner-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--q-s-10); margin-block: var(--q-s-10); align-items: start; }
+.planner-form h2, .planner-result h2 { margin-top: 0; }
+.planner-form label { display: block; font-weight: 600; font-size: var(--q-title-md); margin: var(--q-s-5) 0 var(--q-s-2); line-height: 1.5; }
+.planner-form input, .planner-form select, #plan-text { width: 100%; box-sizing: border-box; padding: var(--q-s-3) var(--q-s-4); border: 1px solid var(--q-border-neutral); border-radius: var(--q-r-sm); background: var(--q-surface-raised); color: var(--q-text); font: inherit; font-size: var(--q-title-md); min-height: 48px; }
+.planner-form input[type="date"] { min-width: 0; }
+.planner-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--q-s-4); }
+.planner-form small { display: block; font-size: var(--q-title-sm); line-height: 1.5; color: var(--q-text-2); margin-top: var(--q-s-2); }
+.planner-result { padding: var(--q-s-6); border-radius: var(--q-r-card); background: var(--q-social-light); border: 1px solid var(--q-social-medium); overflow-wrap: anywhere; }
+.planner-result:focus { outline: 2px solid var(--q-text); outline-offset: 4px; }
+.planner-brand { font-weight: 600; font-size: var(--q-title-sm); }
+.planner-result dt { font-size: var(--q-title-sm); font-weight: 700; margin-top: var(--q-s-4); }
+.planner-result dd { margin: var(--q-s-1) 0 0; font-size: var(--q-title-md); line-height: 1.5; }
+.planner-result .plan-checklist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); list-style: none; padding: 0; gap: var(--q-s-2); }
+.planner-result .plan-checklist li { font-size: var(--q-title-sm); margin: 0; }
+.planner-button { appearance: none; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; min-height: 48px; padding: var(--q-s-3) var(--q-s-5); border: 1px solid var(--q-action); border-radius: var(--q-r-full); background: var(--q-action); color: var(--q-on-action); font: inherit; font-size: var(--q-title-md); font-weight: 600; line-height: 1.4; }
+.planner-form > .planner-button { margin-top: var(--q-s-6); }
+.planner-button--secondary { background: transparent; color: var(--q-text); }
+.planner-button:hover { background: var(--q-action-pressed); color: var(--q-on-action); }
+.planner-button:disabled { opacity: var(--q-o-disabled); cursor: default; }
+.planner-button:focus-visible, .planner-form input:focus-visible, .planner-form select:focus-visible, #plan-text:focus-visible { outline: 3px solid var(--q-text); outline-offset: 3px; }
+.plan-actions { display: flex; flex-wrap: wrap; gap: var(--q-s-2); margin-top: var(--q-s-6); }
+.planner-status, .planner-footnote, .planner-print-source { font-size: var(--q-title-sm); line-height: 1.6; }
+.planner-status { min-height: 1.6em; }
+.planner-print-source { margin-bottom: 0; }
+.planner-support { max-width: 72ch; }
+@media (max-width: 800px) { .planner-grid { grid-template-columns: minmax(0, 1fr); gap: var(--q-s-6); } }
+@media (max-width: 380px) { .planner-row { grid-template-columns: 1fr; } .planner-result { padding: var(--q-s-4); } }
+@media print {
+  @page { margin: 12mm; }
+  .planner-page { background: var(--q-white); }
+  .planner-page .nav, .planner-page .backdrop, .planner-page .page-head, .planner-page .footer, .planner-page .skip-link, .planner-page .article-cta, .planner-page .more, .planner-intro, .planner-form, .planner-support, .planner-page noscript, .plan-actions, .planner-status, #plan-text, #plan-text-label { display: none !important; }
+  .planner-page main, .planner-page .section, .planner-page .shell, .planner-page .card, .planner-page .article__body { padding: 0; margin: 0; max-width: none; width: 100%; border: 0; box-shadow: none; }
+  .planner-grid { display: block; margin: 0; }
+  .planner-result { background: var(--q-white); border: 0; padding: 0; outline: 0 !important; }
+  .planner-result h2 { font-size: var(--q-display-sm); margin-bottom: var(--q-s-2); }
+  .planner-result h3 { margin-top: var(--q-s-4); }
+  .planner-result dt { margin-top: var(--q-s-2); }
+  .planner-result dd, .planner-result .plan-checklist li, .planner-footnote, .planner-print-source { font-size: var(--q-title-sm); line-height: 1.4; }
+  .planner-result .plan-checklist { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--q-s-1); }
+}
