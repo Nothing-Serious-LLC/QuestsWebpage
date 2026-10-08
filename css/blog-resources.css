@@ -1,0 +1,21 @@
+.worksheet {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 1.25rem;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  font: inherit;
+  line-height: 1.8;
+}
+.table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+.table-scroll table { width: 100%; border-collapse: collapse; text-align: left; }
+.table-scroll caption { text-align: left; font-weight: 600; margin-bottom: .75rem; }
+.table-scroll th, .table-scroll td { padding: .75rem; border-bottom: 1px solid #c9c6bf; vertical-align: top; min-width: 10rem; }
+.topic-nav { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; margin: 1.5rem 0 2rem; }
+.topic-nav a { color: inherit; text-underline-offset: .2em; }
+.blog-topic { grid-column: 1 / -1; scroll-margin-top: 6rem; margin: 1.5rem 0 .25rem; }
+@media print {
+  .worksheet { break-inside: avoid; }
+  .table-scroll { overflow: visible; }
+  .table-scroll th, .table-scroll td { min-width: 0; }
+}
