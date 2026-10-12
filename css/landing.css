@@ -301,6 +301,26 @@ em { font-style: italic; }
   20.1%, 95% { opacity: 0; transform: translateY(1.5%) scale(1.03); }
   100%       { opacity: 1; transform: translateY(0) scale(1); }
 }
+/* Desktop: keep the device and screenshot pixels flat for clear text and
+   edges. The inner radius equals the outer radius minus the bezel width. */
+@media (min-width: 601px) {
+  .phones { perspective: none; transform-style: flat; }
+  .phone { transform: none; }
+  .phone__screen {
+    isolation: isolate;
+    border-radius: calc(var(--phone-w) * 0.147);
+    clip-path: inset(0 round calc(var(--phone-w) * 0.147));
+  }
+  .phone__screen picture {
+    will-change: opacity;
+    animation-name: hero-screen-desktop;
+  }
+}
+@keyframes hero-screen-desktop {
+  0%, 15%    { opacity: 1; }
+  20%, 95%   { opacity: 0; }
+  100%       { opacity: 1; }
+}
 .phone__island {
   position: absolute; left: 50%; top: calc(var(--phone-w) * 0.028 + var(--phone-w) * 0.03);
   translate: -50% 0;
