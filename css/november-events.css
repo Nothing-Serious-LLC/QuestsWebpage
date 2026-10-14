@@ -1,0 +1,5 @@
+.november-event .event-hero__art,.november-feature .event-feature__art img { aspect-ratio:1416 / 736; object-fit:contain; }
+.november-event .event-quest-card { background:var(--event-category-light); }
+.november-event .event-quest-card__medallion { border-color:var(--event-category); }
+.november-event .event-quest-card__cover { height:auto; aspect-ratio:1416 / 736; object-fit:contain; }
+.november-event .event-hero h1 { font-size:clamp(36px,4.4vw,64px); }
