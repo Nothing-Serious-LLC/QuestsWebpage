@@ -21,7 +21,8 @@ const QUEST_OG_WIDTH = 640;
 const QUEST_OG_HEIGHT = 800;
 const CATEGORY_VISUALS = Object.freeze({
   recharge_move: Object.freeze({ background: "#ECF0FE", ink: "#889FE9" }),
-  social_lifestyle: Object.freeze({ background: "#DFF2E2", ink: "#57A56C" }),
+  // Match the native Social light/base ramp in questFeedTokens.ts.
+  social_lifestyle: Object.freeze({ background: "#EEF2D5", ink: "#A1B717" }),
   mindfulness: Object.freeze({ background: "#F1E2F8", ink: "#A961CC" }),
   creativity: Object.freeze({ background: "#FFE4D6", ink: "#F0925B" }),
   productivity: Object.freeze({ background: "#F5E9CF", ink: "#DBB66B" }),
