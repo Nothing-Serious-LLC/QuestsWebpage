@@ -5,7 +5,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const base = 'aea339db92489a2b3d08ed9f9ef41d2638c39d10';
+// Preserve separately merged releases #22, #23 and #24 before this SEO batch.
+const base = '652d2e14f80b41cd47657184b7815b13ad5f6577';
 const protectedPaths = [
   'index.html', 'css/landing.css', 'css/tokens.css', 'css/fonts.css',
   'js/landing.js', 'js/clean-urls.js', 'assets',
