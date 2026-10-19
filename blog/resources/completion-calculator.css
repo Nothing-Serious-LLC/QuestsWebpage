@@ -1,0 +1,38 @@
+.completion-form {
+  display: grid;
+  gap: .75rem;
+  margin-block: 1.5rem;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  border: 1px solid currentColor;
+  border-radius: 12px;
+}
+.completion-form[hidden] { display: none; }
+.completion-form label { font-weight: 600; }
+.completion-form input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: .75rem;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+}
+.completion-button {
+  justify-self: start;
+  padding: .75rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.completion-form input:focus-visible, .completion-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.completion-form p { margin: 0; }
+#completion-status { min-height: 5em; }
