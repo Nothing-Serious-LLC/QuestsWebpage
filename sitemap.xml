@@ -8,7 +8,7 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -166,7 +166,7 @@
   <url><loc>https://thequestsapp.com/blog/challenge-planner</loc><lastmod>2026-10-05</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://thequestsapp.com/blog/habit-science</loc><lastmod>2026-10-08</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://thequestsapp.com/blog/if-then-planning</loc><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://thequestsapp.com/blog/habit-tracker-vs-challenge-app</loc><lastmod>2026-10-08</lastmod></url>
+  <url><loc>https://thequestsapp.com/blog/habit-tracker-vs-challenge-app</loc><lastmod>2026-10-20</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/accountability-agreement-template</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/habit-cues-and-context</loc><lastmod>2026-10-08</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/fair-group-challenge-rules</loc><lastmod>2026-10-19</lastmod></url>
@@ -182,4 +182,16 @@
   <url><loc>https://thequestsapp.com/blog/move-ember-with-friends</loc><lastmod>2026-10-14</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/record-a-habit-baseline</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/calculate-challenge-completion-rates</loc><lastmod>2026-10-19</lastmod></url>
+  <url>
+    <loc>https://thequestsapp.com/blog/quests-vs-finch</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://thequestsapp.com/blog/quests-vs-strava</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
