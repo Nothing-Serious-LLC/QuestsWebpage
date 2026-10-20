@@ -19,7 +19,8 @@
       "namespace": "android_app",
       "package_name": "info.nothingserious.quests.staging",
       "sha256_cert_fingerprints": [
-        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C",
+        "71:F7:47:6F:BC:51:C2:C6:86:1E:8F:90:31:F4:75:9F:35:16:47:33:7A:44:69:F9:F8:3F:C6:5D:2C:F8:82:C4"
       ]
     }
   }
