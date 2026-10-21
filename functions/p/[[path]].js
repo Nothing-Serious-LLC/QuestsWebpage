@@ -31,6 +31,9 @@ import {
 const CODE_PATTERN = /^[0-9a-f]{32}$/;
 const REVISION_PATTERN = /^[1-9][0-9]{0,9}$/;
 const APP_STORE_ID = '6745767553';
+// Pages Functions produce their own responses, so Cloudflare's static
+// _headers rules do not protect these HTML pages.
+const PROFILE_PAGE_CSP = "default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' https://*.supabase.co data:; frame-src 'none'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'";
 
 // Foundation surface + inks (SHARED_TEMPLATE_LAYOUT / share card constants).
 const SURFACE = '#f3f1e7';
@@ -59,6 +62,11 @@ function htmlResponse(markup, status) {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store',
       'X-Content-Type-Options': 'nosniff',
+      'Content-Security-Policy': PROFILE_PAGE_CSP,
+      'X-Frame-Options': 'DENY',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+      'X-Robots-Tag': 'noindex, nofollow',
       'Referrer-Policy': 'no-referrer',
       'Vary': 'User-Agent',
     },
