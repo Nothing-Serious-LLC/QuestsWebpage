@@ -734,7 +734,10 @@ test("OG and Story routes proxy the requested PNG artifact", async () => {
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Content-Type"), "image/png");
     assert.equal(response.headers.get("Content-Length"), "4");
-    assert.equal(response.headers.get("Cache-Control"), "no-store");
+    assert.equal(
+      response.headers.get("Cache-Control"),
+      "public, max-age=0, s-maxage=60, stale-while-revalidate=300",
+    );
     assert.deepEqual(edgeBody, {
       action: "image",
       artifact,
@@ -782,13 +785,22 @@ test("unpublished Story artifact returns a private 404 response", async () => {
 });
 
 test("unpinned Open Graph failures serve the branded revision-zero fallback", async () => {
-  for (const upstream of [
-    Response.json({ code: "unavailable" }, { status: 404 }),
-    Response.json({ code: "upstream_failed" }, { status: 502 }),
-    new Response("unexpected", {
-      status: 200,
-      headers: { "Content-Type": "text/plain" },
-    }),
+  // No artwork (404) is a stable state and shares the edge policy; a failing
+  // or malformed upstream keeps the fallback uncached so recovery is seen
+  // on the next request.
+  for (const [upstream, expectedCacheControl] of [
+    [
+      Response.json({ code: "unavailable" }, { status: 404 }),
+      "public, max-age=0, s-maxage=60, stale-while-revalidate=300",
+    ],
+    [Response.json({ code: "upstream_failed" }, { status: 502 }), "no-store"],
+    [
+      new Response("unexpected", {
+        status: 200,
+        headers: { "Content-Type": "text/plain" },
+      }),
+      "no-store",
+    ],
   ]) {
     const assetCalls = [];
     const response = await withFetch(
@@ -802,7 +814,7 @@ test("unpinned Open Graph failures serve the branded revision-zero fallback", as
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Content-Type"), "image/png");
     assert.equal(response.headers.get("Content-Length"), String(FALLBACK_PNG.length));
-    assert.equal(response.headers.get("Cache-Control"), "no-store");
+    assert.equal(response.headers.get("Cache-Control"), expectedCacheControl);
     assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
     assert.deepEqual(assetCalls, [
       "https://invite.thequestsapp.com/quest-share-og-fallback.png",
@@ -969,7 +981,7 @@ test("phone claim maps a lifecycle race to the stable unavailable response", asy
   assert.equal(response.status, 409);
   assert.equal(response.headers.get("Cache-Control"), "no-store");
   assert.deepEqual(await response.json(), {
-    _v: "rl-600-v2",
+    _v: "rl-600-v3",
     error: "quest_unavailable",
   });
 });
@@ -985,7 +997,7 @@ test("phone claim bounds public bodies and Turnstile tokens before fetch", async
   );
   assert.equal(oversizedBody.status, 413);
   assert.deepEqual(await oversizedBody.json(), {
-    _v: "rl-600-v2",
+    _v: "rl-600-v3",
     error: "invalid_request",
   });
 
@@ -1015,7 +1027,7 @@ test("phone claim requires a bounded Turnstile response from an allowed host", a
   assert.ok(suppliedSignal instanceof AbortSignal);
   assert.equal(response.status, 403);
   assert.deepEqual(await response.json(), {
-    _v: "rl-600-v2",
+    _v: "rl-600-v3",
     error: "turnstile_failed",
   });
 });
@@ -1038,7 +1050,7 @@ test("phone claim keeps backend diagnostics out of anonymous errors", async () =
   assert.equal(response.status, 500);
   assert.equal(response.headers.get("Cache-Control"), "no-store");
   const body = await response.json();
-  assert.deepEqual(body, { _v: "rl-600-v2", error: "internal_error" });
+  assert.deepEqual(body, { _v: "rl-600-v3", error: "internal_error" });
   assert.equal(JSON.stringify(body).includes("sensitive"), false);
   assert.equal("debug_message" in body, false);
   assert.equal("debug_stack" in body, false);
@@ -1056,7 +1068,7 @@ test("phone claim keeps thrown diagnostics out of anonymous errors", async () =>
 
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), {
-    _v: "rl-600-v2",
+    _v: "rl-600-v3",
     error: "service_unavailable",
   });
 });

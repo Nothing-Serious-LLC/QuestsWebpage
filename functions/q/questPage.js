@@ -214,20 +214,26 @@ export function normalizeQuestAppHandoff(value = {}) {
   };
 }
 
-function response(markup, status, requestMethod = "GET") {
+// cacheControl defaults to no-store. The live route passes the shared edge
+// policy for joinable pages only (see shareCache.js); ended, unavailable and
+// fixture pages keep no-store. Nothing here sets a cookie, so Vary names only
+// the encoding the CDN negotiates.
+function response(markup, status, requestMethod = "GET", cacheControl = "no-store") {
+  const headers = {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": cacheControl,
+    "Content-Security-Policy": QUEST_PAGE_CSP,
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "X-Robots-Tag": "noindex, nofollow",
+  };
+  if (cacheControl !== "no-store") headers.Vary = "Accept-Encoding";
   return new Response(requestMethod === "HEAD" ? null : markup, {
     status,
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "no-store",
-      "Content-Security-Policy": QUEST_PAGE_CSP,
-      "X-Content-Type-Options": "nosniff",
-      "X-Frame-Options": "DENY",
-      "Referrer-Policy": "no-referrer",
-      "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-      "X-Robots-Tag": "noindex, nofollow",
-    },
+    headers,
   });
 }
 
@@ -280,6 +286,7 @@ export function questSharePage({
   interactionMode = "phone",
   previewQuery = "",
   requestMethod = "GET",
+  cacheControl = "no-store",
 }) {
   const handoff = normalizeQuestAppHandoff(appHandoff);
   const revision = presentation.revision;
@@ -564,5 +571,5 @@ export function questSharePage({
     </main>
     ${phoneScript ? `<script>${phoneScript}</script>` : ""}
   </body>
-</html>`, 200, requestMethod);
+</html>`, 200, requestMethod, cacheControl);
 }
