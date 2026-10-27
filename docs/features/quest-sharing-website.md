@@ -120,10 +120,36 @@ Schema v1 emits `coverImageUrl: null` for Community user covers. Private cover
 delivery remains gated on a durable backend persistence, approval, and serving
 contract. The website establishes zero public user-cover bucket paths.
 
-Open Graph and Story responses use `Cache-Control: no-store`. This lets
-cancellation, expiry, disable, and reset enforcement reach the image route
-immediately. The backend reuses immutable stored objects to keep rendering
-efficient.
+Successful Open Graph and Story responses share the one minute edge policy
+described under Edge caching below, so a rush of previews is served from the
+data center instead of the Edge Function. Cancellation, expiry, disable, and
+reset enforcement reach the image route within that minute; every error
+response stays `no-store`. The backend reuses immutable stored objects to keep
+rendering efficient.
+
+## Edge caching (2026-10-27)
+
+Cloudflare never caches a Pages Function response on its own, so
+`functions/q/shareCache.js` stores joinable responses in the data center's
+cache (`caches.default`) and serves them for 60 seconds. For the following
+300 seconds a request is answered from the stored copy once while a refresh
+runs in the background. Every data center fills its own copy, so 25,000 people
+tapping one link within minutes cost about one metadata call per data center
+per minute instead of one per tap.
+
+| Response | `Cache-Control` | Stored at the edge |
+|---|---|---|
+| Joinable share page (200) | `public, max-age=0, s-maxage=60, stale-while-revalidate=300` | Yes |
+| Preview image (200), including the branded fallback when the backend reports no artwork | same | Yes |
+| Ended Quest page, unavailable page, legacy fallback after an upstream failure, image errors, the branded fallback standing in for an upstream failure | `no-store` | No |
+| Staging fixture page and image | `no-store` | No |
+
+`max-age=0` keeps browsers revalidating on every load; only shared caches hold
+a copy. No response on these routes sets a cookie, and `Vary` names only
+`Accept-Encoding`. Cached responses carry `X-Quest-Cache: HIT`, `STALE` or
+`MISS` (`BYPASS` when no cache is available) and an `Age` header. `HEAD` is
+answered from the `GET` entry with an empty body. The claim RPC enforces Quest
+state on every submit regardless of what a cached page showed.
 
 ## Page behavior
 
@@ -151,10 +177,33 @@ JSON, and keeps backend diagnostics in server logs. A Quest that becomes
 unjoinable between page render and phone submit returns the stable
 `quest_unavailable` response.
 
+### Claim rate limiter (2026-10-27)
+
+Turnstile stays the primary bot control. After it passes,
+`functions/api/link-claims/claimRateLimiter.js` bounds a verified client inside
+a fixed 10 minute window:
+
+| Dimension | Limit per 10 minutes | Why |
+|---|---|---|
+| One exact IP | 100 | A venue, office or campus leaves one egress address |
+| One phone number | 5 | A typo retry or two Quests fit; a cycling script does not |
+| One share code from one network block (IPv4 /24, IPv6 /64) | 1,000 | Carrier NAT puts a city behind a few blocks |
+
+Two backends are supported and the Function picks whichever is bound:
+`CLAIM_LIMITER`, a Durable Object namespace from `workers/claim-limiter`
+(exact counts, one object per key), or `RATE_LIMIT`, the Workers KV namespace
+(approximate counts: KV allows one write a second per key and reads can be a
+minute stale elsewhere). On KV the three reads run in parallel before any
+write, a limited request writes nothing, and a same-key write collision
+(`KV PUT failed: 429`) is logged and skipped. A counter failure at runtime
+never turns a claim into an error; a missing binding is a deploy
+misconfiguration and returns 503. Responses name the backend in
+`X-Claim-Limiter` and carry `_v: rl-600-v3`.
+
 Enhanced Pages Function responses set their own CSP, HSTS, frame denial,
 permissions policy, robots policy, referrer policy, MIME protection, and
-no-store cache headers. Cloudflare `_headers` remains a static-route defense and
-does not supply headers for Pages Function responses.
+cache headers (see Edge caching). Cloudflare `_headers` remains a static-route
+defense and does not supply headers for Pages Function responses.
 
 ## Failure behavior
 
@@ -165,7 +214,8 @@ does not supply headers for Pages Function responses.
 | Valid first link with artwork warming | Rich HTML and phone flow with an unpinned image URL |
 | Metadata returns unavailable | Generic no-store 404 page |
 | Metadata schema is malformed | Generic no-store 404 page |
-| Unpinned Open Graph artifact absent or upstream unavailable | Branded generic no-store 1080 x 1350 PNG |
+| Unpinned Open Graph artifact absent | Branded generic 1080 x 1350 PNG, cached one minute |
+| Unpinned Open Graph upstream unavailable | Branded generic no-store 1080 x 1350 PNG |
 | Pinned Open Graph upstream unavailable | Plain no-store 503 response |
 | Pinned Open Graph artifact absent | Plain no-store 404 response |
 | Story gate disabled | Private no-store 404 response |

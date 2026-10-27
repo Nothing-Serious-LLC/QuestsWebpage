@@ -291,6 +291,11 @@ Concrete anti-abuse starter thresholds:
 - Max 20 submits per share code per 24h from same IP block.
 - Challenge with Turnstile on repeat attempts.
 
+Current values (2026-10-27, SC-30): 100 per IP, 5 per phone and 1,000 per
+share code per IP block, each per 10 minute window, with Turnstile on every
+submit. The starter values above locked out venues and carrier networks; see
+`docs/features/quest-sharing-website.md`.
+
 ---
 
 ## 7) Delivery Phases and Exit Criteria
@@ -350,7 +355,7 @@ Phase 4 - Hardening
 | File | Purpose |
 |------|---------|
 | `functions/api/link-claims/_middleware.js` | CORS middleware with origin allowlist, `Vary: Origin` header, OPTIONS preflight, security headers. |
-| `functions/api/link-claims/start.js` | `POST /api/link-claims/start` endpoint: request validation, Turnstile server-side verification with hostname check, fail-closed KV rate limiting (5/IP/hr, 3/phone/24h, 20/code+IP-block/24h), Supabase RPC call to `start_link_claim`, idempotent `already_claimed` handling. Uses `context.env.cloudflare_key` for Supabase server auth. |
+| `functions/api/link-claims/start.js` | `POST /api/link-claims/start` endpoint: request validation, Turnstile server-side verification with hostname check, rate limiting through `claimRateLimiter.js` (since 2026-10-27: 100 per IP, 5 per phone, 1,000 per code per IP block, 10 minute windows, fail open on counter errors, 503 only when no limiter binding exists; Durable Object `CLAIM_LIMITER` preferred, KV `RATE_LIMIT` fallback), Supabase RPC call to `start_link_claim`, idempotent `already_claimed` handling. Uses `context.env.cloudflare_key` for Supabase server auth. |
 | `_routes.json` | Cloudflare Pages function routing: includes `/q/*`, `/api/*`; excludes `/q/index.html`, `/.well-known/*`. |
 
 **Verified unchanged:**
@@ -369,7 +374,7 @@ Two rounds of security review were conducted (initial 4-agent team + final 3-age
 
 | # | Finding | Resolution |
 |---|---------|------------|
-| H1 | Fail-open rate limiting | Changed to fail-closed: returns 503 when KV unavailable |
+| H1 | Fail-open rate limiting | Changed to fail-closed: returns 503 when KV unavailable. Revised 2026-10-27: a missing binding still returns 503; a counter read or write that fails at runtime (KV same-key write limit, outage) is logged and the claim proceeds, because Turnstile has already passed and a 500 to a venue was the larger harm (SC-31) |
 | H2 | Placeholder credentials | Replaced with real values: Supabase URL, publishable key (`sb_publishable_*`), Turnstile site key |
 | H3 | CORS conflict in `_headers` | Removed static `/api/*` CORS block; middleware handles dynamic CORS |
 | H4 | Untracked files | All files committed |

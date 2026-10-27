@@ -5,13 +5,24 @@
 // Required env bindings:
 //   TURNSTILE_SECRET_KEY  - Cloudflare Turnstile server secret
 //   SUPABASE_URL          - Supabase project URL
-//   cloudflare_key            - Supabase server secret key (never expose to client)
-//   RATE_LIMIT            - Cloudflare KV namespace binding (required for production)
+//   cloudflare_key        - Supabase server secret key (never expose to client)
+//   RATE_LIMIT            - Workers KV namespace for the claim limiter
+//                           (approximate counters; required unless CLAIM_LIMITER is bound)
+// Optional env bindings:
+//   CLAIM_LIMITER         - Durable Object namespace from workers/claim-limiter
+//                           (exact counters; preferred when present)
+//   TURNSTILE_ALLOWED_HOSTS - comma separated hostnames Turnstile may report
 //
 // Backend dependency:
 //   Supabase RPC `start_link_claim(p_share_code, p_phone, p_phone_last4)` must exist.
 //   Expected return: { claim_id, masked_phone, status, expires_at }
 //   Or error:        { error: "quest_not_found" | "quest_not_joinable" | "already_claimed" }
+
+import {
+  claimRateDimensions,
+  hashForRateLimit,
+  selectClaimLimiter,
+} from "./claimRateLimiter.js";
 
 const SHARE_CODE_RE = /^[A-HJ-NP-Za-hj-kmnp-z2-9]{8}$/;
 const E164_RE = /^\+\d{10,15}$/;
@@ -24,16 +35,14 @@ const DEFAULT_TURNSTILE_HOSTS = [
   "www.thequestsapp.com",
 ];
 
-const RATE_LIMITS = {
-  ip: { limit: 10, ttl: 600, prefix: "ip" },
-  phone: { limit: 5, ttl: 600, prefix: "phone" },
-  codeIp: { limit: 30, ttl: 600, prefix: "code" },
-};
+// Response marker so a deploy can be confirmed from a curl. v3 = claim limiter
+// rewrite (fail open, 100 per IP, 1,000 per code per block, 2026-10-27).
+const RESPONSE_VERSION = "rl-600-v3";
 
 // --- Helpers ---
 
 function jsonResponse(status, body, extraHeaders) {
-  return new Response(JSON.stringify({ _v: "rl-600-v2", ...body }), {
+  return new Response(JSON.stringify({ _v: RESPONSE_VERSION, ...body }), {
     status,
     headers: {
       "Content-Type": "application/json",
@@ -41,6 +50,13 @@ function jsonResponse(status, body, extraHeaders) {
       ...extraHeaders,
     },
   });
+}
+
+// Names the limiter backend on every response that passed the limiter, so a
+// deploy can be checked from a curl (kv until the Durable Object is bound).
+function withLimiterHeader(response, limiter) {
+  response.headers.set("X-Claim-Limiter", limiter.backend);
+  return response;
 }
 
 function normalizePhone(raw) {
@@ -141,47 +157,6 @@ function getTurnstileSecret(env) {
 
 function getSupabaseKey(env) {
   return getEnvValue(env, ["cloudflare_key", "CLOUDFLARE_KEY"]);
-}
-
-async function hashForRateLimit(value) {
-  const bytes = new TextEncoder().encode(value);
-  const buffer = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(buffer))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-function getIpBlock(ip) {
-  if (!ip) return "unknown";
-  if (ip.includes(":")) {
-    return ip.split(":").slice(0, 4).join(":");
-  }
-  return ip.split(".").slice(0, 3).join(".");
-}
-
-async function checkAndIncrementRate(kv, key, limit, ttlSeconds) {
-  const raw = await kv.get(key);
-  const now = Math.floor(Date.now() / 1000);
-
-  if (raw) {
-    const data = JSON.parse(raw);
-    if (data.count >= limit) {
-      const elapsed = now - data.firstSeen;
-      const retryAfter = Math.max(ttlSeconds - elapsed, 1);
-      return { limited: true, retryAfter };
-    }
-    data.count += 1;
-    const remaining = ttlSeconds - (now - data.firstSeen);
-    await kv.put(key, JSON.stringify(data), {
-      expirationTtl: Math.max(remaining, 60),
-    });
-    return { limited: false };
-  }
-
-  await kv.put(key, JSON.stringify({ count: 1, firstSeen: now }), {
-    expirationTtl: ttlSeconds,
-  });
-  return { limited: false };
 }
 
 // --- Handler ---
@@ -297,64 +272,36 @@ export async function onRequestPost(context) {
       return jsonResponse(403, { error: "turnstile_failed" });
     }
 
-    // Step 7: Rate limiting (graceful degradation if KV unavailable)
-    const kv = context.env.RATE_LIMIT;
-    if (kv) {
-      const phoneHash = await hashForRateLimit(normalizedPhone);
-      const ipBlock = getIpBlock(clientIP);
-
-      // Check IP rate limit
-      const ipKey = `${RATE_LIMITS.ip.prefix}:${clientIP}:hourly`;
-      const ipCheck = await checkAndIncrementRate(
-        kv,
-        ipKey,
-        RATE_LIMITS.ip.limit,
-        RATE_LIMITS.ip.ttl
-      );
-      if (ipCheck.limited) {
-        return jsonResponse(
-          429,
-          { error: "rate_limited", retryAfter: ipCheck.retryAfter },
-          { "Retry-After": String(ipCheck.retryAfter) }
-        );
-      }
-
-      // Check phone rate limit
-      const phoneKey = `${RATE_LIMITS.phone.prefix}:${phoneHash}:daily`;
-      const phoneCheck = await checkAndIncrementRate(
-        kv,
-        phoneKey,
-        RATE_LIMITS.phone.limit,
-        RATE_LIMITS.phone.ttl
-      );
-      if (phoneCheck.limited) {
-        return jsonResponse(
-          429,
-          { error: "rate_limited", retryAfter: phoneCheck.retryAfter },
-          { "Retry-After": String(phoneCheck.retryAfter) }
-        );
-      }
-
-      // Check code + IP block rate limit
-      const codeIpKey = `${RATE_LIMITS.codeIp.prefix}:${shareCode}:ip:${ipBlock}:daily`;
-      const codeIpCheck = await checkAndIncrementRate(
-        kv,
-        codeIpKey,
-        RATE_LIMITS.codeIp.limit,
-        RATE_LIMITS.codeIp.ttl
-      );
-      if (codeIpCheck.limited) {
-        return jsonResponse(
-          429,
-          { error: "rate_limited", retryAfter: codeIpCheck.retryAfter },
-          { "Retry-After": String(codeIpCheck.retryAfter) }
-        );
-      }
-    } else {
+    // Step 7: Rate limiting. Turnstile has passed; the counters bound what a
+    // verified client can do in a window. A missing binding is a deploy
+    // misconfiguration and stays a 503. A counter that fails at runtime never
+    // blocks the person (claimRateLimiter.js logs and allows the request).
+    const limiter = selectClaimLimiter(context.env);
+    if (!limiter) {
       console.error(
-        "RATE_LIMIT KV binding unavailable, rejecting request"
+        "No claim limiter binding (CLAIM_LIMITER Durable Object or RATE_LIMIT KV), rejecting request"
       );
       return jsonResponse(503, { error: "service_unavailable" });
+    }
+
+    const phoneHash = await hashForRateLimit(normalizedPhone);
+    const verdict = await limiter.check(
+      claimRateDimensions({ clientIp: clientIP, phoneHash, shareCode }),
+      {
+        waitUntil: typeof context.waitUntil === "function"
+          ? (promise) => context.waitUntil(promise)
+          : undefined,
+      }
+    );
+    if (verdict.limited) {
+      return withLimiterHeader(
+        jsonResponse(
+          429,
+          { error: "rate_limited", retryAfter: verdict.retryAfter },
+          { "Retry-After": String(verdict.retryAfter) }
+        ),
+        limiter
+      );
     }
 
     // Step 8: Call Supabase RPC start_link_claim
@@ -382,7 +329,7 @@ export async function onRequestPost(context) {
         rpcResponse.status,
         rpcText
       );
-      return jsonResponse(500, { error: "internal_error" });
+      return withLimiterHeader(jsonResponse(500, { error: "internal_error" }), limiter);
     }
 
     const result = await rpcResponse.json();
@@ -390,32 +337,32 @@ export async function onRequestPost(context) {
     // Step 9: Map Supabase result to API response
     if (result.error) {
       if (result.error === "quest_not_found") {
-        return jsonResponse(404, { error: "quest_not_found" });
+        return withLimiterHeader(jsonResponse(404, { error: "quest_not_found" }), limiter);
       }
       if (
         result.error === "quest_unavailable" ||
         result.error === "quest_not_joinable"
       ) {
-        return jsonResponse(409, { error: "quest_unavailable" });
+        return withLimiterHeader(jsonResponse(409, { error: "quest_unavailable" }), limiter);
       }
       if (result.error === "already_claimed") {
-        return jsonResponse(200, {
+        return withLimiterHeader(jsonResponse(200, {
           claimId: result.claim_id,
           maskedPhone: result.masked_phone,
           status: "ALREADY_CLAIMED",
           expiresAt: result.expires_at,
-        });
+        }), limiter);
       }
       console.error("Supabase RPC returned error:", result.error);
-      return jsonResponse(500, { error: "internal_error" });
+      return withLimiterHeader(jsonResponse(500, { error: "internal_error" }), limiter);
     }
 
-    return jsonResponse(200, {
+    return withLimiterHeader(jsonResponse(200, {
       claimId: result.claim_id,
       maskedPhone: result.masked_phone,
       status: result.status || "PENDING",
       expiresAt: result.expires_at,
-    });
+    }), limiter);
   } catch (err) {
     console.error("Unhandled error in /api/link-claims/start:", err);
     return jsonResponse(500, { error: "internal_error" });

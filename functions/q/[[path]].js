@@ -11,6 +11,7 @@ import {
   stagingQuestFixtureOgPathForCode,
 } from "./stagingQuestFixture.js";
 import { appHandoffForHost } from "./appHandoffTargets.js";
+import { SHARE_PUBLIC_CACHE_CONTROL, withShareEdgeCache } from "./shareCache.js";
 
 const EDGE_TIMEOUT_MS = 4_000;
 const REVISION_ZERO_OG_FALLBACK_PATH = "/quest-share-og-fallback.png";
@@ -109,9 +110,12 @@ function imageServiceUnavailable(requestMethod) {
   });
 }
 
-async function revisionZeroOgFallback(context) {
+// The branded fallback is cacheable when the backend said the link has no
+// artwork (a stable revision-zero state) and stays no-store when it stands in
+// for an upstream failure, so a recovered backend is seen on the next request.
+async function revisionZeroOgFallback(context, { requestMethod, cacheControl }) {
   if (!context.env?.ASSETS?.fetch) {
-    return imageServiceUnavailable(context.request.method);
+    return imageServiceUnavailable(requestMethod);
   }
 
   const url = new URL(context.request.url);
@@ -122,7 +126,7 @@ async function revisionZeroOgFallback(context) {
   try {
     assetResponse = await context.env.ASSETS.fetch(new Request(url.toString()));
   } catch {
-    return imageServiceUnavailable(context.request.method);
+    return imageServiceUnavailable(requestMethod);
   }
 
   const contentType = String(assetResponse.headers.get("Content-Type") || "")
@@ -130,12 +134,12 @@ async function revisionZeroOgFallback(context) {
     .trim()
     .toLowerCase();
   if (!assetResponse.ok || contentType !== "image/png") {
-    return imageServiceUnavailable(context.request.method);
+    return imageServiceUnavailable(requestMethod);
   }
 
   const headers = new Headers({
     "Content-Type": "image/png",
-    "Cache-Control": "no-store",
+    "Cache-Control": cacheControl,
     "X-Content-Type-Options": "nosniff",
     "X-Robots-Tag": "noindex, nofollow",
   });
@@ -145,7 +149,7 @@ async function revisionZeroOgFallback(context) {
   }
 
   return new Response(
-    context.request.method === "HEAD" ? null : assetResponse.body,
+    requestMethod === "HEAD" ? null : assetResponse.body,
     { status: 200, headers },
   );
 }
@@ -197,6 +201,7 @@ async function questArtifactResponse({
   shareCode,
   revision,
   artifact,
+  requestMethod,
 }) {
   const body = {
     action: "image",
@@ -209,14 +214,19 @@ async function questArtifactResponse({
   const canUseRevisionZeroFallback = artifact === "og" && revision === null;
   if (status === 404) {
     return canUseRevisionZeroFallback
-      ? revisionZeroOgFallback(context)
-      : imageNotFound(context.request.method);
+      ? revisionZeroOgFallback(context, {
+        requestMethod,
+        cacheControl: SHARE_PUBLIC_CACHE_CONTROL,
+      })
+      : imageNotFound(requestMethod);
   }
   if (status !== 200 || !response) {
-    if (canUseRevisionZeroFallback) return revisionZeroOgFallback(context);
+    if (canUseRevisionZeroFallback) {
+      return revisionZeroOgFallback(context, { requestMethod, cacheControl: "no-store" });
+    }
     return artifact === "story"
-      ? imageNotFound(context.request.method)
-      : imageServiceUnavailable(context.request.method);
+      ? imageNotFound(requestMethod)
+      : imageServiceUnavailable(requestMethod);
   }
 
   const contentType = String(response.headers.get("Content-Type") || "")
@@ -224,15 +234,17 @@ async function questArtifactResponse({
     .trim()
     .toLowerCase();
   if (contentType !== "image/png") {
-    if (canUseRevisionZeroFallback) return revisionZeroOgFallback(context);
+    if (canUseRevisionZeroFallback) {
+      return revisionZeroOgFallback(context, { requestMethod, cacheControl: "no-store" });
+    }
     return artifact === "story"
-      ? imageNotFound(context.request.method)
-      : imageServiceUnavailable(context.request.method);
+      ? imageNotFound(requestMethod)
+      : imageServiceUnavailable(requestMethod);
   }
 
   const headers = new Headers({
     "Content-Type": "image/png",
-    "Cache-Control": "no-store",
+    "Cache-Control": SHARE_PUBLIC_CACHE_CONTROL,
     "X-Content-Type-Options": "nosniff",
     "X-Robots-Tag": "noindex, nofollow",
   });
@@ -241,9 +253,67 @@ async function questArtifactResponse({
     headers.set("Content-Length", contentLength);
   }
 
-  return new Response(context.request.method === "HEAD" ? null : response.body, {
+  return new Response(requestMethod === "HEAD" ? null : response.body, {
     status: 200,
     headers,
+  });
+}
+
+async function liveQuestSharePage(context, { url, shareCode, revision, requestMethod }) {
+  const body = { action: "metadata", shareCode };
+  if (revision) body.revision = Number(revision);
+  const { status, response } = await callQuestShareWeb(context.env, body);
+  if (status === 404) {
+    return questUnavailablePage({
+      requestMethod,
+      appHandoff: appHandoffFromEnv(context.env, url),
+    });
+  }
+  if (status !== 200 || !response) {
+    return legacyQuestPage(context, { transientFailure: true });
+  }
+
+  let rawPresentation;
+  try {
+    rawPresentation = await response.json();
+  } catch {
+    return questUnavailablePage({
+      requestMethod,
+      appHandoff: appHandoffFromEnv(context.env, url),
+    });
+  }
+
+  const presentation = normalizeQuestSharePresentation(rawPresentation, {
+    supabaseUrl: context.env.QUEST_SHARE_SUPABASE_URL,
+  });
+  if (
+    !presentation ||
+    (revision !== null && presentation.revision !== Number(revision))
+  ) {
+    return questUnavailablePage({
+      requestMethod,
+      appHandoff: appHandoffFromEnv(context.env, url),
+    });
+  }
+
+  const turnstileSiteKey = safeTurnstileSiteKey(context.env.TURNSTILE_SITE_KEY);
+  if (!turnstileSiteKey) {
+    console.error(
+      "TURNSTILE_SITE_KEY missing or malformed; rendering app-only join panel",
+    );
+  }
+
+  return questSharePage({
+    origin: url.origin,
+    shareCode,
+    presentation,
+    turnstileSiteKey,
+    appHandoff: appHandoffFromEnv(context.env, url),
+    interactionMode: turnstileSiteKey ? "phone" : "app-only",
+    requestMethod,
+    cacheControl: presentation.availability === "joinable"
+      ? SHARE_PUBLIC_CACHE_CONTROL
+      : "no-store",
   });
 }
 
@@ -315,68 +385,35 @@ export async function onRequest(context) {
       });
   }
 
+  const waitUntil = typeof context.waitUntil === "function"
+    ? (promise) => context.waitUntil(promise)
+    : undefined;
+
   if (artifact) {
     if (artifact === "story" && !isQuestStorySharingEnabled(context.env)) {
       return imageNotFound(context.request.method);
     }
-    return questArtifactResponse({
-      context,
+    return withShareEdgeCache({
+      request: context.request,
+      waitUntil,
+      produce: (requestMethod) => questArtifactResponse({
+        context,
+        shareCode,
+        revision,
+        artifact,
+        requestMethod,
+      }),
+    });
+  }
+
+  return withShareEdgeCache({
+    request: context.request,
+    waitUntil,
+    produce: (requestMethod) => liveQuestSharePage(context, {
+      url,
       shareCode,
       revision,
-      artifact,
-    });
-  }
-
-  const body = { action: "metadata", shareCode };
-  if (revision) body.revision = Number(revision);
-  const { status, response } = await callQuestShareWeb(context.env, body);
-  if (status === 404) {
-    return questUnavailablePage({
-      requestMethod: context.request.method,
-      appHandoff: appHandoffFromEnv(context.env, url),
-    });
-  }
-  if (status !== 200 || !response) {
-    return legacyQuestPage(context, { transientFailure: true });
-  }
-
-  let rawPresentation;
-  try {
-    rawPresentation = await response.json();
-  } catch {
-    return questUnavailablePage({
-      requestMethod: context.request.method,
-      appHandoff: appHandoffFromEnv(context.env, url),
-    });
-  }
-
-  const presentation = normalizeQuestSharePresentation(rawPresentation, {
-    supabaseUrl: context.env.QUEST_SHARE_SUPABASE_URL,
-  });
-  if (
-    !presentation ||
-    (revision !== null && presentation.revision !== Number(revision))
-  ) {
-    return questUnavailablePage({
-      requestMethod: context.request.method,
-      appHandoff: appHandoffFromEnv(context.env, url),
-    });
-  }
-
-  const turnstileSiteKey = safeTurnstileSiteKey(context.env.TURNSTILE_SITE_KEY);
-  if (!turnstileSiteKey) {
-    console.error(
-      "TURNSTILE_SITE_KEY missing or malformed; rendering app-only join panel",
-    );
-  }
-
-  return questSharePage({
-    origin: url.origin,
-    shareCode,
-    presentation,
-    turnstileSiteKey,
-    appHandoff: appHandoffFromEnv(context.env, url),
-    interactionMode: turnstileSiteKey ? "phone" : "app-only",
-    requestMethod: context.request.method,
+      requestMethod,
+    }),
   });
 }
