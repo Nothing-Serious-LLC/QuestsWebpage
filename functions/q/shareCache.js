@@ -86,14 +86,19 @@ async function store(cache, key, response, cachedAtMs) {
   );
 }
 
+// A refresh that comes back unjoinable (ended, cancelled, removed, an error)
+// deletes the stored copy, so the next request reaches the origin instead of
+// the stale joinable page lingering for the rest of the stale window.
 async function produceAndStore({ cache, key, produce, now }) {
   const response = await produce("GET");
-  if (isShareEdgeCacheable(response)) {
-    try {
+  try {
+    if (isShareEdgeCacheable(response)) {
       await store(cache, key, response.clone(), now());
-    } catch (error) {
-      console.warn("share edge cache store skipped", { reason: reasonOf(error) });
+    } else {
+      await cache.delete(key);
     }
+  } catch (error) {
+    console.warn("share edge cache refresh store skipped", { reason: reasonOf(error) });
   }
   return response;
 }

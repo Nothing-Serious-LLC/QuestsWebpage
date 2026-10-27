@@ -23,10 +23,14 @@ async function fixture(name) {
 // In-memory stand-in for caches.default: stores bytes and headers per URL.
 function memoryCache({ failPut = false } = {}) {
   const entries = new Map();
-  const log = { matches: 0, puts: 0 };
+  const log = { matches: 0, puts: 0, deletes: 0 };
   return {
     entries,
     log,
+    async delete(request) {
+      log.deletes += 1;
+      return entries.delete(request.url);
+    },
     async match(request) {
       log.matches += 1;
       const entry = entries.get(request.url);
@@ -304,6 +308,52 @@ test("stale copy is served once past the TTL while a refresh runs in the backgro
   const expired = await run();
   assert.equal(expired.headers.get(SHARE_CACHE_STATUS_HEADER), "MISS");
   assert.equal(await expired.text(), "page v3");
+});
+
+test("a refresh that turns unjoinable drops the stored copy so the next request sees the live page", async () => {
+  const cache = memoryCache();
+  let clock = Date.parse("2026-11-01T18:00:00.000Z");
+  let joinable = true;
+  const background = [];
+  const produce = async () => (joinable
+    ? new Response("joinable page", {
+      status: 200,
+      headers: { "Content-Type": "text/html", "Cache-Control": SHARE_PUBLIC_CACHE_CONTROL },
+    })
+    : new Response("unavailable page", {
+      status: 404,
+      headers: { "Content-Type": "text/html", "Cache-Control": "no-store" },
+    }));
+  const run = () => withShareEdgeCache({
+    request: new Request("https://invite.thequestsapp.com/q/AbCd2345"),
+    produce,
+    cache,
+    now: () => clock,
+    waitUntil: (promise) => background.push(promise),
+  });
+
+  await run();
+  await Promise.all(background.splice(0));
+
+  // The host cancels the Quest 30 s after the page was stored.
+  clock += 30_000;
+  joinable = false;
+  const hit = await run();
+  assert.equal(hit.headers.get(SHARE_CACHE_STATUS_HEADER), "HIT");
+
+  // Past the TTL the stored copy is served once while the refresh runs.
+  clock += 35_000;
+  const stale = await run();
+  assert.equal(stale.headers.get(SHARE_CACHE_STATUS_HEADER), "STALE");
+  await Promise.all(background.splice(0));
+  assert.equal(cache.entries.size, 0);
+
+  // The next request goes to the origin and gets the unavailable page.
+  clock += 1_000;
+  const live = await run();
+  assert.equal(live.status, 404);
+  assert.equal(live.headers.get(SHARE_CACHE_STATUS_HEADER), "MISS");
+  assert.equal(await live.text(), "unavailable page");
 });
 
 test("a rejected cache store is logged and the live response is still served", async () => {

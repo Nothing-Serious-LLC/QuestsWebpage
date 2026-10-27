@@ -133,7 +133,9 @@ Cloudflare never caches a Pages Function response on its own, so
 `functions/q/shareCache.js` stores joinable responses in the data center's
 cache (`caches.default`) and serves them for 60 seconds. For the following
 300 seconds a request is answered from the stored copy once while a refresh
-runs in the background. Every data center fills its own copy, so 25,000 people
+runs in the background; a refresh that comes back unjoinable (ended,
+cancelled, removed or an error) deletes the stored copy, so the next request
+reaches the origin. Every data center fills its own copy, so 25,000 people
 tapping one link within minutes cost about one metadata call per data center
 per minute instead of one per tap.
 
