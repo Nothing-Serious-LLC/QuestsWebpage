@@ -28,6 +28,11 @@ const CATEGORY_VISUALS = Object.freeze({
   productivity: Object.freeze({ background: "#F5E9CF", ink: "#DBB66B" }),
 });
 const DEFAULT_CATEGORY_VISUAL = CATEGORY_VISUALS.mindfulness;
+// MDI calendar-check-outline (7.4.47) inline, so the page no longer loads the
+// whole MDI stylesheet and icon font (render-blocking CSS plus a large font
+// request on a phone) for this one glyph.
+const CHECK_IN_RULE_ICON =
+  '<svg class="check-in-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M19 3H18V1H16V3H8V1H6V3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H19C20.11 21 21 20.11 21 19V5C21 3.9 20.11 3 19 3M19 19H5V9H19V19M5 7V5H19V7H5M10.56 17.46L16.5 11.53L15.43 10.47L10.56 15.34L8.45 13.23L7.39 14.29L10.56 17.46Z"/></svg>';
 const DEFAULT_APP_HANDOFF = Object.freeze({
   appScheme: "info.nothingserious.quests",
   androidPackage: "info.nothingserious.quests",
@@ -132,7 +137,7 @@ function checkInRuleMarkup(presentation) {
         : `Check in ${cadence.toLowerCase()}`;
       break;
   }
-  return `<div class="check-in-rule"><span class="mdi mdi-calendar-check-outline" aria-hidden="true"></span><span>${escapeHtml(rule)}</span></div>`;
+  return `<div class="check-in-rule">${CHECK_IN_RULE_ICON}<span>${escapeHtml(rule)}</span></div>`;
 }
 
 function participantLabel(count) {
@@ -406,8 +411,6 @@ export function questSharePage({
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet"
-      integrity="sha384-HphS8cQyN+eYiJ5PMbzShG6qZdRtvHPVLPkYb8JwMkmNgaIxrFVDhQe3jIbq3EZ2" crossorigin="anonymous" />
     ${turnstileScript}
     <style>
       :root { --accent: ${accent}; --category-bg: ${categoryBackground}; --surface: ${SURFACE}; --title: ${TITLE_INK}; --body: ${BODY_INK};
@@ -468,7 +471,7 @@ export function questSharePage({
         gap: 8px; margin-top: 16px; padding: 10px 24px; border: 1px solid #e4e2dd; border-radius: 32px;
         background: #fdfbf6; color: #292929; font-size: 14px; line-height: 20px; font-weight: 500;
         box-shadow: 0 4px 30px rgba(255,255,255,.5); }
-      .check-in-rule .mdi { color: #292929; font-size: 18px; }
+      .check-in-icon { display: block; width: 18px; height: 18px; flex: 0 0 auto; color: #292929; }
       .host { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 8px; margin-top: 24px; }
       .host-avatar { width: 24px; height: 24px; flex: 0 0 auto; border: 1px solid #ffffff; border-radius: 50%; object-fit: cover; }
       .host-initials { display: grid; place-items: center; background: #fdfbf6; color: var(--accent); font-size: 9px; font-weight: 700; }
@@ -485,10 +488,12 @@ export function questSharePage({
         background: transparent; color: var(--title); padding: 0 12px; font-size: 17px; text-align: center; outline: none; }
       .phone-input::placeholder { color: #9b9b95; }
       .phone-number-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
-      .phone-input[aria-invalid="true"] { border-color: #b74040; }
+      .phone-number-field:has(.phone-input[aria-invalid="true"]) { border-color: #b74040; }
       .join-button { width: 100%; min-height: 54px; border: 0; border-radius: 999px; background: var(--title); color: #ffffff;
         padding: 0 22px; font-size: 16px; font-weight: 700; cursor: pointer; }
-      .join-button:disabled { cursor: default; opacity: .42; }
+      /* Disabled reads as the old 42% ink over the page surface, painted opaque
+         so the fixed background shapes cannot show through the button. */
+      .join-button:disabled { cursor: default; background: #979690; color: #f8f7f1; }
       .phone-error { margin-top: 9px; color: #a82f2f; font-size: 14px; line-height: 1.4; }
       .privacy { margin-top: 12px; color: #72726d; font-size: 11px; line-height: 1.5; }
       .privacy a { color: inherit; }
