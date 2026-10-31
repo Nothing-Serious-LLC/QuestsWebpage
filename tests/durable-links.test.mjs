@@ -122,7 +122,13 @@ function assertCanonicalCurrentPage(html) {
   // The preview image keeps the CURRENT revision as a cache key.
   assert.ok(html.includes(`content="${canonical}/og.png?r=3"`), "og:image cache key");
   assert.doesNotMatch(html, /\/q\/fvMz9mhk\?r=/);
+  // Web join and app handoff carry the canonical code: the phone claim and
+  // the app scheme use the bare code, and the Android install referrer
+  // (deferred continuation) carries the canonical URL with no revision.
   assert.match(html, /var shareCode = "fvMz9mhk"/);
+  const playStoreUrl = new URL(JSON.parse(html.match(/var PLAY_STORE_URL = (".*?");/)[1]));
+  const referrer = new URLSearchParams(playStoreUrl.searchParams.get("referrer"));
+  assert.equal(referrer.get("quests_link_v1"), canonical);
 }
 
 test("canonical URL: og:url, canonical link and app-argument carry no query", async () => {
