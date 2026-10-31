@@ -1,4 +1,4 @@
-import { devicePlatform, downloadTarget, DOWNLOAD_PAGE_URL } from './device-platform.mjs';
+import { devicePlatform, downloadTarget } from './device-platform.mjs';
 
 const platform = devicePlatform(navigator);
 document.documentElement.dataset.device = platform;
@@ -31,7 +31,7 @@ if (legacyQr && platform === 'desktop') {
   if (match) {
     const { qrSvg } = await import('./qr-svg.mjs');
     const url = new URL(`/q/${match[1]}`, window.location.origin).href;
-    legacyQr.innerHTML = qrSvg(DOWNLOAD_PAGE_URL);
+    legacyQr.innerHTML = qrSvg(url + '?download=1');
     const link = document.querySelector('[data-legacy-invite-link]');
     link.href = url;
     link.textContent = url.replace(/^https?:\/\//, '');

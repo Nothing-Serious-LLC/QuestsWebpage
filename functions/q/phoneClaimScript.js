@@ -1,3 +1,5 @@
+import { devicePlatform } from '../../js/device-platform.mjs';
+
 export function questPhoneClaimScript({
   shareCode,
   turnstileSiteKey,
@@ -32,6 +34,10 @@ export function questPhoneClaimScript({
     var submitLabel = document.getElementById("join-quest-label");
     var openApp = document.getElementById("open-app-link");
     var success = document.getElementById("claim-success");
+    var desktopHandoff = document.getElementById("desktop-handoff");
+    var questStage = document.getElementById("quest-stage");
+    var questCard = document.getElementById("quest-card-front");
+    var joinPanel = document.getElementById("quest-join-panel");
     var turnstileBox = document.getElementById("turnstile-container");
     var turnstileToken = null;
     var turnstileWidget = null;
@@ -45,11 +51,36 @@ export function questPhoneClaimScript({
     var PLAY_STORE_URL = ${serializedPlayStoreUrl};
 
     function platform() {
-      var ua = (navigator.userAgent || "").toLowerCase();
-      if (/android/.test(ua)) return "android";
-      if (/iphone|ipad|ipod/.test(ua)) return "ios";
-      if (ua.indexOf("mac") >= 0 && navigator.maxTouchPoints > 1) return "ios";
-      return "desktop";
+      return (${devicePlatform.toString()})(navigator);
+    }
+
+    if (platform() === "desktop") openApp.hidden = true;
+
+    function showClaimSuccess() {
+      if (platform() === "desktop") {
+        // Preserve the card's position while the controls disappear below it.
+        joinPanel.style.minHeight = joinPanel.getBoundingClientRect().height + "px";
+        form.hidden = true;
+        success.hidden = true;
+        desktopHandoff.hidden = false;
+        questCard.setAttribute("aria-hidden", "true");
+        questCard.inert = true;
+        // Establish the second face before starting its crossfade.
+        void desktopHandoff.offsetHeight;
+        questStage.classList.add("is-complete");
+        desktopHandoff.focus({ preventScroll: true });
+        // Bring the card back into view after a below-fold form submission.
+        var bounds = desktopHandoff.getBoundingClientRect();
+        if (bounds.top < 0 || bounds.bottom > window.innerHeight) {
+          desktopHandoff.scrollIntoView({ block: "center", behavior: "auto" });
+        }
+        return;
+      }
+      form.hidden = true;
+      success.hidden = false;
+      success.focus();
+      var target = platform() === "android" ? PLAY_STORE_URL : APP_STORE_URL;
+      setTimeout(function () { window.location.href = target; }, 1600);
     }
 
     function inputDigits(value) {
@@ -165,11 +196,7 @@ export function questPhoneClaimScript({
         return;
       }
       if (DEMO) {
-        form.hidden = true;
-        success.hidden = false;
-        success.focus();
-        var demoTarget = platform() === "android" ? PLAY_STORE_URL : APP_STORE_URL;
-        setTimeout(function () { window.location.href = demoTarget; }, 1600);
+        showClaimSuccess();
         return;
       }
       if (!turnstileToken) {
@@ -180,7 +207,7 @@ export function questPhoneClaimScript({
 
       submitting = true;
       setError("");
-      submitLabel.innerHTML = 'Opening Quests<span class="dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>';
+      submitLabel.innerHTML = 'Joining Quest<span class="dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>';
       updateButton();
 
       fetch("/api/link-claims/start", {
@@ -202,11 +229,7 @@ export function questPhoneClaimScript({
           return;
         }
 
-        form.hidden = true;
-        success.hidden = false;
-        success.focus();
-        var target = platform() === "android" ? PLAY_STORE_URL : APP_STORE_URL;
-        setTimeout(function () { window.location.href = target; }, 1600);
+        showClaimSuccess();
       }).catch(function () {
         setError("Something went wrong. Try again.");
         resetChallenge();
@@ -248,7 +271,7 @@ export function questPhoneClaimScript({
         openIosChain(0);
         return;
       }
-      window.location.href = APP_STORE_URL;
+      // Desktop stays on the phone-entry or QR step.
     });
 
     updateButton();

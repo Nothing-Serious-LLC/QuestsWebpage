@@ -13,6 +13,8 @@ import {
 import { QUEST_ICON_PATHS } from "./questIconPaths.js";
 import { questPhoneClaimScript } from "./phoneClaimScript.js";
 import { androidInstallStoreUrl } from "../androidInstallReferrer.js";
+import { devicePlatform } from "../../js/device-platform.mjs";
+import { qrSvg } from "../../js/qr-svg.mjs";
 
 const SURFACE = "#f3f1e7";
 const TITLE_INK = "#191919";
@@ -245,6 +247,7 @@ export function questUnavailablePage({ requestMethod = "GET", appHandoff } = {})
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Quest unavailable | Quests</title>
+    <script type="module" src="/js/device-download.mjs"></script>
     <meta name="robots" content="noindex,nofollow" />
     <meta name="theme-color" content="${SURFACE}" />
     <link rel="icon" type="image/png" href="/icon.png" />
@@ -271,7 +274,7 @@ export function questUnavailablePage({ requestMethod = "GET", appHandoff } = {})
     <main>
       <span class="wordmark">${WORDMARK}</span>
       <h1>This Quest link is unavailable or has expired.</h1>
-      <a class="cta" href="${escapeHtml(handoff.appStoreUrl)}">Get Quests</a>
+      <a class="cta" href="/share" data-store-link data-ios-store="${escapeHtml(handoff.appStoreUrl)}" data-android-store="${escapeHtml(handoff.playStoreUrl)}">Get Quests</a>
     </main>
   </body>
 </html>`, 404, requestMethod);
@@ -333,16 +336,24 @@ export function questSharePage({
   const turnstileScript = !isEnded && interactionMode === "phone"
     ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`
     : "";
+  const desktopHandoff = `<div class="desktop-handoff" id="desktop-handoff" tabindex="-1"${usesPhoneClaim ? ' hidden' : ''}>
+          <h2>Continue on your phone</h2>
+          <p>${usesPhoneClaim ? 'Scan to get Quests, then sign in with the phone number you entered.' : 'Scan with your phone’s camera to open this Quest in Quests.'}</p>
+          <div class="invitation-qr">${qrSvg(usesPhoneClaim ? `${universalLink}?download=1` : universalLink)}</div>
+          <p class="handoff-hint">Works with iPhone and Android.</p>
+          <a class="invitation-link" href="${escapeHtml(universalLink)}">${escapeHtml(universalLink.replace(/^https:\/\//, ""))}</a>
+        </div>`;
   const actionPanel = isEnded
     ? `<section class="join-panel ended-panel" aria-label="This Quest has ended">
         <div class="ended-mark" aria-hidden="true">&#10003;</div>
-        <a class="store-button" href="${escapeHtml(handoff.appStoreUrl)}">Get Quests</a>
+        <a class="store-button" href="/share" data-store-link data-ios-store="${escapeHtml(handoff.appStoreUrl)}" data-android-store="${escapeHtml(handoff.playStoreUrl)}">Get Quests</a>
       </section>`
     : !usesPhoneClaim
       ? `<section class="join-panel" aria-label="Join this Quest">
-        <a class="store-button" href="${escapeHtml(`${handoff.appScheme}://q/${shareCode}`)}">Open Quests</a>
+        ${desktopHandoff}
+        <div id="app-only-open"><a class="store-button" href="${escapeHtml(`${handoff.appScheme}://q/${shareCode}`)}">Open Quests</a></div>
       </section>`
-      : `<section class="join-panel" aria-label="Join this Quest">
+      : `<section class="join-panel" id="quest-join-panel" aria-label="Join this Quest">
         <form id="phone-claim-form" novalidate>
           <div class="phone-row">
             <label class="visually-hidden" for="phone-input">Phone number</label>
@@ -376,9 +387,10 @@ export function questSharePage({
     : "";
 
   return response(`<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-device="desktop">
   <head>
     <meta charset="UTF-8" />
+    <script>document.documentElement.dataset.device = (${devicePlatform.toString()})(navigator);</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>${escapeHtml(pageTitle)}</title>
     <meta name="description" content="${safeDescription}" />
@@ -408,6 +420,7 @@ export function questSharePage({
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet"
       integrity="sha384-HphS8cQyN+eYiJ5PMbzShG6qZdRtvHPVLPkYb8JwMkmNgaIxrFVDhQe3jIbq3EZ2" crossorigin="anonymous" />
+    ${isEnded ? '<script type="module" src="/js/device-download.mjs"></script>' : ""}
     ${turnstileScript}
     <style>
       :root { --accent: ${accent}; --category-bg: ${categoryBackground}; --surface: ${SURFACE}; --title: ${TITLE_INK}; --body: ${BODY_INK};
@@ -517,6 +530,27 @@ export function questSharePage({
         margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
         white-space: nowrap !important; border: 0 !important; }
       [hidden] { display: none !important; }
+      .quest-stage { display: grid; isolation: isolate; }
+      .quest-stage > .quest-card, .quest-stage > .desktop-handoff { grid-area: 1 / 1; min-width: 0; }
+      .quest-stage > .quest-card { transition: opacity .4s var(--ease-out), transform .4s var(--ease-out), visibility 0s .4s; }
+      .desktop-handoff { display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 36px 28px; border: 1px solid #fff; border-radius: 40px; background: var(--category-bg);
+        box-shadow: 4px 4px 30px rgba(0,0,0,.12); text-align: center; }
+      .quest-stage > .desktop-handoff { opacity: 0; transform: translateY(10px);
+        transition: opacity .45s var(--ease-out) .12s, transform .45s var(--ease-out) .12s; }
+      .quest-stage.is-complete > .quest-card { animation: none; opacity: 0; transform: translateY(-10px); visibility: hidden; pointer-events: none; }
+      .quest-stage.is-complete > .desktop-handoff { opacity: 1; transform: translateY(0); }
+      .desktop-handoff:focus { outline: none; }
+      .desktop-handoff h2 { font: 400 34px/1.15 "Instrument Serif", Georgia, serif; color: var(--title); }
+      .desktop-handoff p { margin: 14px auto 0; max-width: 290px; color: #696969; font-size: 16px; line-height: 1.5; }
+      .invitation-qr { width: 240px; max-width: 100%; margin: 26px auto 0; padding: 10px; border-radius: 20px; background: #fff; }
+      .invitation-qr svg { display: block; width: 100%; height: auto; }
+      .desktop-handoff .handoff-hint { margin-top: 20px; font-size: 13px; }
+      .invitation-link { display: inline-block; margin-top: 16px; color: #4f4f4f; font-size: 12px; overflow-wrap: anywhere; }
+      html[data-device="desktop"] #open-app-link,
+      html[data-device="desktop"] #app-only-open { display: none; }
+      html[data-device="ios"] .desktop-handoff,
+      html[data-device="android"] .desktop-handoff { display: none; }
       @media (max-width: 460px) {
         .page { width: min(calc(100% - 28px), 420px); }
         .field-icon { opacity: .25; }
@@ -542,7 +576,8 @@ export function questSharePage({
         <h1>${pageHeadline}</h1>
       </header>
 
-      <article class="quest-card" aria-label="${safeTitle}">
+      <div class="quest-stage" id="quest-stage">
+      <article class="quest-card" id="quest-card-front" aria-label="${safeTitle}">
         ${coverMarkup(presentation)}
         <div class="quest-content">
           <div class="medallion">${questIconMarkup(presentation)}</div>
@@ -557,6 +592,8 @@ export function questSharePage({
           </div>
         </div>
       </article>
+      ${usesPhoneClaim ? desktopHandoff : ""}
+      </div>
 
       ${actionPanel}
       </div>

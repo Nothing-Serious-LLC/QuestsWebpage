@@ -81,7 +81,7 @@ function clickOpen(script, platform) {
     setInterval() {}, clearInterval() {},
   };
   vm.runInNewContext(script, context);
-  element('open-app-link').listeners.click({ preventDefault() {} });
+  element('open-app-link').listeners.click?.({ preventDefault() {} });
   return { context, timers };
 }
 test('the rendered Quest Android button delivers the referrer in its actual browser intent', async () => {
@@ -90,11 +90,13 @@ test('the rendered Quest Android button delivers the referrer in its actual brow
   assert.ok(intent.startsWith('intent://q/mXdY7ea7#Intent;scheme=info.nothingserious.quests;package=info.nothingserious.quests;'));
   assert.equal(payload(decodeURIComponent(intent.match(/S.browser_fallback_url=(.*);end$/)[1])), `${origin}/q/mXdY7ea7`);
 });
-test('the rendered Quest iOS and desktop buttons retain their scheme/store behavior', async () => {
+test('the rendered Quest keeps iOS handoff and leaves desktop on its QR page', async () => {
   const script = await generatedQuestScript();
   const ios = clickOpen(script, 'iPhone');
   assert.equal(ios.context.window.location.href, 'info.nothingserious.quests://q/mXdY7ea7');
   ios.timers.shift()();
   assert.equal(ios.context.window.location.href, questApple);
-  assert.equal(clickOpen(script, 'Desktop').context.window.location.href, questApple);
+  const desktop = clickOpen(script, 'Desktop');
+  assert.equal(desktop.context.window.location.href, undefined);
+  assert.equal(desktop.timers.length, 0);
 });

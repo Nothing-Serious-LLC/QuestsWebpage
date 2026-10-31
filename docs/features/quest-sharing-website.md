@@ -165,6 +165,13 @@ hierarchy:
 - Host identity and accepted participant count
 - Active, upcoming, and completed supporting state
 
+Desktop visitors enter their phone number and select Join Quest. After the existing
+verified phone claim succeeds, the page reveals a download QR and asks them to
+sign in with the same number. Invalid input and failed claims keep the QR hidden.
+The desktop browser remains on the invitation. iPhone, iPad and Android visitors
+retain their existing store handoff. See [device-aware downloads](device-aware-downloads.md)
+for routing, verification and release status.
+
 Joinable pages preserve the current phone claim endpoint. A successful claim
 opens the platform store so the pending claim can be consumed after sign-in.
 The installed-app action keeps the share code through the environment-bound
@@ -299,3 +306,6 @@ claim payloads, replacement autofill, malformed lengths and legacy parity. The
 rendered page was also checked in a browser with formatted and bare-country-code
 paste. The native iPhone contact suggestion itself retains a physical-device
 review gate. This change preserves routes, backend bindings and Turnstile.
+
+
+October 31 final release: the post-claim desktop QR now preserves `/q/{code}?download=1` for installed-app handling. Browser requests receive immediate store redirects; Android retains the original invitation in its Play install referrer. See [device-aware downloads](device-aware-downloads.md) for current behavior and verification limits.

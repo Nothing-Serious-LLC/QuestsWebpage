@@ -12,6 +12,7 @@ import {
 } from "./stagingQuestFixture.js";
 import { appHandoffForHost } from "./appHandoffTargets.js";
 import { SHARE_PUBLIC_CACHE_CONTROL, withShareEdgeCache } from "./shareCache.js";
+import { questDownloadHandoff } from "./downloadHandoff.js";
 
 const EDGE_TIMEOUT_MS = 4_000;
 const REVISION_ZERO_OG_FALLBACK_PATH = "/quest-share-og-fallback.png";
@@ -343,6 +344,13 @@ export async function onRequest(context) {
   if (segments.length === 2 && !artifact) return legacyQuestPage(context);
 
   const url = new URL(context.request.url);
+  if (!artifact && url.searchParams.get("download") === "1") {
+    return questDownloadHandoff({
+      request: context.request,
+      shareCode,
+      appHandoff: appHandoffFromEnv(context.env, url),
+    });
+  }
   const stagingFixture = stagingQuestFixtureForRequest({
     url,
     shareCode,

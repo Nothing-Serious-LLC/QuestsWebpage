@@ -986,7 +986,16 @@
         animation: fadeInUp 0.4s ease-out 0.15s both;
       }
     </style>
-  </head>
+  <script type="module" src="/js/device-download.mjs"></script>
+<style>
+  html[data-device="desktop"] #open-app-link { display:none !important; }
+  #legacy-desktop-handoff { padding:24px 12px; text-align:center; animation: fadeInUp .45s ease-out both; }
+  #legacy-desktop-handoff [data-legacy-invite-qr] { width:220px; max-width:100%; margin:18px auto; }
+  #legacy-desktop-handoff svg { display:block; width:100%; }
+  #legacy-desktop-handoff p { margin-top:8px; line-height:1.5; }
+  #legacy-desktop-handoff a { font-size:12px; overflow-wrap:anywhere; color:inherit; }
+</style>
+</head>
   <body>
     <div class="page-bg" aria-hidden="true"></div>
 
@@ -1089,6 +1098,12 @@
 
           <!-- Phone + Download unified flow -->
           <div id="phone-gate" class="state-hidden">
+            <div id="legacy-desktop-handoff" tabindex="-1" hidden>
+              <h2>Continue on your phone</h2>
+              <p>Scan to get Quests, then sign in with the phone number you entered.</p>
+              <div data-legacy-invite-qr></div>
+              <a data-legacy-invite-link></a>
+            </div>
             <div id="gate-form">
               <div class="phone-input-group" id="phone-input-group">
                 <label for="phone-input" class="sr-only">Phone number</label>
@@ -1199,6 +1214,7 @@
           return 'desktop';
         }
         var platform = detectPlatform();
+        document.documentElement.dataset.device = platform;
         // Expose for other script blocks on this page
         window.__questsPlatform = platform;
         window.__questsPlayStoreUrl = PLAY_STORE_URL;
@@ -1246,10 +1262,11 @@
         //   iOS: visiting the universal link redirects to App Store as fallback
         //   Android: launch via intent:// (App Links open the app directly if installed),
         //            fall back to Play Store if intent fails
-        //   Desktop: App Store
+        //   Desktop: the invitation QR on this page
         var openAppBtn = document.getElementById('open-app-link');
         if (openAppBtn) {
           openAppBtn.addEventListener('click', function () {
+            if (platform === 'desktop') return;
             if (platform === 'android' && shareCode) {
               var intentUrl =
                 'intent://invite.thequestsapp.com/q/' + shareCode +
@@ -1838,6 +1855,17 @@
            ============================================ */
         function onSubmitSuccess(data) {
           setButtonSuccess();
+          if (PLATFORM === 'desktop') {
+            gateForm.classList.add('state-hidden');
+            gateConfirmed.classList.add('state-hidden');
+            document.getElementById('install-handoff').classList.add('state-hidden');
+            document.getElementById('quest-hero').classList.add('state-hidden');
+            document.getElementById('quest-meta').classList.add('state-hidden');
+            var desktopHandoff = document.getElementById('legacy-desktop-handoff');
+            desktopHandoff.hidden = false;
+            desktopHandoff.focus();
+            return;
+          }
 
           // Set the confirmation subtitle to reflect the actual destination
           // so the user isn't surprised when the store opens.
