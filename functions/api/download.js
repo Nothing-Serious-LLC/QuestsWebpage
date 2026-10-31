@@ -15,7 +15,7 @@ export function onRequest({ request }) {
   const platform = devicePlatform({ userAgent: request.headers.get('User-Agent') });
   const destination = platform === 'ios' ? APP_STORE_URL
     : platform === 'android' ? PLAY_STORE_URL
-    : 'https://thequestsapp.com/share?v=2';
+    : 'https://thequestsapp.com/share?v=3';
 
   // Destinations are fixed. Query parameters cannot forward private data or
   // turn this into an arbitrary redirect endpoint.

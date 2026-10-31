@@ -10,9 +10,9 @@ for (const [device, userAgent, destination] of [
   ['iPad', 'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) Mobile/15E148 Safari/604.1', APP_STORE_URL],
   ['Android Chrome', 'Mozilla/5.0 (Linux; Android 15; Pixel 9) Chrome/130.0 Mobile Safari/537.36', PLAY_STORE_URL],
   ['Samsung Internet', 'Mozilla/5.0 (Linux; Android 14; SM-S928B) SamsungBrowser/26.0 Chrome/122.0', PLAY_STORE_URL],
-  ['desktop', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'https://thequestsapp.com/share?v=2'],
-  ['iPad desktop mode fallback', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'https://thequestsapp.com/share?v=2'],
-  ['unknown device', '', 'https://thequestsapp.com/share?v=2'],
+  ['desktop', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'https://thequestsapp.com/share?v=3'],
+  ['iPad desktop mode fallback', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'https://thequestsapp.com/share?v=3'],
+  ['unknown device', '', 'https://thequestsapp.com/share?v=3'],
 ]) {
   test(`QR server redirect: ${device}`, async () => {
     const response = onRequest({ request: new Request(DOWNLOAD_PAGE_URL, { headers: { 'User-Agent': userAgent } }) });
