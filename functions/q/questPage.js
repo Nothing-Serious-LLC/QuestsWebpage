@@ -293,16 +293,22 @@ export function questSharePage({
 }) {
   const handoff = normalizeQuestAppHandoff(appHandoff);
   const revision = presentation.revision;
-  const revisionQuery = previewQuery
+  // The canonical invitation is the bare share code: identity lives in the
+  // code, never in a revision, so og:url, the canonical link and the iOS
+  // app-argument stay stable across presentation edits. Only the preview
+  // image carries the current revision, as a cache key for link unfurlers.
+  const canonicalUrl = previewQuery
+    ? `${origin}/q/${shareCode}?${previewQuery}`
+    : `${origin}/q/${shareCode}`;
+  const imageQuery = previewQuery
     ? `?${previewQuery}`
     : revision > 0
       ? `?r=${revision}`
       : "";
-  const canonicalUrl = `${origin}/q/${shareCode}${revisionQuery}`;
   // The https share link is the first "open" offer: iOS routes it to whichever
   // installed client claims this host, so it never assumes one scheme.
   const universalLink = `${origin}/q/${shareCode}`;
-  const imageUrl = `${origin}/q/${shareCode}/og.png${revisionQuery}`;
+  const imageUrl = `${origin}/q/${shareCode}/og.png${imageQuery}`;
   const pageTitle = presentation.availability === "ended"
     ? `${presentation.title} has ended | Quests`
     : `Join ${presentation.title} on Quests`;
