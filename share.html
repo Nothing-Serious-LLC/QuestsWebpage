@@ -43,8 +43,10 @@
   }
   </script>
 <script src="/js/clean-urls.js?v=1" data-clean-path="/share" defer></script>
+  <script type="module" src="/js/device-download.mjs"></script>
+  <link rel="stylesheet" href="/css/device-download.css">
 </head>
-<body>
+<body data-download-page>
 
 <a class="skip-link" href="#main">Skip to content</a>
 
@@ -65,7 +67,7 @@
     <a class="nav__logo" href="/" aria-label="Quests home">
       <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
     </a>
-    <a class="nav__cta" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" data-store-link target="_blank" rel="noopener">Download</a>
+    <a class="nav__cta" href="/share" data-store-link rel="noopener">Download</a>
   </div>
 </header>
 
@@ -73,17 +75,22 @@
 
   <section class="page-head cat-growth">
   <div class="shell">
-    <h1 class="serif">Scan to download</h1>
-    <p class="lede">Point your camera at the code to get Quests.</p>
+    <h1 class="serif" data-download-heading>Get Quests on your phone</h1>
+    <p class="lede" data-download-description>Scan the code with your phone’s camera to open the right app store.</p>
   </div>
 </section>
 
   <section class="section">
     <div class="shell container--narrow">
-      <div class="card share-card reveal">
-        <div class="share-qr">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https%3A%2F%2Fapps.apple.com%2Fus%2Fapp%2Fquests-social-habit-tracking%2Fid6745767553" width="220" height="220" alt="QR code that links to the Quests download page">
+      <div class="card download-card reveal">
+        <div class="share-qr" data-desktop-download>
+          <img src="/assets/img/download-qr.svg" width="220" height="220" alt="QR code that links to the Quests download page">
         </div>
+        <div class="download-stores" aria-label="Choose your app store">
+          <a href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store"><img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="140" height="46"></a>
+          <a href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play"><img src="/google-play-badge.svg" alt="Get it on Google Play" width="140" height="46"></a>
+        </div>
+        <p class="download-help">Available for iPhone, iPad and Android.</p>
       </div>
     </div>
   </section>
