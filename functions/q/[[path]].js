@@ -110,6 +110,43 @@ function imageServiceUnavailable(requestMethod) {
   });
 }
 
+// Code succession (durable links): quest-share-web answers a retired code that
+// has a recorded successor with 200 {"resolution":"alias","shareCode":TARGET}
+// for both actions. The web follows exactly one hop: it answers 301 to the
+// target's canonical URL (no query) and never redirects a code to itself.
+export function questShareAliasTarget(body, requestedCode) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
+  if (body.resolution !== "alias") return null;
+  const target = normalizeShareCode(body.shareCode);
+  return target && target !== requestedCode ? target : null;
+}
+
+async function readAliasTarget(response, requestedCode) {
+  const contentType = String(response?.headers?.get("Content-Type") || "")
+    .split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+  if (contentType !== "application/json") return null;
+  try {
+    return questShareAliasTarget(await response.clone().json(), requestedCode);
+  } catch {
+    return null;
+  }
+}
+
+function aliasRedirect(location, requestMethod) {
+  return new Response(null, {
+    status: 301,
+    headers: {
+      Location: location,
+      "Cache-Control": SHARE_PUBLIC_CACHE_CONTROL,
+      "X-Content-Type-Options": "nosniff",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Referrer-Policy": "no-referrer",
+    },
+  });
+}
+
 // The branded fallback is cacheable when the backend said the link has no
 // artwork (a stable revision-zero state) and stays no-store when it stands in
 // for an upstream failure, so a recovered backend is seen on the next request.
@@ -196,10 +233,13 @@ async function stagingFixtureOg(context, shareCode) {
   );
 }
 
+// Preview images always resolve the link's CURRENT artwork. A ?r= on the
+// image URL is only a cache key for unfurlers, so an old, pruned or unknown
+// revision never 404s and never serves stale art for a live code.
 async function questArtifactResponse({
   context,
+  url,
   shareCode,
-  revision,
   artifact,
   requestMethod,
 }) {
@@ -208,10 +248,16 @@ async function questArtifactResponse({
     artifact,
     shareCode,
   };
-  if (revision) body.revision = Number(revision);
 
   const { status, response } = await callQuestShareWeb(context.env, body);
-  const canUseRevisionZeroFallback = artifact === "og" && revision === null;
+  if (status === 200 && response) {
+    const aliasTarget = await readAliasTarget(response, shareCode);
+    if (aliasTarget) {
+      const file = artifact === "story" ? "story.png" : "og.png";
+      return aliasRedirect(`${url.origin}/q/${aliasTarget}/${file}`, requestMethod);
+    }
+  }
+  const canUseRevisionZeroFallback = artifact === "og";
   if (status === 404) {
     return canUseRevisionZeroFallback
       ? revisionZeroOgFallback(context, {
@@ -259,10 +305,38 @@ async function questArtifactResponse({
   });
 }
 
-async function liveQuestSharePage(context, { url, shareCode, revision, requestMethod }) {
-  const body = { action: "metadata", shareCode };
-  if (revision) body.revision = Number(revision);
-  const { status, response } = await callQuestShareWeb(context.env, body);
+async function fetchPresentation(context, shareCode) {
+  const { status, response } = await callQuestShareWeb(context.env, {
+    action: "metadata",
+    shareCode,
+  });
+  if (status !== 200 || !response) return { status, raw: null };
+  try {
+    return { status, raw: await response.json() };
+  } catch {
+    return { status, raw: null };
+  }
+}
+
+// An alias redirects only to a target that renders a real presentation, so a
+// misrecorded alias (a chain, a loop, a dead target) shows "Quest unavailable"
+// instead of bouncing the visitor between codes.
+async function aliasTargetIsLive(context, targetCode) {
+  const { status, raw } = await fetchPresentation(context, targetCode);
+  if (status !== 200 || !raw || raw.resolution === "alias") return false;
+  return normalizeQuestSharePresentation(raw, {
+    supabaseUrl: context.env.QUEST_SHARE_SUPABASE_URL,
+  }) !== null;
+}
+
+// The page always renders the link's CURRENT revision. Any ?r= (current,
+// older, pruned, unknown or malformed) is ignored for lookup: identity is the
+// share code, so old revision-pinned URLs keep working and show fresh content.
+async function liveQuestSharePage(context, { url, shareCode, requestMethod }) {
+  const { status, response } = await callQuestShareWeb(context.env, {
+    action: "metadata",
+    shareCode,
+  });
   if (status === 404) {
     return questUnavailablePage({
       requestMethod,
@@ -283,13 +357,20 @@ async function liveQuestSharePage(context, { url, shareCode, revision, requestMe
     });
   }
 
+  const aliasTarget = questShareAliasTarget(rawPresentation, shareCode);
+  if (aliasTarget) {
+    return await aliasTargetIsLive(context, aliasTarget)
+      ? aliasRedirect(`${url.origin}/q/${aliasTarget}`, requestMethod)
+      : questUnavailablePage({
+        requestMethod,
+        appHandoff: appHandoffFromEnv(context.env, url),
+      });
+  }
+
   const presentation = normalizeQuestSharePresentation(rawPresentation, {
     supabaseUrl: context.env.QUEST_SHARE_SUPABASE_URL,
   });
-  if (
-    !presentation ||
-    (revision !== null && presentation.revision !== Number(revision))
-  ) {
+  if (!presentation) {
     return questUnavailablePage({
       requestMethod,
       appHandoff: appHandoffFromEnv(context.env, url),
@@ -372,18 +453,14 @@ export async function onRequest(context) {
     return legacyQuestPage(context);
   }
 
+  // r is a cache hint only. A well-formed value keeps its own stored image
+  // (cache busting for unfurlers); anything else collapses onto the bare
+  // path. Pages always store under the bare canonical path.
   const revisionParam = url.searchParams.get("r");
-  const revision = revisionParam && QUEST_SHARE_REVISION_PATTERN.test(revisionParam)
+  const cacheRevision = revisionParam && QUEST_SHARE_REVISION_PATTERN.test(revisionParam)
     ? revisionParam
     : null;
-  if (revisionParam && !revision) {
-    return artifact
-      ? imageNotFound(context.request.method)
-      : questUnavailablePage({
-        requestMethod: context.request.method,
-        appHandoff: appHandoffFromEnv(context.env, url),
-      });
-  }
+  const canonicalPath = `${url.origin}${url.pathname}`;
 
   const waitUntil = typeof context.waitUntil === "function"
     ? (promise) => context.waitUntil(promise)
@@ -395,11 +472,12 @@ export async function onRequest(context) {
     }
     return withShareEdgeCache({
       request: context.request,
+      cacheKeyUrl: cacheRevision ? `${canonicalPath}?r=${cacheRevision}` : canonicalPath,
       waitUntil,
       produce: (requestMethod) => questArtifactResponse({
         context,
+        url,
         shareCode,
-        revision,
         artifact,
         requestMethod,
       }),
@@ -408,11 +486,11 @@ export async function onRequest(context) {
 
   return withShareEdgeCache({
     request: context.request,
+    cacheKeyUrl: canonicalPath,
     waitUntil,
     produce: (requestMethod) => liveQuestSharePage(context, {
       url,
       shareCode,
-      revision,
       requestMethod,
     }),
   });
