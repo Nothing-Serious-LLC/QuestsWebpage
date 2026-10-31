@@ -341,7 +341,6 @@ export function questSharePage({
           <p>${usesPhoneClaim ? 'Scan to get Quests, then sign in with the phone number you entered.' : 'Scan with your phone’s camera to open this Quest in Quests.'}</p>
           <div class="invitation-qr">${qrSvg(usesPhoneClaim ? `${universalLink}?download=1` : universalLink)}</div>
           <p class="handoff-hint">Works with iPhone and Android.</p>
-          <a class="invitation-link" href="${escapeHtml(universalLink)}">${escapeHtml(universalLink.replace(/^https:\/\//, ""))}</a>
         </div>`;
   const actionPanel = isEnded
     ? `<section class="join-panel ended-panel" aria-label="This Quest has ended">
@@ -546,7 +545,6 @@ export function questSharePage({
       .invitation-qr { width: 240px; max-width: 100%; margin: 26px auto 0; padding: 10px; border-radius: 20px; background: #fff; }
       .invitation-qr svg { display: block; width: 100%; height: auto; }
       .desktop-handoff .handoff-hint { margin-top: 20px; font-size: 13px; }
-      .invitation-link { display: inline-block; margin-top: 16px; color: #4f4f4f; font-size: 12px; overflow-wrap: anywhere; }
       html[data-device="desktop"] #open-app-link,
       html[data-device="desktop"] #app-only-open { display: none; }
       html[data-device="ios"] .desktop-handoff,

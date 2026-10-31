@@ -32,8 +32,5 @@ if (legacyQr && platform === 'desktop') {
     const { qrSvg } = await import('./qr-svg.mjs');
     const url = new URL(`/q/${match[1]}`, window.location.origin).href;
     legacyQr.innerHTML = qrSvg(url + '?download=1');
-    const link = document.querySelector('[data-legacy-invite-link]');
-    link.href = url;
-    link.textContent = url.replace(/^https?:\/\//, '');
   }
 }

@@ -47,13 +47,13 @@ test('all generic site Download controls have a device-neutral no-JavaScript fal
   }
 });
 
-test('phone-claim invitations start with a hidden download QR and preserve the invitation link', async () => {
+test('phone-claim invitations start with a hidden Quest QR without a redundant invitation link', async () => {
   const presentation = JSON.parse(await readFile(new URL('fixtures/quest-share-community.json', import.meta.url)));
   for (const origin of ['https://invite.thequestsapp.com', 'https://invite-staging.thequestsapp.com']) {
     const html = await questSharePage({ origin, shareCode: 'JWfaB7wu', presentation }).text();
     assert.ok(html.includes(qrSvg(`${origin}/q/JWfaB7wu?download=1`)));
     assert.match(html, /id="desktop-handoff" tabindex="-1" hidden/);
-    assert.ok(html.includes(`href="${origin}/q/JWfaB7wu"`));
+    assert.doesNotMatch(html, /class="invitation-link"/);
     assert.match(html, /Continue on your phone/);
     assert.match(html, /data-device="desktop"/);
   }
