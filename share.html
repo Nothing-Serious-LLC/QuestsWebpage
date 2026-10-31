@@ -1,120 +1,52 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Scan to download Quests</title>
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-  <meta name="description" content="Scan the code to download Quests and start a healthy challenge with your friends." />
-  <meta name="robots" content="noindex" />
-  <meta name="apple-itunes-app" content="app-id=6745767553" />
-  <meta name="color-scheme" content="light" />
-  <meta name="theme-color" content="#F3F1E7" />
-  <link rel="canonical" href="https://thequestsapp.com/share" />
-
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Scan to download Quests" />
-  <meta property="og:description" content="Scan the code to download Quests and start a healthy challenge with your friends." />
-  <meta property="og:url" content="https://thequestsapp.com/share" />
-  <meta property="og:image" content="https://thequestsapp.com/og-image.png" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Scan to download Quests" />
-  <meta name="twitter:description" content="Scan the code to download Quests and start a healthy challenge with your friends." />
-  <meta name="twitter:image" content="https://thequestsapp.com/og-image.png" />
-  <link rel="preload" href="/assets/fonts/woff2/InstrumentSerif-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/css/fonts.css">
-  <link rel="stylesheet" href="/css/tokens.css?v=3">
-  <link rel="stylesheet" href="/css/page.css?v=2">
-  <script src="/js/page.js?v=2" defer></script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "Scan to download Quests",
-    "url": "https://thequestsapp.com/share",
-    "description": "Scan the code to download Quests and start a healthy challenge with your friends.",
-    "isPartOf": { "@type": "WebSite", "name": "Quests", "url": "https://thequestsapp.com/" }
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Get Quests</title>
+  <meta name="description" content="Download Quests for iPhone, iPad or Android.">
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://thequestsapp.com/share">
+  <script id="download-redirect">
+    // Run before styles and body content, without waiting for a script download.
+    (function () {
+      var ua = (navigator.userAgent || '').toLowerCase();
+      var platform = /android/.test(ua) ? 'android'
+        : /iphone|ipad|ipod/.test(ua) || (/mac/.test(ua) && navigator.maxTouchPoints > 1) ? 'ios' : 'desktop';
+      document.documentElement.dataset.device = platform;
+      if (platform === 'ios') window.location.replace('https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553');
+      else if (platform === 'android') window.location.replace('https://play.google.com/store/apps/details?id=info.nothingserious.quests');
+    })();
   </script>
-<script src="/js/clean-urls.js?v=1" data-clean-path="/share" defer></script>
-  <script type="module" src="/js/device-download.mjs"></script>
-  <link rel="stylesheet" href="/css/device-download.css">
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #252525; background: #fff; }
+    * { box-sizing: border-box; }
+    body { min-height: 100svh; margin: 0; display: grid; place-items: center; padding: 24px; }
+    main { max-width: 340px; text-align: center; }
+    h1 { font-size: 24px; margin: 0 0 12px; font-weight: 600; }
+    p { font-size: 15px; line-height: 1.5; color: #626262; margin: 0 0 20px; }
+    img { display: block; width: 220px; height: 220px; margin: 0 auto 20px; }
+    nav { display: flex; justify-content: center; gap: 24px; }
+    a { color: #252525; font-size: 15px; text-underline-offset: 3px; padding: 12px 0; }
+    a:focus-visible { outline: 2px solid #252525; outline-offset: 5px; }
+    .mobile-status { display: none; }
+    html[data-device="ios"] .desktop-content, html[data-device="android"] .desktop-content { display: none; }
+    html[data-device="ios"] .mobile-status, html[data-device="android"] .mobile-status { display: block; }
+    html[data-device="ios"] .android, html[data-device="android"] .ios { display: none; }
+  </style>
 </head>
 <body data-download-page>
-
-<a class="skip-link" href="#main">Skip to content</a>
-
-<!-- Home screen decorative tail: the flat category glyphs, large and sparse. -->
-<div class="backdrop" aria-hidden="true">
-  <img class="glyph glyph--1" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
-  <img class="glyph glyph--2" src="/assets/img/glyph-flat-social.svg" alt="">
-  <img class="glyph glyph--3" src="/assets/img/glyph-flat-recharge.svg" alt="">
-  <img class="glyph glyph--4" src="/assets/img/glyph-flat-creativity.svg" alt="">
-  <img class="glyph glyph--5" src="/assets/img/glyph-flat-growth.svg" alt="">
-  <img class="glyph glyph--6" src="/assets/img/glyph-flat-mindfulness.svg" alt="">
-  <img class="glyph glyph--7" src="/assets/img/glyph-flat-social.svg" alt="">
-  <img class="glyph glyph--8" src="/assets/img/glyph-flat-recharge.svg" alt="">
-</div>
-
-<header class="nav">
-  <div class="shell nav__inner">
-    <a class="nav__logo" href="/" aria-label="Quests home">
-      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
-    </a>
-    <a class="nav__cta" href="/share" data-store-link rel="noopener">Download</a>
-  </div>
-</header>
-
-<main id="main">
-
-  <section class="page-head cat-growth">
-  <div class="shell">
-    <h1 class="serif" data-download-heading>Get Quests on your phone</h1>
-    <p class="lede" data-download-description>Scan the code with your phone’s camera to open the right app store.</p>
-  </div>
-</section>
-
-  <section class="section">
-    <div class="shell container--narrow">
-      <div class="card download-card reveal">
-        <div class="share-qr" data-desktop-download>
-          <img src="/assets/img/download-qr.svg" width="220" height="220" alt="QR code that links to the Quests download page">
-        </div>
-        <div class="download-stores" aria-label="Choose your app store">
-          <a href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553" aria-label="Download Quests on the App Store"><img src="/download-on-the-app-store.svg" alt="Download on the App Store" width="140" height="46"></a>
-          <a href="https://play.google.com/store/apps/details?id=info.nothingserious.quests" aria-label="Get Quests on Google Play"><img src="/google-play-badge.svg" alt="Get it on Google Play" width="140" height="46"></a>
-        </div>
-        <p class="download-help">Available for iPhone, iPad and Android.</p>
-      </div>
+  <main>
+    <div class="desktop-content">
+      <h1>Get Quests on your phone</h1>
+      <p>Scan with your phone’s camera.</p>
+      <img src="/assets/img/download-qr.svg?v=3" width="220" height="220" alt="Scan to open Quests in your phone’s app store">
     </div>
-  </section>
-
-</main>
-
-<footer class="footer">
-  <div class="shell">
-    <div class="footer__top">
-      <img src="/assets/img/quests-wordmark-ink.svg" alt="Quests" width="84" height="22">
-      <nav class="footer__links" aria-label="Footer">
-        <a href="/blog">Blog</a>
-        <a href="/contact">Contact</a>
-        <a href="/privacy">Privacy</a>
-        <a href="/terms">Terms</a>
-        <a href="/health-privacy">Health Data</a>
-        <a href="https://instagram.com/quests.app" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://tiktok.com/@quests.app" target="_blank" rel="noopener">TikTok</a>
-        <a href="https://www.youtube.com/@questsapp" target="_blank" rel="noopener">YouTube</a>
-      </nav>
-    </div>
-    <p class="footer__legal">&copy; <span data-year>2026</span> Nothing Serious LLC</p>
-  </div>
-</footer>
-
+    <p class="mobile-status" role="status">Opening <span class="ios">the App Store</span><span class="android">Google Play</span>…</p>
+    <nav aria-label="Open your app store">
+      <a class="ios" href="https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553">Open App Store</a>
+      <a class="android" href="https://play.google.com/store/apps/details?id=info.nothingserious.quests">Open Google Play</a>
+    </nav>
+  </main>
 </body>
 </html>

@@ -14,7 +14,8 @@ document.querySelectorAll('[data-desktop-download]').forEach(panel => {
   panel.hidden = platform !== 'desktop';
 });
 
-// The QR points to this page, letting the scanning phone choose its store.
+// Older QR codes and direct /share visits use this client-side fallback.
+// New QR codes choose the store in the server response, before loading HTML.
 // Ordinary site visits and invitation previews never redirect on page load.
 if (document.body.hasAttribute('data-download-page') && platform !== 'desktop') {
   document.querySelector('[data-download-heading]').textContent = platform === 'android' ? 'Get Quests for Android' : 'Get Quests for iPhone and iPad';

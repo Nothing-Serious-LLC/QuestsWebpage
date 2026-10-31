@@ -13,7 +13,8 @@ for (const [name, userAgent, touches, expected] of [
   ['desktop', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 0, undefined],
 ]) {
   test(`download page routes ${name} after a QR scan`, async () => {
-    const source = (await readFile(new URL('../js/device-download.mjs', import.meta.url), 'utf8')).replace(/^import .*;\n/, '');
+    const html = await readFile(new URL('../share.html', import.meta.url), 'utf8');
+    const source = html.match(/<script id="download-redirect">([\s\S]*?)<\/script>/)[1];
     const link = { dataset: {}, removeAttribute() {} };
     const qr = { hidden: false };
     let destination;
@@ -28,17 +29,19 @@ for (const [name, userAgent, touches, expected] of [
     });
     await new vm.Script(`(async () => {${source}})()`).runInContext(context);
     assert.equal(destination, expected);
-    assert.equal(qr.hidden, Boolean(expected));
-    assert.equal(link.href, expected || '/share');
+    assert.equal(context.document.documentElement.dataset.device, expected === APP_STORE_URL ? 'ios' : expected === PLAY_STORE_URL ? 'android' : 'desktop');
   });
 }
 
-test('published download page loads the router and its QR avoids the previous cached page', async () => {
+test('published download page retains fallback routing and its QR uses the server redirect', async () => {
   const html = await readFile(new URL('../share.html', import.meta.url), 'utf8');
   assert.match(html, /<body data-download-page>/);
-  assert.match(html, /type="module" src="\/js\/device-download.mjs"/);
+  assert.match(html, /<script id="download-redirect">/);
+  assert.doesNotMatch(html, /<script[^>]+src=|<link[^>]+rel="(?:stylesheet|preload)"/);
+  assert.ok(html.indexOf('<script id="download-redirect">') < html.indexOf('<style>'));
   assert.doesNotMatch(html, /api\.qrserver\.com/);
-  assert.equal(DOWNLOAD_PAGE_URL, 'https://thequestsapp.com/share?v=2');
+  assert.equal(DOWNLOAD_PAGE_URL, 'https://invite.thequestsapp.com/api/download');
+  assert.match(html, /download-qr\.svg\?v=3/);
   assert.equal(await readFile(new URL('../assets/img/download-qr.svg', import.meta.url), 'utf8'), qrSvg(DOWNLOAD_PAGE_URL));
   assert.ok(html.includes(APP_STORE_URL));
   assert.ok(html.includes(PLAY_STORE_URL));

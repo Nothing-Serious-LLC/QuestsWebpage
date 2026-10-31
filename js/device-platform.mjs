@@ -1,6 +1,6 @@
 export const APP_STORE_URL = 'https://apps.apple.com/us/app/quests-social-habit-tracking/id6745767553';
 export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=info.nothingserious.quests';
-export const DOWNLOAD_PAGE_URL = 'https://thequestsapp.com/share?v=2';
+export const DOWNLOAD_PAGE_URL = 'https://invite.thequestsapp.com/api/download';
 
 // Device identity keeps an iPad in desktop browsing mode on the iOS path.
 // Screen width alone would misclassify tablets and narrow desktop windows.
