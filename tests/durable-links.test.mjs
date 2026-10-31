@@ -279,3 +279,10 @@ test("only 301s with a Location join 200s as edge-storable", () => {
   assert.equal(isShareEdgeCacheable(bare), false);
   assert.equal(isShareEdgeCacheable(found), false);
 });
+
+test("the og cache key follows currentRevision when the server echoes a requested revision", async () => {
+  const routes = { [LIVE]: { presentation: { ...PRESENTATION, revision: 2, currentRevision: 3 } } };
+  const { result } = await withBackend(routes, () => onRequest(context({ search: "?r=2" })));
+  assert.equal(result.status, 200);
+  assertCanonicalCurrentPage(await result.text());
+});
