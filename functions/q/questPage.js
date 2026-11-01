@@ -366,7 +366,7 @@ export function questSharePage({
             </button>
           </div>
           <p id="phone-error" class="phone-error" role="alert" aria-live="polite" hidden></p>
-          <p id="phone-use" class="privacy">We only use your number to sign you up for this challenge</p>
+          <p id="phone-use" class="privacy">We only use your number to add you to this Quest when you join the app</p>
           <p id="phone-privacy" class="privacy">By continuing, you agree to the <a href="https://thequestsapp.com/privacy.html">Privacy Policy</a> and
             <a href="https://thequestsapp.com/terms.html">Terms of Service</a>.</p>
           <div id="turnstile-container"></div>
