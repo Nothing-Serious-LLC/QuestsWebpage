@@ -359,13 +359,14 @@ export function questSharePage({
             <div class="phone-number-field">
               <span class="phone-country-prefix" aria-hidden="true">+1</span>
               <input id="phone-input" class="phone-input" type="tel" inputmode="tel" autocomplete="tel"
-                placeholder="(555) 000-0000" aria-describedby="phone-error phone-privacy" />
+                placeholder="(555) 000-0000" aria-describedby="phone-error phone-use phone-privacy" />
             </div>
             <button id="join-quest-button" class="join-button" type="submit" disabled>
               <span id="join-quest-label">Join Quest</span>
             </button>
           </div>
           <p id="phone-error" class="phone-error" role="alert" aria-live="polite" hidden></p>
+          <p id="phone-use" class="privacy">We only use your number to sign you up for this challenge</p>
           <p id="phone-privacy" class="privacy">By continuing, you agree to the <a href="https://thequestsapp.com/privacy.html">Privacy Policy</a> and
             <a href="https://thequestsapp.com/terms.html">Terms of Service</a>.</p>
           <div id="turnstile-container"></div>
