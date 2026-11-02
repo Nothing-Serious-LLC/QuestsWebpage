@@ -5,11 +5,13 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-// Preserve separately merged releases through #29 before this SEO batch.
-const base = '95386ad975cf59a7b0f41bb9bf50529a67bf02b9';
+// Preserve the verified production release, including the desktop QR handoff.
+const base = 'a2e3da3fe59b0e48926ed18f0d9a972e71b7f356';
 const protectedPaths = [
-  'index.html', 'css/landing.css', 'css/tokens.css', 'css/fonts.css',
-  'js/landing.js', 'js/clean-urls.js', 'assets',
+  'index.html', 'css', 'js',
+  'js/landing.js', 'js/clean-urls.js', 'js/device-download.mjs',
+  'js/download-platform.mjs', 'js/download-qr-redirect.js', 'js/vendor',
+  'css/device-download.css', 'assets',
   'favicon.ico', 'favicon-32.png', 'favicon-96.png', 'apple-touch-icon.png',
   'site.webmanifest', 'og-image.png', 'download-on-the-app-store.svg', 'google-play-badge.svg',
   'functions', '.well-known', '_headers', '_redirects', '_routes.json', 'CNAME', 'robots.txt',
