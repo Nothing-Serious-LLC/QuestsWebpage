@@ -1,0 +1,20 @@
+{
+  // Durable Object Worker for the website claim limiter. Deploy with
+  //   npx wrangler@4 deploy --config workers/claim-limiter/wrangler.jsonc
+  // then bind it to the quests-invite Pages project (Settings > Bindings >
+  // Durable Object, variable CLAIM_LIMITER, class ClaimLimiter, Worker
+  // quests-claim-limiter) in both the Production and Preview environments and
+  // redeploy the Pages project. Until the binding exists the Function keeps
+  // using the RATE_LIMIT KV namespace.
+  "name": "quests-claim-limiter",
+  "main": "src/index.js",
+  "compatibility_date": "2025-09-01",
+  "durable_objects": {
+    "bindings": [
+      { "name": "CLAIM_LIMITER", "class_name": "ClaimLimiter" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["ClaimLimiter"] }
+  ]
+}
