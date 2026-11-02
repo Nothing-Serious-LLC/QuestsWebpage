@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 // Preserve the verified production release, including the desktop QR handoff.
-const base = 'a2e3da3fe59b0e48926ed18f0d9a972e71b7f356';
+const base = 'cf3a46ab567e7e9e3ec5174f0cc64973c7359807';
 const protectedPaths = [
   'index.html', 'css', 'js',
   'js/landing.js', 'js/clean-urls.js', 'js/device-download.mjs',
