@@ -1,0 +1,20 @@
+SHARED CHALLENGE ACROSS TIME ZONES
+
+Action and scheduled local dates:
+Start and finish dates for each participant:
+
+For each person:
+Name or chosen label:
+City / named time zone:
+Available session start times, in local time:
+Date of any clock change or travel:
+Preferred reminder window and consent:
+
+Does everyone need to participate at the same instant?
+If yes, proposed date and time in each person's city:
+If separately, how will each person label their local activity date?
+Where and when can we leave an update?
+When will the host read everyone's updates, with city and date?
+How will a missing update or late correction be handled?
+App or event rule that also applies:
+Review date:
