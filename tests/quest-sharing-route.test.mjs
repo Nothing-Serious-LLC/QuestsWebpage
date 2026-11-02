@@ -713,7 +713,7 @@ test("Community presentation maps public, category, duration, and cadence card s
   assert.doesNotMatch(html, /class="quest-cover"/);
 });
 
-test("OG and Story routes proxy the requested PNG artifact", async () => {
+test("OG and Story routes proxy the current PNG artifact whatever r says", async () => {
   for (const [file, artifact] of [["og.png", "og"], ["story.png", "story"]]) {
     let edgeBody;
     const response = await withFetch(async (_url, init) => {
@@ -742,7 +742,6 @@ test("OG and Story routes proxy the requested PNG artifact", async () => {
       action: "image",
       artifact,
       shareCode: "AbCd2345",
-      revision: 9,
     });
   }
 });
@@ -853,21 +852,24 @@ test("Story route stays dark behind its independent feature gate", async () => {
   assert.equal(edgeCalled, false);
 });
 
-test("pinned Open Graph and Story failures preserve image content contracts", async () => {
+test("revisioned Open Graph failures serve the branded fallback; Story failures stay private", async () => {
   const unpublishedOg = await withFetch(
     async () => Response.json({ code: "unavailable" }, { status: 404 }),
     () => onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=4" })),
   );
-  assert.equal(unpublishedOg.status, 404);
-  assert.match(unpublishedOg.headers.get("Content-Type"), /^text\/plain/);
-  assert.equal(unpublishedOg.headers.get("Cache-Control"), "no-store");
+  assert.equal(unpublishedOg.status, 200);
+  assert.equal(unpublishedOg.headers.get("Content-Type"), "image/png");
+  assert.equal(
+    unpublishedOg.headers.get("Cache-Control"),
+    "public, max-age=0, s-maxage=60, stale-while-revalidate=300",
+  );
 
   const og = await withFetch(
     async () => Response.json({ code: "upstream_failed" }, { status: 502 }),
     () => onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=4" })),
   );
-  assert.equal(og.status, 503);
-  assert.match(og.headers.get("Content-Type"), /^text\/plain/);
+  assert.equal(og.status, 200);
+  assert.equal(og.headers.get("Content-Type"), "image/png");
   assert.equal(og.headers.get("Cache-Control"), "no-store");
 
   const story = await withFetch(
@@ -915,29 +917,6 @@ test("malformed metadata fails closed", async () => {
   const html = await response.text();
   assert.equal(response.status, 404);
   assert.doesNotMatch(html, /Leaked Quest/);
-});
-
-test("pinned revision fails closed when upstream returns another revision", async () => {
-  const presentation = {
-    ...(await fixture("quest-share-upcoming.json")),
-    revision: 4,
-  };
-  let edgeBody;
-  const response = await withFetch(
-    async (_url, init) => {
-      edgeBody = JSON.parse(init.body);
-      return Response.json(presentation, { status: 200 });
-    },
-    () => onRequest(context({ search: "?r=3" })),
-  );
-  const html = await response.text();
-  assert.deepEqual(edgeBody, {
-    action: "metadata",
-    shareCode: "AbCd2345",
-    revision: 3,
-  });
-  assert.equal(response.status, 404);
-  assert.doesNotMatch(html, /Morning Momentum/);
 });
 
 test("upstream failure preserves the legacy Quest experience", async () => {
@@ -1257,7 +1236,7 @@ test("staging host offers the universal link, both iOS schemes, and the staging 
   assert.match(html, /var ANDROID_PACKAGE = "info\.nothingserious\.quests\.staging"/);
   assert.match(html, /event\.preventDefault\(\)/);
   assert.match(html, /openIosChain\(index \+ 1\)/);
-  assert.match(html, /property="og:url" content="https:\/\/invite-staging\.thequestsapp\.com\/q\/AbCd2345(\?r=\d+)?"/);
+  assert.match(html, /property="og:url" content="https:\/\/invite-staging\.thequestsapp\.com\/q\/AbCd2345"/);
 });
 
 test("staging host app-only panel keeps its primary control without a build-specific prompt", async () => {

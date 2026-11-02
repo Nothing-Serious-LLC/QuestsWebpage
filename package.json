@@ -8,6 +8,8 @@
     "test": "node --test tests/*.test.mjs",
     "check:seo-boundaries": "node scripts/check-seo-boundaries.mjs",
     "audit:seo-live": "node scripts/audit-seo-live.mjs",
-    "report:seo": "node scripts/seo-scorecard.mjs"
+    "report:seo": "node scripts/seo-scorecard.mjs",
+    "check:invite-links": "node scripts/invite-links.mjs check",
+    "sync:invite-links": "node scripts/invite-links.mjs sync"
   }
 }

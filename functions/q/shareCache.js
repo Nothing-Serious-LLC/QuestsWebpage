@@ -26,8 +26,16 @@ const CACHED_AT_HEADER = "X-Quest-Cached-At";
 const STORED_CACHE_CONTROL =
   `public, max-age=${SHARE_EDGE_TTL_SECONDS + SHARE_STALE_SECONDS}`;
 
+// Alias redirects (301 to a successor's canonical URL) share the same short
+// edge policy as joinable pages, so a printed QR on a retired code does not
+// reach the backend on every scan; max-age=0 keeps browsers from pinning it.
 export function isShareEdgeCacheable(response) {
-  if (!response || response.status !== 200) return false;
+  if (!response) return false;
+  if (response.status === 301) {
+    if (!response.headers.get("Location")) return false;
+  } else if (response.status !== 200) {
+    return false;
+  }
   if (response.headers.has("Set-Cookie")) return false;
   return response.headers.get("Cache-Control") === SHARE_PUBLIC_CACHE_CONTROL;
 }
@@ -113,9 +121,12 @@ function schedule(promise, waitUntil) {
 
 // produce(method) renders the live response for the given method. The cache
 // layer always renders "GET" for the stored copy and strips the body for HEAD.
+// cacheKeyUrl lets the route collapse request variants (for example every
+// ?r= value on a share page) onto one stored copy; it defaults to the URL.
 export async function withShareEdgeCache({
   request,
   produce,
+  cacheKeyUrl,
   waitUntil,
   cache = defaultCache(),
   now = Date.now,
@@ -128,7 +139,7 @@ export async function withShareEdgeCache({
     return withStatus(await produce("GET"), method, "BYPASS", null);
   }
 
-  const key = new Request(request.url, { method: "GET" });
+  const key = new Request(cacheKeyUrl || request.url, { method: "GET" });
 
   let stored = null;
   try {

@@ -78,7 +78,13 @@ export function normalizeQuestSharePresentation(raw, { supabaseUrl = "" } = {}) 
   if (!QUEST_SHARE_PRESENTATION_VERSIONS.has(presentationVersion)) return null;
 
   if (raw.revision == null) return null;
-  const revision = positiveInteger(raw.revision, Number.MAX_SAFE_INTEGER);
+  // quest-share-web echoes a requested revision in "revision" for deployed
+  // sites that pin it and reports the real one in "currentRevision"; the
+  // og cache key must follow the current revision.
+  const revision = positiveInteger(
+    raw.currentRevision ?? raw.revision,
+    Number.MAX_SAFE_INTEGER,
+  );
   if (revision == null) return null;
 
   const title = boundedText(raw.title, QUEST_TITLE_LIMIT);

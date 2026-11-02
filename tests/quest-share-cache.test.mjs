@@ -214,49 +214,59 @@ test("unavailable (404) and transient failure (legacy) responses stay no-store a
   assert.equal(cache.log.puts, 0);
 });
 
-test("preview image: 200 PNG is cached, pinned 404 is not, revision-zero fallback follows the upstream reason", async () => {
+test("preview image: r is a cache key only, every value gets current art, an unpublished link gets the fallback", async () => {
   const cache = memoryCache();
   const background = [];
   const png = new Uint8Array([137, 80, 78, 71]);
+  const bodies = [];
+  let published = true;
   const { result, calls } = await withEdge(
     async (_url, init) => {
-      const body = JSON.parse(init.body);
-      if (body.revision === 9) {
-        return new Response(png, { status: 200, headers: { "Content-Type": "image/png", "Content-Length": "4" } });
-      }
-      if (body.revision === 4) return Response.json({ code: "unavailable" }, { status: 404 });
-      return Response.json({ code: "unavailable" }, { status: 404 });
+      bodies.push(JSON.parse(init.body));
+      return published
+        ? new Response(png, { status: 200, headers: { "Content-Type": "image/png", "Content-Length": "4" } })
+        : Response.json({ code: "unavailable" }, { status: 404 });
     },
     async () => {
       installCache(cache);
-      const pinnedMiss = await onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=9", background }));
+      const r9Miss = await onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=9", background }));
       await Promise.all(background);
-      const pinnedHit = await onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=9", background }));
-      const pinnedMissing = await onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=4", background }));
+      const r9Hit = await onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=9", background }));
+      const r4 = await onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=4", background }));
+      await Promise.all(background);
+      published = false;
       const fallback = await onRequest(context({ path: ["AbCd2345", "og.png"], background }));
       await Promise.all(background);
-      const fallbackHit = await onRequest(context({ path: ["AbCd2345", "og.png"], background }));
-      return { pinnedMiss, pinnedHit, pinnedMissing, fallback, fallbackHit };
+      const garbage = await onRequest(context({ path: ["AbCd2345", "og.png"], search: "?r=zz", background }));
+      return { r9Miss, r9Hit, r4, fallback, garbage };
     },
   );
 
-  assert.equal(result.pinnedMiss.status, 200);
-  assert.equal(result.pinnedMiss.headers.get("Cache-Control"), SHARE_PUBLIC_CACHE_CONTROL);
-  assert.equal(result.pinnedMiss.headers.get(SHARE_CACHE_STATUS_HEADER), "MISS");
-  assert.equal(result.pinnedHit.headers.get(SHARE_CACHE_STATUS_HEADER), "HIT");
-  assert.equal(result.pinnedHit.headers.get("Content-Type"), "image/png");
-  assert.deepEqual(new Uint8Array(await result.pinnedHit.arrayBuffer()), png);
+  assert.equal(result.r9Miss.status, 200);
+  assert.equal(result.r9Miss.headers.get("Cache-Control"), SHARE_PUBLIC_CACHE_CONTROL);
+  assert.equal(result.r9Miss.headers.get(SHARE_CACHE_STATUS_HEADER), "MISS");
+  assert.equal(result.r9Hit.headers.get(SHARE_CACHE_STATUS_HEADER), "HIT");
+  assert.deepEqual(new Uint8Array(await result.r9Hit.arrayBuffer()), png);
 
-  assert.equal(result.pinnedMissing.status, 404);
-  assert.equal(result.pinnedMissing.headers.get("Cache-Control"), "no-store");
+  // An older or pruned revision on the image URL still answers with the
+  // current artwork under its own cache key.
+  assert.equal(result.r4.status, 200);
+  assert.deepEqual(new Uint8Array(await result.r4.arrayBuffer()), png);
 
   assert.equal(result.fallback.status, 200);
   assert.equal(result.fallback.headers.get("Cache-Control"), SHARE_PUBLIC_CACHE_CONTROL);
   assert.equal(result.fallback.headers.get("Content-Length"), String(FALLBACK_PNG.length));
-  assert.equal(result.fallbackHit.headers.get(SHARE_CACHE_STATUS_HEADER), "HIT");
+  // A malformed r collapses onto the bare image key instead of 404ing.
+  assert.equal(result.garbage.status, 200);
+  assert.equal(result.garbage.headers.get(SHARE_CACHE_STATUS_HEADER), "HIT");
 
+  assert.ok(bodies.every((body) => !("revision" in body)));
   assert.equal(calls(), 3);
-  assert.equal(cache.entries.size, 2);
+  assert.deepEqual([...cache.entries.keys()].sort(), [
+    "https://invite.thequestsapp.com/q/AbCd2345/og.png",
+    "https://invite.thequestsapp.com/q/AbCd2345/og.png?r=4",
+    "https://invite.thequestsapp.com/q/AbCd2345/og.png?r=9",
+  ]);
 });
 
 test("stale copy is served once past the TTL while a refresh runs in the background", async () => {

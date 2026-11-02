@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "repository": "Quests-Improve-Together-App/Quests",
+    "path": "campaigns/registry.json",
+    "commit": "c9b3eb20164a0607494b7bb08a612443ae59ec1b",
+    "sha256": "badca22800124ef47dbfb47268197cc1a848dd0646febdf3d067f77495a308e2"
+  },
+  "inviteOrigin": "https://invite.thequestsapp.com",
+  "campaigns": [
+    {
+      "id": "2026-11-tcaf-go-nuts",
+      "challengeName": "Go Nuts November",
+      "shareCode": "fvMz9mhk",
+      "canonicalUrl": "https://invite.thequestsapp.com/q/fvMz9mhk",
+      "status": "live",
+      "supersededCodes": [
+        {
+          "code": "hf9vuqGB",
+          "serverAlias": "proposed"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-musella-no-shave",
+      "challengeName": "No Shave November",
+      "shareCode": "JWfaB7wu",
+      "canonicalUrl": "https://invite.thequestsapp.com/q/JWfaB7wu",
+      "status": "live",
+      "supersededCodes": []
+    },
+    {
+      "id": "2026-10-quests-sober-october",
+      "challengeName": "Sober October",
+      "shareCode": "kqkHT9GV",
+      "canonicalUrl": "https://invite.thequestsapp.com/q/kqkHT9GV",
+      "status": "live",
+      "supersededCodes": [
+        {
+          "code": "zRgtzzZn",
+          "serverAlias": "none"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-quests-no-shave",
+      "challengeName": "No Shave November",
+      "shareCode": "hf9vuqGB",
+      "canonicalUrl": "https://invite.thequestsapp.com/q/hf9vuqGB",
+      "status": "retired",
+      "supersededCodes": []
+    }
+  ]
+}
