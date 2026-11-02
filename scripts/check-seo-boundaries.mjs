@@ -5,8 +5,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-// Preserve separately merged releases #22, #23 and #24 before this SEO batch.
-const base = '652d2e14f80b41cd47657184b7815b13ad5f6577';
+// Preserve separately merged releases through #29 before this SEO batch.
+const base = '95386ad975cf59a7b0f41bb9bf50529a67bf02b9';
 const protectedPaths = [
   'index.html', 'css/landing.css', 'css/tokens.css', 'css/fonts.css',
   'js/landing.js', 'js/clean-urls.js', 'assets',
@@ -15,7 +15,7 @@ const protectedPaths = [
   'functions', '.well-known', '_headers', '_redirects', '_routes.json', 'CNAME', 'robots.txt',
   'QuestCard.pass', 'QuestCard.pkpass', 'fix-and-rebuild-pass.py',
   'subscribe-app.js', 'subscribe-boot.js', 'q/index.html',
-  'privacy.html', 'terms.html', 'health-privacy.html',
+  'privacy.html', 'terms.html', 'health-privacy.html', 'business-health',
 ];
 const files = execFileSync('git', ['ls-tree', '-r', '--name-only', base], { cwd: root, encoding: 'utf8' })
   .trim().split('\n').filter(file => file.endsWith('.sh') || protectedPaths.some(path => file === path || file.startsWith(`${path}/`)));
