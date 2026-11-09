@@ -8,7 +8,7 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog</loc>
-    <lastmod>2026-11-02</lastmod>
+    <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -169,7 +169,7 @@
   <url><loc>https://thequestsapp.com/blog/habit-tracker-vs-challenge-app</loc><lastmod>2026-10-20</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/accountability-agreement-template</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/habit-cues-and-context</loc><lastmod>2026-10-08</lastmod></url>
-  <url><loc>https://thequestsapp.com/blog/fair-group-challenge-rules</loc><lastmod>2026-10-19</lastmod></url>
+  <url><loc>https://thequestsapp.com/blog/fair-group-challenge-rules</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/weekly-habit-review</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/progress-monitoring-habits</loc><lastmod>2026-10-19</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/start-your-first-quest</loc><lastmod>2026-10-08</lastmod></url>
@@ -181,7 +181,7 @@
   <url><loc>https://thequestsapp.com/blog/write-supportive-reminder-messages</loc><lastmod>2026-10-12</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/move-ember-with-friends</loc><lastmod>2026-11-02</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/record-a-habit-baseline</loc><lastmod>2026-10-19</lastmod></url>
-  <url><loc>https://thequestsapp.com/blog/calculate-challenge-completion-rates</loc><lastmod>2026-10-19</lastmod></url>
+  <url><loc>https://thequestsapp.com/blog/calculate-challenge-completion-rates</loc><lastmod>2026-11-09</lastmod></url>
   <url>
     <loc>https://thequestsapp.com/blog/quests-vs-finch</loc>
     <lastmod>2026-10-20</lastmod>
@@ -200,4 +200,5 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url><loc>https://thequestsapp.com/blog/welcome-someone-joining-a-challenge-late</loc><lastmod>2026-11-09</lastmod></url>
 </urlset>
