@@ -75,6 +75,29 @@ test('the campaign shares its clean canonical and retains every live invite dest
   assert.equal(manifest.canonical, 'https://thequestsapp.com/blog/sober-october-with-friends');
 });
 
+test('the Go Nuts November guide keeps its clean canonical, live invite destination and cutoff', () => {
+  const html = readFileSync(new URL('blog/go-nuts-november.html', root), 'utf8');
+  assert.ok(html.includes('rel="canonical" href="https://thequestsapp.com/blog/go-nuts-november"'));
+  assert.equal((html.match(/href="https:\/\/invite\.thequestsapp\.com\/q\/fvMz9mhk" data-event-invite data-event-cutoff="2026-12-01T04:59:00Z"/g) || []).length, 2);
+  assert.ok(!/[–—]/.test(html));
+});
+
+test('the retired Move-ember address forwards to the Go Nuts November guide and stays out of the index', () => {
+  const html = readFileSync(new URL('blog/move-ember-with-friends.html', root), 'utf8');
+  assert.ok(html.includes('<meta name="robots" content="noindex">'));
+  assert.ok(html.includes('rel="canonical" href="https://thequestsapp.com/blog/go-nuts-november"'));
+  assert.ok(html.includes('<meta http-equiv="refresh" content="0; url=/blog/go-nuts-november">'));
+  const redirects = [];
+  vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], { window: { location: { replace: value => redirects.push(value) } } });
+  assert.deepEqual(redirects, ['/blog/go-nuts-november']);
+  const sitemap = readFileSync(new URL('sitemap.xml', root), 'utf8');
+  assert.ok(!sitemap.includes('move-ember'));
+  assert.ok(sitemap.includes('<loc>https://thequestsapp.com/blog/go-nuts-november</loc>'));
+  const journal = readFileSync(new URL('blog.html', root), 'utf8');
+  assert.ok(!/move-ember/i.test(journal));
+  assert.ok(journal.includes('href="/blog/go-nuts-november"'));
+});
+
 test('the blog directory alias preserves query and fragment when forwarding', () => {
   const html = readFileSync(new URL('blog/index.html', root), 'utf8');
   const inline = html.match(/<script>([\s\S]*?)<\/script>/)[1];
