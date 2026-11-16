@@ -70,13 +70,7 @@
     Promise.race([Promise.all([minHold, fontsIn, screenIn]), cap]).then(ready, ready);
   }
 
-  /* ---- Download goes straight to the store for this device. ---- */
-  var storeLinks = document.querySelectorAll('[data-store-link]');
-  if (storeLinks.length && /android/i.test(navigator.userAgent)) {
-    Array.prototype.forEach.call(storeLinks, function (a) {
-      a.href = 'https://play.google.com/store/apps/details?id=info.nothingserious.quests';
-    });
-  }
+  /* Device-aware downloads are owned by /js/device-download.mjs. */
 
   /* ---- Reviews marquee. One clock, every card. Each card sits in the flex
      track at its natural x and is translated left by a shared offset; once a

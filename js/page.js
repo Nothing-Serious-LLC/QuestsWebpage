@@ -11,13 +11,7 @@
 
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---- Download goes straight to the store for this device. ---- */
-  var storeLinks = document.querySelectorAll('[data-store-link]');
-  if (storeLinks.length && /android/i.test(navigator.userAgent)) {
-    Array.prototype.forEach.call(storeLinks, function (a) {
-      a.href = 'https://play.google.com/store/apps/details?id=info.nothingserious.quests';
-    });
-  }
+  /* Device-aware downloads are owned by /js/device-download.mjs. */
 
   /* ---- Backdrop glyphs ride the scroll at a fraction of its speed. ---- */
   var backdrop = document.querySelector('.backdrop');
