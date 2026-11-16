@@ -106,10 +106,13 @@ export function questPhoneClaimScript({
       return digits.length === 10 ? "+1" + digits : null;
     }
 
-    function setError(message) {
+    // Only an error about the number itself marks the field invalid (the red
+    // outline). Rate limits, verification and availability errors show their
+    // message and leave the number unmarked.
+    function setError(message, isNumberError) {
       error.textContent = message || "";
       error.hidden = !message;
-      input.setAttribute("aria-invalid", message ? "true" : "false");
+      input.setAttribute("aria-invalid", message && isNumberError ? "true" : "false");
     }
 
     function updateButton() {
@@ -167,6 +170,12 @@ export function questPhoneClaimScript({
       return "Something went wrong. Try again.";
     }
 
+    // /api/link-claims/start answers 400 invalid_phone when it cannot use the
+    // number; every other code is about the Quest, the visitor or the service.
+    function isNumberErrorResponse(status, body) {
+      return status === 400 && Boolean(body) && body.error === "invalid_phone";
+    }
+
     var lastPhoneValue = "";
     input.addEventListener("input", function () {
       var previous = input.value;
@@ -191,7 +200,7 @@ export function questPhoneClaimScript({
       if (submitting) return;
       var phone = normalizedPhone();
       if (!phone) {
-        setError("Enter a valid 10-digit phone number.");
+        setError("Enter a valid 10-digit phone number.", true);
         input.focus();
         return;
       }
@@ -224,7 +233,10 @@ export function questPhoneClaimScript({
         });
       }).then(function (result) {
         if (!result.ok) {
-          setError(responseErrorMessage(result.status, result.body, result.headers));
+          setError(
+            responseErrorMessage(result.status, result.body, result.headers),
+            isNumberErrorResponse(result.status, result.body)
+          );
           resetChallenge();
           return;
         }

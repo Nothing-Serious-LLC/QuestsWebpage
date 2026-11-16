@@ -4,7 +4,7 @@ import test from 'node:test';
 import vm from 'node:vm';
 import { questPhoneClaimScript } from '../functions/q/phoneClaimScript.js';
 
-function formHarness({ userAgent = 'iPhone', maxTouchPoints = 1, responseStatus = 200, hasToken = true, demoMode = false } = {}) {
+function formHarness({ userAgent = 'iPhone', maxTouchPoints = 1, responseStatus = 200, responseBody, hasToken = true, demoMode = false, fetchFails = false } = {}) {
   const elements = new Map();
   const requests = [];
   const timers = [];
@@ -17,7 +17,7 @@ function formHarness({ userAgent = 'iPhone', maxTouchPoints = 1, responseStatus 
       style: {}, classes: new Set(),
       classList: {add(name) { element(id).classes.add(name); }},
       getBoundingClientRect() { return {height:160}; },
-      setAttribute() {}, focus() {},
+      attributes: {}, setAttribute(name, value) { this.attributes[name] = String(value); }, focus() {},
       setSelectionRange(start) { this.selectionStart = start; },
     });
     return elements.get(id);
@@ -29,7 +29,9 @@ function formHarness({ userAgent = 'iPhone', maxTouchPoints = 1, responseStatus 
     setTimeout(fn, delay) { timers.push(fn); timerDelays.push(delay); }, clearTimeout() {}, setInterval() {}, clearInterval() {},
     fetch: async (url, options) => {
       requests.push({ url, body: JSON.parse(options.body) });
-      return { ok: responseStatus === 200, status: responseStatus, json: async () => (responseStatus === 200 ? { status: 'PENDING' } : { error: 'quest_unavailable' }), headers: { get() {} } };
+      if (fetchFails) throw new TypeError('network down');
+      const body = responseBody ?? (responseStatus === 200 ? { status: 'PENDING' } : { error: 'quest_unavailable' });
+      return { ok: responseStatus === 200, status: responseStatus, json: async () => body, headers: { get() {} } };
     },
   };
   vm.runInNewContext(questPhoneClaimScript({
@@ -80,6 +82,52 @@ for (const options of [{responseStatus:403},{responseStatus:429},{hasToken:false
     assert.equal(h.element('phone-error').hidden, false);
     assert.equal(h.element('quest-stage').classes.has('is-complete'), false);
     assert.equal(h.context.window.location.href, undefined);
+  });
+}
+
+test('a Join error about the number outlines the field in red', async () => {
+  const h = formHarness({ responseStatus: 400, responseBody: { error: 'invalid_phone' } });
+  h.enter('2025550142');
+  assert.equal(h.input.attributes['aria-invalid'], 'false');
+  await h.submit();
+  assert.equal(h.requests.length, 1);
+  assert.equal(h.element('phone-error').textContent, 'Enter a valid phone number.');
+  assert.equal(h.element('phone-error').hidden, false);
+  assert.equal(h.input.attributes['aria-invalid'], 'true');
+  h.enter('(202) 555-014');
+  assert.equal(h.input.attributes['aria-invalid'], 'false');
+  assert.equal(h.element('phone-error').hidden, true);
+});
+
+test('typing an incomplete number leaves the field unmarked until Join', async () => {
+  const h = formHarness();
+  for (const value of ['2', '202555', '202555014']) {
+    h.enter(value);
+    assert.equal(h.input.attributes['aria-invalid'], 'false');
+  }
+  await h.submit();
+  assert.equal(h.requests.length, 0);
+  assert.equal(h.element('phone-error').textContent, 'Enter a valid 10-digit phone number.');
+  assert.equal(h.input.attributes['aria-invalid'], 'true');
+});
+
+for (const [name, options, message] of [
+  ['a rate limit', { responseStatus: 429, responseBody: { error: 'rate_limited', retryAfter: 300 } }, 'Too many attempts. Try again in 5 minutes.'],
+  ['a failed verification', { responseStatus: 403, responseBody: { error: 'turnstile_failed' } }, 'Verification failed. Try again.'],
+  ['an unavailable Quest', { responseStatus: 409, responseBody: { error: 'quest_unavailable' } }, 'This Quest is unavailable.'],
+  ['a missing Quest', { responseStatus: 404, responseBody: { error: 'quest_not_found' } }, 'This Quest is unavailable.'],
+  ['a service outage', { responseStatus: 503, responseBody: { error: 'service_unavailable' } }, 'Joining is temporarily unavailable. Try again.'],
+  ['a server error', { responseStatus: 500, responseBody: { error: 'internal_error' } }, 'Something went wrong. Try again.'],
+  ['a network failure', { fetchFails: true }, 'Something went wrong. Try again.'],
+  ['a verification still loading', { hasToken: false }, 'Verification is getting ready. Try again in a moment.'],
+]) {
+  test(`${name} shows its message and leaves the number unmarked`, async () => {
+    const h = formHarness(options);
+    h.enter('2025550142');
+    await h.submit();
+    assert.equal(h.element('phone-error').textContent, message);
+    assert.equal(h.element('phone-error').hidden, false);
+    assert.equal(h.input.attributes['aria-invalid'], 'false');
   });
 }
 

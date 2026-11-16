@@ -1327,3 +1327,21 @@ test("Profile route keeps its primary control without a build-specific prompt on
   assert.match(production, new RegExp(`href="info\\.nothingserious\\.quests://p/${profileCode}">Open in the app`));
   assert.doesNotMatch(production, /quests-staging/);
 });
+
+test("joinable page paints the disabled Join Quest button opaque and needs no icon font", async () => {
+  const presentation = await fixture("quest-share-upcoming.json");
+  const response = await withFetch(
+    async () => Response.json(presentation, { status: 200 }),
+    () => onRequest(context()),
+  );
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  const disabledRule = /\.join-button:disabled \{([^}]*)\}/.exec(html);
+  assert.ok(disabledRule, "disabled Join Quest rule present");
+  assert.doesNotMatch(disabledRule[1], /opacity/);
+  assert.match(disabledRule[1], /background: #979690/);
+  assert.doesNotMatch(html, /materialdesignicons/);
+  assert.doesNotMatch(html, /class="mdi /);
+  assert.match(html, /<div class="check-in-rule"><svg class="check-in-icon"[^>]*><path fill="currentColor" d="M19 3H18V1H16V3H8V1/);
+  assert.match(html, /\.phone-number-field:has\(\.phone-input\[aria-invalid="true"\]\) \{ border-color: #b74040; \}/);
+});
