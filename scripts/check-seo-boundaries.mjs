@@ -5,8 +5,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-// Preserve the verified production release, including the desktop QR handoff.
-const base = 'cf3a46ab567e7e9e3ec5174f0cc64973c7359807';
+// Preserve independently merged PR 31 and its verified November 16 production release.
+const base = '96ea3086f236986fae9a4759c88068edf06f3933';
 const protectedPaths = [
   'index.html', 'css', 'js',
   'js/landing.js', 'js/clean-urls.js', 'js/device-download.mjs',

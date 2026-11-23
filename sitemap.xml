@@ -8,7 +8,7 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog</loc>
-    <lastmod>2026-11-16</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -44,7 +44,7 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog/step-challenge-with-friends</loc>
-    <lastmod>2026-11-02</lastmod>
+    <lastmod>2026-11-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -56,7 +56,7 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog/no-sugar-challenge</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -74,7 +74,7 @@
   </url>
   <url>
     <loc>https://thequestsapp.com/blog/workplace-wellness-challenge</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -202,4 +202,8 @@
   </url>
   <url><loc>https://thequestsapp.com/blog/welcome-someone-joining-a-challenge-late</loc><lastmod>2026-11-09</lastmod></url>
   <url><loc>https://thequestsapp.com/blog/resolve-different-goals-in-a-shared-challenge</loc><lastmod>2026-11-16</lastmod></url>
+  <url>
+    <loc>https://thequestsapp.com/blog/a-creative-practice-group-for-remote-colleagues</loc>
+    <lastmod>2026-11-23</lastmod>
+  </url>
 </urlset>
